@@ -13,31 +13,14 @@
 // #pragma comment (lib, "Mswsock.lib")
 #pragma warning(disable : 4996)
 
-#define DEFAULT_BUFLEN	2048
+#define DEFAULT_BUFLEN	128
 #define DEFAULT_PORT	"80"
 
-bool readFile(const char* file_name, char* in_buff, int len)
-{
-	FILE* fp = fopen(file_name, "r"); // read mode
-
-	if (fp == NULL) {
-		perror("Error while opening the file.\n");
-		return false;
-	}
-
-	memset(in_buff, '\0', len);
-
-	char ch;
-	while ((ch = fgetc(fp)) != EOF) {
-		*in_buff++ = ch;
-		if (--len == 0) {
-			break;
-		}
-	}
-
-	fclose(fp);
-	return true;
-}
+enum HttpRequestTypeT {
+	Get = 0,
+	Post,
+	NotDefined
+};
 
 void parseCharValue(char* buff, const char* tag, int* value)
 {
@@ -61,25 +44,38 @@ void parseCharValue(char* buff, const char* tag, int* value)
 	}	
 }
 
-char* setButtonState(char *buff, bool enabled)
+void setButtonState(char* buff, bool enabled)
 {
 	if (buff == NULL) {
-		return buff;
+		return;
 	}
 
-	char* c = strstr(buff, "button1 button");
+	char* c = strstr(buff, " button");
 	if (c != NULL) {
-		c += 14;
+		c += 7;
 		*c = (enabled) ? '1' : '2';
 	}
+}
 
-	return c;
+void setVolumeLevel(char* buff, int volume)
+{
+	if (buff == NULL) {
+		return;
+	}
+
+	char* c = strstr(buff, "value=\"");
+	if (c != NULL) {
+		c += 7;
+		*c++ = (volume / 10) + 48;
+		*c = (volume % 10) + 48;
+	}
 }
 
 int handleConnection(int& volume, int& input, bool& auto_find)
 {
 	WSADATA wsaData;
 	int iResult;
+	int errorCode = 0;
 
 	SOCKET ListenSocket = INVALID_SOCKET;
 	SOCKET ClientSocket = INVALID_SOCKET;
@@ -90,14 +86,6 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
-	char txbuf[DEFAULT_BUFLEN];
-	int txbuflen = DEFAULT_BUFLEN;
-
-	if (!readFile("..\\index.html", txbuf, txbuflen)) {
-		//printf(recvbuf);
-		//printf("\r\n\r\nLen: %d bytes", strlen(recvbuf));
-		return 2;
-	}
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -161,76 +149,33 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	// No longer need server socket
 	closesocket(ListenSocket);
 
+	HttpRequestTypeT requestType = NotDefined;
+
 	// Receive until the peer shuts down the connection
 	do {
 		memset(recvbuf, '\0', recvbuflen);
-		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		iResult = recv(ClientSocket, recvbuf, recvbuflen - 1, 0);
 		if (iResult > 0) {
-			printf("\r\n");
-			printf("Bytes received: %d\n", iResult);
-			//printf(recvbuf);
-			printf("\r\n");
-
-			parseCharValue(recvbuf, "pot=", &volume);
-			if ((volume >= 0) && (volume < 100)) {
-				printf("Volume: %d\r\n", volume);
-			}
-			else {
-				return 2;
-			}
-
-			int temp_value = -1;
-			parseCharValue(recvbuf, "spdif=", &temp_value);
-
-			switch (temp_value) {
-			case 0:
-			case 1:
-			case 2:
-				input = temp_value;
+			//printf("\r\n");
+			//printf("Bytes received: %d\n", iResult);
+			printf(recvbuf);
+			if (strstr(recvbuf, "\r\n\r\n") != NULL) {
 				break;
-			case 3:
-				auto_find = !auto_find;
-				if (auto_find) {
-					input = (input + 1) % 3;
+			}
+
+			if (requestType == NotDefined) {
+				if (strstr(recvbuf, "GET") != NULL) {
+					requestType = Get;
+					if (strstr(recvbuf, "stop") != NULL) {
+						closesocket(ListenSocket);
+						WSACleanup();
+						return 2;
+					}
 				}
-				break;
-			default:
-				break;
+				else if (strstr(recvbuf, "POST") != NULL) {
+					requestType = Post;
+				}
 			}
-
-			char* c = setButtonState(txbuf, input == 0);
-			c = setButtonState(c, input == 1);
-			c = setButtonState(c, input == 2);
-			c = setButtonState(c, auto_find);
-			
-			c = strstr(txbuf, "value=\"");
-			if (c != NULL) {
-				c += 7;
-				*c++ = (volume / 10) + 48;
-				*c = (volume % 10) + 48;
-			}		
-
-			iSendResult = send(ClientSocket, txbuf, strlen(txbuf), 0);
-			if (iSendResult == SOCKET_ERROR) {
-				printf("send failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				return 1;
-			}
-			printf("Bytes sent: %d\n", iSendResult);
-			break;
-
-#if 0
-			// Echo the buffer back to the sender
-			iSendResult = send(ClientSocket, recvbuf, iResult, 0);
-			if (iSendResult == SOCKET_ERROR) {
-				printf("send failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				return 1;
-			}
-			printf("Bytes sent: %d\n", iSendResult);
-#endif
 		}
 		else if (iResult == 0)
 			printf("Connection closing...\n");
@@ -242,6 +187,89 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 		}
 
 	} while (iResult > 0);
+
+	// Parse input data
+	if (requestType == Post) {
+		parseCharValue(recvbuf, "pot=", &volume);
+		if ((volume >= 0) && (volume < 100)) {
+			printf("Volume: %d\r\n", volume);
+		}
+		else {
+			return 2;
+		}
+
+		int temp_value = -1;
+		parseCharValue(recvbuf, "spdif=", &temp_value);
+
+		switch (temp_value) {
+		case 0:
+		case 1:
+		case 2:
+			auto_find = false;
+			input = temp_value;
+			break;
+		case 3:
+			auto_find = !auto_find;
+			if (auto_find) {
+				input = (input + 1) % 3;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// Build up response to the client
+	memset(recvbuf, '\0', recvbuflen);
+
+	FILE* fp = fopen("..\\index.html", "r");
+	if (fp != NULL) {	
+		char ch;
+		char* wp = recvbuf;
+		int line = 0;
+		while ((ch = fgetc(fp)) != EOF) {
+			*wp++ = ch;
+			if (ch == '\n') {
+				// Process line		
+				++line;
+
+				switch(line) {
+				case 14:
+					setVolumeLevel(recvbuf, volume);
+					break;
+				case 17:
+					setButtonState(recvbuf, input == 0);
+					break;
+				case 18:
+					setButtonState(recvbuf, input == 1);
+					break;
+				case 19:
+					setButtonState(recvbuf, input == 2);
+					break;
+				case 20:
+					setButtonState(recvbuf, auto_find);
+					break;
+				default:
+					break;
+				}
+							
+				iSendResult = send(ClientSocket, recvbuf, strlen(recvbuf), 0);
+				if (iSendResult == SOCKET_ERROR) {
+					printf("send failed with error: %d\n", WSAGetLastError());
+					closesocket(ClientSocket);
+					WSACleanup();
+					errorCode = 1;
+					break;
+				}
+				//printf("Bytes sent: %d\n", iSendResult);
+				//printf(recvbuf);
+				memset(recvbuf, '\0', recvbuflen);
+				wp = recvbuf;
+			}
+		}
+	}
+
+	fclose(fp);
 
 	// shutdown the connection since we're done
 	iResult = shutdown(ClientSocket, SD_SEND);
@@ -256,7 +284,7 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	closesocket(ClientSocket);
 	WSACleanup();
 
-	return 0;
+	return errorCode;
 }
 
 int __cdecl main(void)
