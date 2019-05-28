@@ -91,9 +91,6 @@ void handleConnection(SOCKET ClientSocket)
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
 			printf(recvbuf);
-			if (strstr(recvbuf, "\r\n\r\n") != NULL) {
-				break;
-			}
 
 			if (requestType == NotDefined) {
 				if (strstr(recvbuf, "GET") != NULL) {
@@ -107,6 +104,10 @@ void handleConnection(SOCKET ClientSocket)
 				else if (strstr(recvbuf, "POST") != NULL) {
 					requestType = Post;
 				}
+			}
+
+			if (strstr(recvbuf, "\r\n\r\n") != NULL) {
+				break;
 			}
 		}
 		else if (iResult == 0)
@@ -154,7 +155,7 @@ void handleConnection(SOCKET ClientSocket)
 	// Build up response to the client
 	memset(recvbuf, '\0', recvbuflen);
 
-	FILE* fp = fopen("..\\index.html", "r");
+	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
 		char ch;
 		char* wp = recvbuf;
@@ -212,7 +213,7 @@ void handleConnection(SOCKET ClientSocket)
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
-
+    printf("Socket closed\n");
 	//return errorCode;
 }
 
@@ -222,7 +223,6 @@ int serverThread()
 	int iResult;
 
 	SOCKET ListenSocket = INVALID_SOCKET;
-	SOCKET ClientSocket = INVALID_SOCKET;
 
 	struct addrinfo* result = NULL;
 	struct addrinfo hints;
@@ -280,18 +280,33 @@ int serverThread()
 
     printf("TCP server started!\n\n");
 
-	while (true) {
-        // Accept a client socket
-        ClientSocket = accept(ListenSocket, NULL, NULL);
+    while (true) {
+        SOCKET ClientSocket = INVALID_SOCKET;
+        // Accept a Connection
+        while (ClientSocket == INVALID_SOCKET){
+            ClientSocket = accept(ListenSocket, NULL, NULL);
+        }
         std::thread t1(handleConnection, ClientSocket);
+        t1.join();
+    }
+#if 0
+	while (ListenSocket != NULL) {
+        // Accept a client socket
+        SOCKET ClientSocket = accept(ListenSocket, NULL, NULL);
         if (ClientSocket == INVALID_SOCKET) {
             printf("accept failed with error: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
-            WSACleanup();
-            return 1;
+            //closesocket(ListenSocket);
+            //WSACleanup();
+            //return 1;
+
+        } else {
+            printf("accept new connection\n");
+            std::thread t1(handleConnection, ClientSocket);
+            t1.join();
         }
 	}
-
+#endif
+	printf("server thread exit...\n");
 	// No longer need server socket
 	closesocket(ListenSocket);
 }
