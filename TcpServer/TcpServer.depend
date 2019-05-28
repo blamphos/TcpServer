@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1559059046 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+	<windows.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+

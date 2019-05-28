@@ -1,17 +1,13 @@
 #undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x501
 
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-// #pragma comment (lib, "Mswsock.lib")
-#pragma warning(disable : 4996)
 
 #define DEFAULT_BUFLEN	128
 #define DEFAULT_PORT	"80"
@@ -25,7 +21,7 @@ enum HttpRequestTypeT {
 void parseCharValue(char* buff, const char* tag, int* value)
 {
 	const int CHAR_BUFF_LEN = 3;
-	
+
 	char* c = strstr(buff, tag);
 	if (c != NULL) {
 		c += strlen(tag);
@@ -40,8 +36,8 @@ void parseCharValue(char* buff, const char* tag, int* value)
 
 		if (value != NULL) {
 			*value = atoi(str);
-		}		
-	}	
+		}
+	}
 }
 
 void setButtonState(char* buff, bool enabled)
@@ -111,7 +107,7 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	// Create a SOCKET for connecting to server
 	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (ListenSocket == INVALID_SOCKET) {
-		printf("socket failed with error: %ld\n", WSAGetLastError());
+		printf("socket failed with error: %d\n", WSAGetLastError());
 		freeaddrinfo(result);
 		WSACleanup();
 		return 1;
@@ -223,14 +219,14 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	memset(recvbuf, '\0', recvbuflen);
 
 	FILE* fp = fopen("..\\index.html", "r");
-	if (fp != NULL) {	
+	if (fp != NULL) {
 		char ch;
 		char* wp = recvbuf;
 		int line = 0;
 		while ((ch = fgetc(fp)) != EOF) {
 			*wp++ = ch;
 			if (ch == '\n') {
-				// Process line		
+				// Process line
 				++line;
 
 				switch(line) {
@@ -252,7 +248,7 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 				default:
 					break;
 				}
-							
+
 				iSendResult = send(ClientSocket, recvbuf, strlen(recvbuf), 0);
 				if (iSendResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
@@ -287,11 +283,17 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	return errorCode;
 }
 
-int __cdecl main(void)
+int main(void)
 {
 	static int volume = 26;
 	static int input = 0;
 	static bool auto_find = true;
+
+	FILE* fp = fopen("/local/index.html", "r");
+	if (fp == NULL) {
+        printf("File 'index.html' not found!\n");
+        return -1;
+	}
 
 	printf("TCP server started!\n\n");
 	while (handleConnection(volume, input, auto_find) == 0) {
