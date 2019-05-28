@@ -8,6 +8,8 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <conio.h>
+#include <thread>
 
 #define DEFAULT_BUFLEN	128
 #define DEFAULT_PORT	"80"
@@ -67,83 +69,17 @@ void setVolumeLevel(char* buff, int volume)
 	}
 }
 
-int handleConnection(int& volume, int& input, bool& auto_find)
+void handleConnection(SOCKET ClientSocket)
 {
-	WSADATA wsaData;
+    int volume = 26;
+    bool auto_find = true;
+    int input = 0;
+
 	int iResult;
 	int errorCode = 0;
-
-	SOCKET ListenSocket = INVALID_SOCKET;
-	SOCKET ClientSocket = INVALID_SOCKET;
-
-	struct addrinfo* result = NULL;
-	struct addrinfo hints;
-
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
-
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0) {
-		printf("WSAStartup failed with error: %d\n", iResult);
-		return 1;
-	}
-
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-
-	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-	if (iResult != 0) {
-		printf("getaddrinfo failed with error: %d\n", iResult);
-		WSACleanup();
-		return 1;
-	}
-
-	// Create a SOCKET for connecting to server
-	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (ListenSocket == INVALID_SOCKET) {
-		printf("socket failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(result);
-		WSACleanup();
-		return 1;
-	}
-
-	// Setup the TCP listening socket
-	iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		printf("bind failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(result);
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	freeaddrinfo(result);
-
-	iResult = listen(ListenSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR) {
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// Accept a client socket
-	ClientSocket = accept(ListenSocket, NULL, NULL);
-	if (ClientSocket == INVALID_SOCKET) {
-		printf("accept failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// No longer need server socket
-	closesocket(ListenSocket);
 
 	HttpRequestTypeT requestType = NotDefined;
 
@@ -162,11 +98,11 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 			if (requestType == NotDefined) {
 				if (strstr(recvbuf, "GET") != NULL) {
 					requestType = Get;
-					if (strstr(recvbuf, "stop") != NULL) {
+					/*if (strstr(recvbuf, "stop") != NULL) {
 						closesocket(ListenSocket);
 						WSACleanup();
 						return 2;
-					}
+					}*/
 				}
 				else if (strstr(recvbuf, "POST") != NULL) {
 					requestType = Post;
@@ -179,7 +115,7 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 			printf("recv failed with error: %d\n", WSAGetLastError());
 			closesocket(ClientSocket);
 			WSACleanup();
-			return 1;
+			return;
 		}
 
 	} while (iResult > 0);
@@ -191,7 +127,7 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 			printf("Volume: %d\r\n", volume);
 		}
 		else {
-			return 2;
+			return;
 		}
 
 		int temp_value = -1;
@@ -271,16 +207,93 @@ int handleConnection(int& volume, int& input, bool& auto_find)
 	iResult = shutdown(ClientSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
 		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(ClientSocket);
-		WSACleanup();
-		return 1;
 	}
 
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
 
-	return errorCode;
+	//return errorCode;
+}
+
+int serverThread()
+{
+	WSADATA wsaData;
+	int iResult;
+
+	SOCKET ListenSocket = INVALID_SOCKET;
+	SOCKET ClientSocket = INVALID_SOCKET;
+
+	struct addrinfo* result = NULL;
+	struct addrinfo hints;
+
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		printf("WSAStartup failed with error: %d\n", iResult);
+		return 1;
+	}
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+
+	// Resolve the server address and port
+	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+	if (iResult != 0) {
+		printf("getaddrinfo failed with error: %d\n", iResult);
+		WSACleanup();
+		return 1;
+	}
+
+	// Create a SOCKET for connecting to server
+	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	if (ListenSocket == INVALID_SOCKET) {
+		printf("socket failed with error: %d\n", WSAGetLastError());
+		freeaddrinfo(result);
+		WSACleanup();
+		return 1;
+	}
+
+	// Setup the TCP listening socket
+	iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+	if (iResult == SOCKET_ERROR) {
+		printf("bind failed with error: %d\n", WSAGetLastError());
+		freeaddrinfo(result);
+		closesocket(ListenSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	freeaddrinfo(result);
+
+	iResult = listen(ListenSocket, SOMAXCONN);
+	if (iResult == SOCKET_ERROR) {
+		printf("listen failed with error: %d\n", WSAGetLastError());
+		closesocket(ListenSocket);
+		WSACleanup();
+		return 1;
+	}
+
+    printf("TCP server started!\n\n");
+
+	while (true) {
+        // Accept a client socket
+        ClientSocket = accept(ListenSocket, NULL, NULL);
+        std::thread t1(handleConnection, ClientSocket);
+        if (ClientSocket == INVALID_SOCKET) {
+            printf("accept failed with error: %d\n", WSAGetLastError());
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+	}
+
+	// No longer need server socket
+	closesocket(ListenSocket);
 }
 
 int main(void)
@@ -295,9 +308,15 @@ int main(void)
         return -1;
 	}
 
-	printf("TCP server started!\n\n");
-	while (handleConnection(volume, input, auto_find) == 0) {
 
-	}
+    std::thread t1(serverThread);
+
+    getch();
+
+    // Makes the main thread wait for the new thread to finish execution, therefore blocks its own execution.
+    //t1.join();
+	/*while (handleConnection(volume, input, auto_find) == 0) {
+
+	}*/
 	return 0;
 }
