@@ -212,7 +212,7 @@ void handleConnection(SOCKET ClientSocket)
 
 	// cleanup
 	closesocket(ClientSocket);
-	WSACleanup();
+	//WSACleanup();
     printf("Socket closed\n");
 	//return errorCode;
 }
@@ -333,5 +333,6 @@ int main(void)
 	/*while (handleConnection(volume, input, auto_find) == 0) {
 
 	}*/
+	WSACleanup();
 	return 0;
 }
