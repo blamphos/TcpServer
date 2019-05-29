@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add library="Ws2_32" />
@@ -23,7 +24,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/Parameters.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Parameters.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

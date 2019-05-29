@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1559073252 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+1559146723 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
 	<windows.h>
 	<winsock2.h>
 	<ws2tcpip.h>
@@ -7,4 +7,10 @@
 	<stdio.h>
 	<conio.h>
 	<thread>
+	"Parameters.h"
+
+1559146665 source:c:\data\sw_dev\tcpserver\tcpserver\src\parameters.cpp
+	"Parameters.h"
+
+1559146972 c:\data\sw_dev\tcpserver\tcpserver\include\parameters.h
 

@@ -11,6 +11,8 @@
 #include <conio.h>
 #include <thread>
 
+#include "Parameters.h"
+
 #define DEFAULT_BUFLEN	128
 #define DEFAULT_PORT	"80"
 
