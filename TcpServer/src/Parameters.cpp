@@ -1,7 +1,7 @@
 #include "Parameters.h"
 
 Parameters::Parameters() :
-    _volume(0), _spdif_input(0), _auto_find(true)
+    _volume(0), _spdif_input(Spdif::Coax1), _auto_find(true)
 {
 
 }
@@ -16,12 +16,12 @@ int Parameters::getVolume()
     return _volume;
 }
 
-void Parameters::setSpdifInput(int input)
+void Parameters::setSpdifInput(Spdif::InputTypeT input)
 {
     _spdif_input = input;
 }
 
-int Parameters::getSpdifInput()
+Spdif::InputTypeT Parameters::getSpdifInput()
 {
     return _spdif_input;
 }
@@ -34,10 +34,4 @@ void Parameters::setAutoFind(bool state)
 bool Parameters::getAutoFind()
 {
     return _auto_find;
-}
-
-Parameters* Parameters::instance()
-{
-    static Parameters inst;
-    return &inst;
 }

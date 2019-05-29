@@ -12,6 +12,7 @@
 #include <thread>
 
 #include "Parameters.h"
+#include "SystemControl.h"
 
 #define DEFAULT_BUFLEN	128
 #define DEFAULT_PORT	"80"
@@ -73,12 +74,11 @@ void setVolumeLevel(char* buff, int volume)
 
 void handleConnection(SOCKET ClientSocket)
 {
-    int volume = 26;
-    bool auto_find = true;
-    int input = 0;
+    int volume = SystemControl::instance()->getVolume();
+    bool auto_find = SystemControl::instance()->getAutoFind();
+    int input = SystemControl::instance()->getSpdifInput();
 
 	int iResult;
-	int errorCode = 0;
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
@@ -128,6 +128,7 @@ void handleConnection(SOCKET ClientSocket)
 		parseCharValue(recvbuf, "pot=", &volume);
 		if ((volume >= 0) && (volume < 100)) {
 			printf("Volume: %d\r\n", volume);
+			SystemControl::instance()->onVolumeChanged(volume);
 		}
 		else {
 			return;
@@ -142,17 +143,20 @@ void handleConnection(SOCKET ClientSocket)
 		case 2:
 			auto_find = false;
 			input = temp_value;
+			SystemControl::instance()->onInputChanged(static_cast<Spdif::InputTypeT>(input));
 			break;
 		case 3:
 			auto_find = !auto_find;
-			if (auto_find) {
+			/*if (auto_find) {
 				input = (input + 1) % 3;
-			}
+			}*/
 			break;
 		default:
 			break;
 		}
 	}
+
+    SystemControl::instance()->setAutoFind(auto_find);
 
 	// Build up response to the client
 	memset(recvbuf, '\0', recvbuflen);
@@ -193,7 +197,6 @@ void handleConnection(SOCKET ClientSocket)
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
 					WSACleanup();
-					errorCode = 1;
 					break;
 				}
 				//printf("Bytes sent: %d\n", iSendResult);
@@ -315,26 +318,16 @@ int serverThread()
 
 int main(void)
 {
-	static int volume = 26;
-	static int input = 0;
-	static bool auto_find = true;
-
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp == NULL) {
         printf("File 'index.html' not found!\n");
         return -1;
 	}
 
-
     std::thread t1(serverThread);
 
     getch();
 
-    // Makes the main thread wait for the new thread to finish execution, therefore blocks its own execution.
-    //t1.join();
-	/*while (handleConnection(volume, input, auto_find) == 0) {
-
-	}*/
 	WSACleanup();
 	return 0;
 }
