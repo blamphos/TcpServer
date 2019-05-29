@@ -24,9 +24,11 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/HttpServer.h" />
 		<Unit filename="include/Parameters.h" />
 		<Unit filename="include/SystemControl.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
 		<Extensions>
