@@ -3,34 +3,36 @@ Connection: close
 
 <!DOCTYPE html>
 <html><head><link rel="icon" href="data:,">
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GEVOL 3.0</title>
-<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}
+<style>* { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; display: inline-block; }
 .button1 { background-color: #195B6A; border: none; color: white; padding: 8px 8px; width: 100px;
 text-decoration: none; font-size: 18px; margin: 2px; cursor: pointer;}
-.button2 {background-color: #77878A;}</style></head>
-<body><h3>VOLUME</h3>
-<FORM action="/" method="post" id="form">
-<p><input type="range" name="pot" min="0" max="99" value="00" class="slider" id="myRange">
-<p>Level: <span id="vol"></span><p>
-<hr><h3>SPDIF INPUT</h3>
+.button2 {background-color: #77878A;}
+header {background-color: #666;padding: 2px; text-align: center; font-size: 16px; color: white;}
+article {float: left; padding: 20px; background-color: #f1f1f1;}
+section:after {content: ""; display: table; clear: both;}
+.slidecontainer {width: 100%;}
+.slider {-webkit-appearance: none; width: 210px; height: 25px; background: #d3d3d3; outline: none; 
+opacity: 0.7; -webkit-transition: .2s; transition: opacity .2s;}
+.slider:hover {opacity: 1;}
+.slider::-webkit-slider-thumb {-webkit-appearance: none; appearance: none; width: 25px; height: 
+25px; background: #4CAF50; cursor: pointer;}
+.slider::-moz-range-thumb {width: 25px; height: 25px; background: #4CAF50; cursor: pointer;}
+</style></head><body><header><h2>GEVOL 3.0</h2></header>
+<section><article><p><h3>VOLUME: <span id="vol"></span></h3></p>
+<FORM action="/" method="post" id="form"><p><div class="slidecontainer">
+<input type="range" name="pot" min="0" max="99" value="00" class="slider" id="myRange"></div>    
+<h3>SPDIF INPUT</h3>
 <p><button name="spdif" id="coax1" class="button1 button2" value="0">COAX1</button>
 <button name="spdif" id="coax2" class="button1 button2" value="1">COAX2</button></p>
 <p><button name="spdif" id="opt1" class="button1 button2" value="2">OPT1</button>
 <button name="spdif" id="auto" class="button1 button2" value="3">AUTO</button></p>
-</p></FORM>
-<script>
+</p></FORM><script>
 var slider = document.getElementById("myRange");
 var output = document.getElementById("vol");
-
 output.innerHTML = +slider.value;
-
-slider.oninput = function() {
-  output.innerHTML = this.value;
-}
-
-slider.onmouseup = function () {
-  document.getElementById("form").submit();
-}
-</script>
-</body></html>
+slider.oninput = function() {output.innerHTML = this.value;}
+slider.onchange = function () {document.getElementById("form").submit();}
+</script></article></section></body></html>

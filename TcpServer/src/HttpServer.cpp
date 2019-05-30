@@ -82,20 +82,19 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 	// Receive until the peer shuts down the connection
 	do {
 		memset(recvbuf, '\0', recvbuflen);
-		iResult = recv(ClientSocket, recvbuf, recvbuflen - 1, 0);
+		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
-			printf(recvbuf);
+			//printf(recvbuf);
+			for (int i = 0; i < strlen(recvbuf); ++i) {
+                //printf("%02X ", recvbuf[i]);
+                printf("%c", recvbuf[i]);
+			}
 
 			if (requestType == NotDefined) {
 				if (strstr(recvbuf, "GET") != NULL) {
 					requestType = Get;
-					/*if (strstr(recvbuf, "stop") != NULL) {
-						closesocket(ListenSocket);
-						WSACleanup();
-						return 2;
-					}*/
 				}
 				else if (strstr(recvbuf, "POST") != NULL) {
 					requestType = Post;
@@ -103,6 +102,7 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 			}
 
 			if (strstr(recvbuf, "\r\n\r\n") != NULL) {
+                //printf("HTTP header received\n");
 				break;
 			}
 		}
@@ -111,7 +111,7 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
 			closesocket(ClientSocket);
-			WSACleanup();
+			//WSACleanup();
 			return;
 		}
 
@@ -141,9 +141,6 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 			break;
 		case 3:
 			auto_find = !auto_find;
-			/*if (auto_find) {
-				input = (input + 1) % 3;
-			}*/
 			break;
 		default:
 			break;
@@ -167,19 +164,19 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 				++line;
 
 				switch(line) {
-				case 14:
+				case 26:
 					setVolumeLevel(recvbuf, volume);
 					break;
-				case 17:
+				case 28:
 					setButtonState(recvbuf, input == 0);
 					break;
-				case 18:
+				case 29:
 					setButtonState(recvbuf, input == 1);
 					break;
-				case 19:
+				case 30:
 					setButtonState(recvbuf, input == 2);
 					break;
-				case 20:
+				case 31:
 					setButtonState(recvbuf, auto_find);
 					break;
 				default:
@@ -209,11 +206,7 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 		printf("shutdown failed with error: %d\n", WSAGetLastError());
 	}
 
-	// cleanup
 	closesocket(ClientSocket);
-	//WSACleanup();
-    printf("Socket closed\n");
-	//return errorCode;
 }
 
 int HttpServer::serverThreadImp()
