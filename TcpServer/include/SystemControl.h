@@ -1,7 +1,6 @@
 #ifndef SYSTEMCONTROL_H
 #define SYSTEMCONTROL_H
 
-#include "stdint.h"
 #include "Parameters.h"
 
 class SystemControl : public Parameters

@@ -1,6 +1,8 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include "stdint.h"
+
 namespace Spdif {
 enum InputTypeT {
 	Coax1 = 0,

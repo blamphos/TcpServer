@@ -1,22 +1,18 @@
-#include <stdio.h>
-#include <conio.h>
-
+#include <iostream>
 #include "HttpServer.h"
 
-int main(void)
+int main()
 {
-    HttpServer::instance()->start();
-
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp == NULL) {
         printf("File 'index.html' not found!\n");
         return -1;
 	}
 
-    //std::thread t1(serverThread);
+    HttpServer::instance()->start();
 
-    getch();
+    std::cin.get();
     HttpServer::instance()->stop();
-	//WSACleanup();
+
 	return 0;
 }

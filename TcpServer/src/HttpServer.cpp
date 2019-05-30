@@ -1,5 +1,4 @@
 #include "HttpServer.h"
-#include <stdio.h>
 #include "SystemControl.h"
 
 HttpServer::HttpServer(void)

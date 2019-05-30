@@ -28,3 +28,28 @@
 	<stdio.h>
 	"SystemControl.h"
 
+1559189709 source:c:\data\tcpserver\tcpserver\src\parameters.cpp
+	"Parameters.h"
+
+1559199784 c:\data\tcpserver\tcpserver\include\parameters.h
+	"stdint.h"
+
+1559189709 source:c:\data\tcpserver\tcpserver\src\systemcontrol.cpp
+	"SystemControl.h"
+
+1559199784 c:\data\tcpserver\tcpserver\include\systemcontrol.h
+	"Parameters.h"
+
+1559199950 source:c:\data\tcpserver\tcpserver\main.cpp
+	<iostream>
+	"HttpServer.h"
+
+1559199756 c:\data\tcpserver\tcpserver\include\httpserver.h
+	<winsock2.h>
+	<ws2tcpip.h>
+	<thread>
+
+1559199756 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
+	"HttpServer.h"
+	"SystemControl.h"
+
