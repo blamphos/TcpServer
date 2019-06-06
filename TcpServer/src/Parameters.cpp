@@ -1,37 +1,39 @@
 #include "Parameters.h"
 
 Parameters::Parameters() :
-    _volume(0), _spdif_input(Spdif::Coax1), _auto_find(true)
+		auto_find(true),
+		current_level(0),
+		current_input(Spdif::Auto)
 {
-
+	for (int i = 0; i < Spdif::INPUT_COUNT; ++i) {
+		_spdif_status[i] = 0;
+	}
 }
 
-void Parameters::setVolume(int volume)
+bool Parameters::isMuted()
 {
-    _volume = volume;
+	return current_level == 0;
 }
 
-int Parameters::getVolume()
+uint32_t Parameters::getSpdifStatus(int index)
 {
-    return _volume;
+	if (index < Spdif::INPUT_COUNT) {
+		return _spdif_status[index];
+	}
+
+	return 0;
 }
 
-void Parameters::setSpdifInput(Spdif::InputTypeT input)
+void Parameters::setSpdifStatus(uint32_t data)
 {
-    _spdif_input = input;
+	int index = data & 0x3;
+	if (index < Spdif::INPUT_COUNT) {
+		_spdif_status[index] = data;
+	}
 }
 
-Spdif::InputTypeT Parameters::getSpdifInput()
+Parameters* Parameters::instance()
 {
-    return _spdif_input;
-}
-
-void Parameters::setAutoFind(bool state)
-{
-    _auto_find = state;
-}
-
-bool Parameters::getAutoFind()
-{
-    return _auto_find;
+	static Parameters inst;
+	return &inst;
 }

@@ -2,17 +2,17 @@
 
 SystemControl::SystemControl()
 {
-
+    _parameters = Parameters::instance();
 }
 
 void SystemControl::onVolumeChanged(uint32_t data)
 {
-    setVolume((int)data);
+    _parameters->current_level = (int)data;
 }
 
 void SystemControl::onInputChanged(Spdif::InputTypeT input)
 {
-    setSpdifInput(input);
+    _parameters->current_input = input;
 }
 
 SystemControl* SystemControl::instance()

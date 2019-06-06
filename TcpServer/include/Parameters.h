@@ -4,6 +4,8 @@
 #include "stdint.h"
 
 namespace Spdif {
+const int INPUT_COUNT = 3;
+
 enum InputTypeT {
 	Coax1 = 0,
 	Coax2,
@@ -12,23 +14,21 @@ enum InputTypeT {
 };
 }
 
-class Parameters
-{
+class Parameters {
 public:
-    Parameters();
-    int getVolume();
-    Spdif::InputTypeT getSpdifInput();
-    bool getAutoFind();
-    void setAutoFind(bool state);
+	bool isMuted();
+	uint32_t getSpdifStatus(int index);
+	void setSpdifStatus(uint32_t data);
+	static Parameters* instance();
 
-protected:
-    void setVolume(int volume);
-    void setSpdifInput(Spdif::InputTypeT input);
+	bool auto_find;
+	int current_level;
+	Spdif::InputTypeT current_input;
 
 private:
-    int _volume;
-    Spdif::InputTypeT _spdif_input;
-    bool _auto_find;
+	Parameters();
+
+	uint32_t _spdif_status[Spdif::INPUT_COUNT];
 };
 
 #endif

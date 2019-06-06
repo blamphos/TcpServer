@@ -68,9 +68,9 @@ void HttpServer::setVolumeLevel(char* buff, int volume)
 
 void HttpServer::handleConnection(SOCKET ClientSocket)
 {
-    int volume = SystemControl::instance()->getVolume();
-    bool auto_find = SystemControl::instance()->getAutoFind();
-    int input = SystemControl::instance()->getSpdifInput();
+    int volume = Parameters::instance()->current_level;
+    bool auto_find = Parameters::instance()->auto_find;
+    int input = Parameters::instance()->current_input;
 
 	int iResult;
 	int iSendResult;
@@ -147,7 +147,7 @@ void HttpServer::handleConnection(SOCKET ClientSocket)
 		}
 	}
 
-    SystemControl::instance()->setAutoFind(auto_find);
+    Parameters::instance()->auto_find = auto_find;
 
 	// Build up response to the client
 	memset(recvbuf, '\0', recvbuflen);

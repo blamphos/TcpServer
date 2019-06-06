@@ -3,7 +3,7 @@
 
 #include "Parameters.h"
 
-class SystemControl : public Parameters
+class SystemControl
 {
 public:
     void onVolumeChanged(uint32_t data);
@@ -12,6 +12,8 @@ public:
 
 private:
     SystemControl();
+
+    Parameters* _parameters;
 };
 
 #endif
