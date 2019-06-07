@@ -24,17 +24,26 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/DigitalOut.h" />
 		<Unit filename="include/ESP8266.h" />
 		<Unit filename="include/ESP8266Simulated.h" />
+		<Unit filename="include/EmbeddedMessages.h" />
+		<Unit filename="include/EventQueue.h" />
+		<Unit filename="include/Fifo.h" />
 		<Unit filename="include/HttpServer.h" />
+		<Unit filename="include/IO_mapping.h" />
 		<Unit filename="include/Parameters.h" />
+		<Unit filename="include/RawSerial.h" />
 		<Unit filename="include/SystemControl.h" />
+		<Unit filename="include/mbed.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
 		<Unit filename="src/ESP8266Simulated.cpp" />
+		<Unit filename="src/EventQueue.cpp" />
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
+		<Unit filename="src/mbed.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

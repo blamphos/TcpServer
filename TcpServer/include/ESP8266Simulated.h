@@ -38,5 +38,4 @@ private:
 	std::thread* _serverThread;
 };
 
-
 #endif

@@ -1,12 +1,15 @@
-#include <iostream>
+#include "mbed.h"
 #include "ESP8266Simulated.h"
+
+BusOut leds;
+RawSerial pc(p5, p6, 115200);
 
 int main()
 {
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp == NULL) {
         printf("File 'index.html' not found!\n");
-        return -1;
+        //return -1;
 	}
 
     ESP8266Simulated::instance()->start();
