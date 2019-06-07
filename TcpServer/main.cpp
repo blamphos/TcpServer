@@ -1,5 +1,5 @@
 #include <iostream>
-#include "HttpServer.h"
+#include "ESP8266Simulated.h"
 
 int main()
 {
@@ -9,10 +9,10 @@ int main()
         return -1;
 	}
 
-    HttpServer::instance()->start();
+    ESP8266Simulated::instance()->start();
 
     std::cin.get();
-    HttpServer::instance()->stop();
+    ESP8266Simulated::instance()->stop();
 
 	return 0;
 }
