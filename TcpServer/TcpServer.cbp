@@ -45,6 +45,7 @@
 		<Unit filename="src/EventQueue.cpp" />
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
+		<Unit filename="src/RawSerial.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
 		<Unit filename="src/mbed.cpp" />
 		<Extensions>

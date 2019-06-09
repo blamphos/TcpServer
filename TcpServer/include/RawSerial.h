@@ -12,29 +12,13 @@ namespace Serial {
 
 class RawSerial {
 public:
-    RawSerial(PinName TxPin, PinName RxPin, int baudrate) {}
-
-    void attach(Callback<void()> cb, Serial::IrqTypeT iqrType) {
-        _cb = cb;
-    }
-
-    template<typename T>
-    void attach(T* tptr, void (T::*mptr)(), Serial::IrqTypeT iqrType)
-    {
-        _cb = callback(tptr, mptr);
-    }
-
-    void detach()
-    {
-        _cb = NULL;
-    }
-    bool readable() { return true; }
-    void printf(const char*, ...) {}
-    void putc(char c) {}
-    char getc()
-    {
-        return 0;
-    }
+    RawSerial(PinName TxPin, PinName RxPin, int baudrate);
+    void attach(Callback<void()> cb, Serial::IrqTypeT iqrType);
+    void detach();
+    bool readable();
+    void printf(const char*, ...);
+    void putc(char c);
+    char getc();
 
 private:
     Callback<void()> _cb;
