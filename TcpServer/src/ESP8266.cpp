@@ -20,7 +20,7 @@ void ESP8266::initialize()
 
 	_esp_reset->write(0);
 	wait(2);
-	//this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
+	this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
 	_esp_reset->write(1);
 	wait(2);
 
@@ -66,7 +66,7 @@ void ESP8266::handleMessage()
 			processLine();
 			break;
 		case EVENT_SERIAL_CMD_SEND:
-			//_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
+			_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
 			//sendNextCommand();
 			break;
 		default:
@@ -77,7 +77,7 @@ void ESP8266::handleMessage()
 
 void ESP8266::sendNextCommand()
 {
-	//_timeout.detach();
+	_timeout.detach();
 	memset(_rx_buf, '\0', sizeof(_rx_buf));
 	_buf_index = 0;
 
@@ -85,7 +85,7 @@ void ESP8266::sendNextCommand()
 	case 0:
 		_expected_response = AT_OK;
 		this->printf("AT\r\n");
-		//_timeout.attach(callback(this, &ESP8266::initialize), 5);
+		_timeout.attach(callback(this, &ESP8266::initialize), 5);
 		break;
 	case 1:
 		leds = 0x1;
@@ -163,7 +163,7 @@ void ESP8266::processLine()
 		c = strstr(_rx_buf, "CLOSED");
 		if (c != NULL) {
 			//_client->processResponse(_rx_buf);
-			//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
+			_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
 		}
 		break;
 	case AT_IPD_RECEIVED:
@@ -171,9 +171,9 @@ void ESP8266::processLine()
 		if (c != NULL) {
 			_expected_response = AT_IP_CONN_CLOSED;
 			return;
-			//this->attach(NULL, Serial::RxIrq);
+			this->attach(NULL, Serial::RxIrq);
 			_buf_index = 0;
-			//this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
+			this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
 		}
 		break;
 	default:

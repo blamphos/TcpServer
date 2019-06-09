@@ -35,7 +35,7 @@ private:
 	void queryStatus();
 
 	DigitalOut* _esp_reset;
-	//Timeout _timeout;
+	Timeout _timeout;
 	ResponseTypeT _expected_response;
 
 	char _rx_buf[SERIAL_RX_BUF_SIZE];
