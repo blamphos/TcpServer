@@ -1,9 +1,8 @@
 #include "ESP8266Simulated.h"
-#include "SystemControl.h"
 
 ESP8266Simulated::ESP8266Simulated()
 {
-    _listenSocket = INVALID_SOCKET;
+    _listen_socket = INVALID_SOCKET;
 }
 
 void ESP8266Simulated::attach(Callback<void()> cb)
@@ -29,7 +28,7 @@ void ESP8266Simulated::start()
 
 void ESP8266Simulated::stop()
 {
-    closesocket(_listenSocket);
+    closesocket(_listen_socket);
     WSACleanup();
 }
 
@@ -84,9 +83,9 @@ void ESP8266Simulated::setVolumeLevel(char* buff, int volume)
 
 void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 {
-    int volume = Parameters::instance()->current_level;
-    bool auto_find = Parameters::instance()->auto_find;
-    int input = Parameters::instance()->current_input;
+    int volume = 0;//Parameters::instance()->current_level;
+    bool auto_find = true;//Parameters::instance()->auto_find;
+    int input = 0;//Parameters::instance()->current_input;
 
 	int iResult;
 	int iSendResult;
@@ -138,7 +137,7 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 		parseCharValue(_buffer, "pot=", &volume);
 		if ((volume >= 0) && (volume < 100)) {
 			printf("Volume: %d\r\n", volume);
-			SystemControl::instance()->onVolumeChanged(volume);
+			//SystemControl::instance()->onVolumeChanged(volume);
 		}
 		else {
 			return;
@@ -153,7 +152,7 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 		case 2:
 			auto_find = false;
 			input = temp_value;
-			SystemControl::instance()->onInputChanged(static_cast<Spdif::InputTypeT>(input));
+			//SystemControl::instance()->onInputChanged(static_cast<Spdif::InputTypeT>(input));
 			break;
 		case 3:
 			auto_find = !auto_find;
@@ -163,7 +162,7 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 		}
 	}
 
-    Parameters::instance()->auto_find = auto_find;
+    //Parameters::instance()->auto_find = auto_find;
 
 	// Build up response to the client
 	memset(_buffer, '\0', DEFAULT_BUFLEN);
@@ -255,8 +254,8 @@ int ESP8266Simulated::serverThreadImp()
 	}
 
 	// Create a SOCKET for connecting to server
-	_listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (_listenSocket == INVALID_SOCKET) {
+	_listen_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	if (_listen_socket == INVALID_SOCKET) {
 		printf("socket failed with error: %d\n", WSAGetLastError());
 		freeaddrinfo(result);
 		WSACleanup();
@@ -264,21 +263,21 @@ int ESP8266Simulated::serverThreadImp()
 	}
 
 	// Setup the TCP listening socket
-	iResult = bind(_listenSocket, result->ai_addr, (int)result->ai_addrlen);
+	iResult = bind(_listen_socket, result->ai_addr, (int)result->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
 		printf("bind failed with error: %d\n", WSAGetLastError());
 		freeaddrinfo(result);
-		closesocket(_listenSocket);
+		closesocket(_listen_socket);
 		WSACleanup();
 		return 1;
 	}
 
 	freeaddrinfo(result);
 
-	iResult = listen(_listenSocket, SOMAXCONN);
+	iResult = listen(_listen_socket, SOMAXCONN);
 	if (iResult == SOCKET_ERROR) {
 		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(_listenSocket);
+		closesocket(_listen_socket);
 		WSACleanup();
 		return 1;
 	}
@@ -286,18 +285,18 @@ int ESP8266Simulated::serverThreadImp()
     printf("TCP server started!\n\n");
 
     while (true) {
-        SOCKET ClientSocket = INVALID_SOCKET;
+        _client_socket = INVALID_SOCKET;
         // Accept a Connection
-        while (ClientSocket == INVALID_SOCKET){
-            ClientSocket = accept(_listenSocket, NULL, NULL);
+        while (_client_socket == INVALID_SOCKET){
+            _client_socket = accept(_listen_socket, NULL, NULL);
         }
-        std::thread t1(&ESP8266Simulated::handleConnection, this, ClientSocket);
+        std::thread t1(&ESP8266Simulated::handleConnection, this, _client_socket);
         t1.join();
     }
 
 	printf("server thread exit...\n");
 	// No longer need server socket
-	closesocket(_listenSocket);
+	closesocket(_listen_socket);
 }
 
 ESP8266Simulated* ESP8266Simulated::instance()
