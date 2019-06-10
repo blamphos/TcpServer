@@ -1,18 +1,21 @@
 #include "mbed.h"
+#include "ESP8266.h"
 #include "ESP8266Simulated.h"
 
 BusOut leds;
-RawSerial pc(p5, p6, 115200);
+//RawSerial pc(p5, p6, 115200);
+ESP8266 esp;
 
 int main()
 {
-	FILE* fp = fopen("/local/index.html", "r");
-	if (fp == NULL) {
-        printf("File 'index.html' not found!\n");
-        //return -1;
-	}
+	//pc.attach(&pc_rx_isr, Serial::RxIrq);
+	printf("GeVol 2.0 TFT\r\n");
 
-    ESP8266Simulated::instance()->start();
+	esp.initialize();
+
+	/*while (1) {
+		esp.handleMessage();
+	}*/
 
     std::cin.get();
     ESP8266Simulated::instance()->stop();

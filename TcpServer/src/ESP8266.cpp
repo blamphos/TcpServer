@@ -16,7 +16,7 @@ ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 
 void ESP8266::initialize()
 {
-	pc.printf("ESP8266 initializing...\r\n");
+	printf("ESP8266 initializing...\r\n");
 
 	_esp_reset->write(0);
 	wait(2);
@@ -27,7 +27,7 @@ void ESP8266::initialize()
 	esp_rx_flush();
 
 	_cmd_index = 0;
-	sendNextCommand();
+	//sendNextCommand();
 }
 
 void ESP8266::esp_rx_flush()

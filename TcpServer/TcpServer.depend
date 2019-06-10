@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1559885991 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+1560143176 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
 	"mbed.h"
+	"ESP8266.h"
 	"ESP8266Simulated.h"
 
 1559850976 source:c:\data\sw_dev\tcpserver\tcpserver\src\parameters.cpp
@@ -46,7 +47,7 @@
 	"HttpServer.h"
 	"SystemControl.h"
 
-1560062939 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
+1560143810 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
@@ -54,12 +55,13 @@
 1560062792 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
-1559883918 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
+1560143515 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
 	<winsock2.h>
 	<ws2tcpip.h>
 	<thread>
+	"mbed.h"
 
-1559883534 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
+1560144046 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
 	"ESP8266Simulated.h"
 	"SystemControl.h"
 
@@ -72,7 +74,7 @@
 	"Timeout.h"
 	"Callback.h"
 
-1560064005 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
+1560144184 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
 1559884817 source:c:\data\sw_dev\tcpserver\tcpserver\src\eventqueue.cpp
@@ -111,4 +113,8 @@
 
 1533617190 c:\data\sw_dev\tcpserver\tcpserver\include\callback.h
 	<string.h>
+
+1560143869 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
+	"RawSerial.h"
+	"ESP8266Simulated.h"
 

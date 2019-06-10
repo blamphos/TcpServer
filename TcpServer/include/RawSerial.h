@@ -21,6 +21,8 @@ public:
     char getc();
 
 private:
+    void rxIsr();
+
     Callback<void()> _cb;
 };
 

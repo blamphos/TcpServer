@@ -6,6 +6,23 @@ ESP8266Simulated::ESP8266Simulated()
     _listenSocket = INVALID_SOCKET;
 }
 
+void ESP8266Simulated::attach(Callback<void()> cb)
+{
+    onDataReceived = cb;
+    onDataReceived();
+}
+
+void ESP8266Simulated::detach()
+{
+    onDataReceived = NULL;
+}
+
+void ESP8266Simulated::getBuffer(const char* buff, int* len)
+{
+    buff = _buffer;
+    (*len) = DEFAULT_BUFLEN;
+}
+
 void ESP8266Simulated::start()
 {
     _serverThread = new std::thread(&ESP8266Simulated::serverThreadImp, this);
@@ -74,34 +91,32 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 
 	int iResult;
 	int iSendResult;
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
 
 	HttpRequestTypeT requestType = NotDefined;
 
 	// Receive until the peer shuts down the connection
 	do {
-		memset(recvbuf, '\0', recvbuflen);
-		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		memset(_buffer, '\0', DEFAULT_BUFLEN);
+		iResult = recv(ClientSocket, _buffer, DEFAULT_BUFLEN, 0);
 		if (iResult > 0) {
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
 			//printf(recvbuf);
-			for (int i = 0; i < strlen(recvbuf); ++i) {
+			for (int i = 0; i < strlen(_buffer); ++i) {
                 //printf("%02X ", recvbuf[i]);
-                printf("%c", recvbuf[i]);
+                printf("%c", _buffer[i]);
 			}
 
 			if (requestType == NotDefined) {
-				if (strstr(recvbuf, "GET") != NULL) {
+				if (strstr(_buffer, "GET") != NULL) {
 					requestType = Get;
 				}
-				else if (strstr(recvbuf, "POST") != NULL) {
+				else if (strstr(_buffer, "POST") != NULL) {
 					requestType = Post;
 				}
 			}
 
-			if (strstr(recvbuf, "\r\n\r\n") != NULL) {
+			if (strstr(_buffer, "\r\n\r\n") != NULL) {
                 //printf("HTTP header received\n");
 				break;
 			}
@@ -117,9 +132,11 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 
 	} while (iResult > 0);
 
+	onDataReceived();
+
 	// Parse input data
 	if (requestType == Post) {
-		parseCharValue(recvbuf, "pot=", &volume);
+		parseCharValue(_buffer, "pot=", &volume);
 		if ((volume >= 0) && (volume < 100)) {
 			printf("Volume: %d\r\n", volume);
 			SystemControl::instance()->onVolumeChanged(volume);
@@ -129,7 +146,7 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 		}
 
 		int temp_value = -1;
-		parseCharValue(recvbuf, "spdif=", &temp_value);
+		parseCharValue(_buffer, "spdif=", &temp_value);
 
 		switch (temp_value) {
 		case 0:
@@ -150,12 +167,12 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
     Parameters::instance()->auto_find = auto_find;
 
 	// Build up response to the client
-	memset(recvbuf, '\0', recvbuflen);
+	memset(_buffer, '\0', DEFAULT_BUFLEN);
 
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
 		char ch;
-		char* wp = recvbuf;
+		char* wp = _buffer;
 		int line = 0;
 		while ((ch = fgetc(fp)) != EOF) {
 			*wp++ = ch;
@@ -165,25 +182,25 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 
 				switch(line) {
 				case 26:
-					setVolumeLevel(recvbuf, volume);
+					setVolumeLevel(_buffer, volume);
 					break;
 				case 28:
-					setButtonState(recvbuf, input == 0);
+					setButtonState(_buffer, input == 0);
 					break;
 				case 29:
-					setButtonState(recvbuf, input == 1);
+					setButtonState(_buffer, input == 1);
 					break;
 				case 30:
-					setButtonState(recvbuf, input == 2);
+					setButtonState(_buffer, input == 2);
 					break;
 				case 31:
-					setButtonState(recvbuf, auto_find);
+					setButtonState(_buffer, auto_find);
 					break;
 				default:
 					break;
 				}
 
-				iSendResult = send(ClientSocket, recvbuf, strlen(recvbuf), 0);
+				iSendResult = send(ClientSocket, _buffer, strlen(_buffer), 0);
 				if (iSendResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
@@ -192,8 +209,8 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 				}
 				//printf("Bytes sent: %d\n", iSendResult);
 				//printf(recvbuf);
-				memset(recvbuf, '\0', recvbuflen);
-				wp = recvbuf;
+				memset(_buffer, '\0', DEFAULT_BUFLEN);
+				wp = _buffer;
 			}
 		}
 	}
