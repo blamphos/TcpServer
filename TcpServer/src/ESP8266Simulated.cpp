@@ -9,7 +9,6 @@ ESP8266Simulated::ESP8266Simulated()
 void ESP8266Simulated::attach(Callback<void()> cb)
 {
     onDataReceived = cb;
-    onDataReceived();
 }
 
 void ESP8266Simulated::detach()
@@ -17,9 +16,9 @@ void ESP8266Simulated::detach()
     onDataReceived = NULL;
 }
 
-void ESP8266Simulated::getBuffer(const char* buff, int* len)
+void ESP8266Simulated::getBuffer(char* buff, int* len)
 {
-    buff = _buffer;
+    memcpy(buff, _buffer, DEFAULT_BUFLEN);
     (*len) = DEFAULT_BUFLEN;
 }
 
@@ -102,10 +101,10 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
 			//printf(recvbuf);
-			for (int i = 0; i < strlen(_buffer); ++i) {
+			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 //printf("%02X ", recvbuf[i]);
                 printf("%c", _buffer[i]);
-			}
+			}*/
 
 			if (requestType == NotDefined) {
 				if (strstr(_buffer, "GET") != NULL) {

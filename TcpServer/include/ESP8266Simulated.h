@@ -11,7 +11,7 @@
 #include <thread>
 #include "mbed.h"
 
-#define DEFAULT_BUFLEN	128
+#define DEFAULT_BUFLEN	2048
 #define DEFAULT_PORT	"80"
 
 class ESP8266Simulated
@@ -19,7 +19,7 @@ class ESP8266Simulated
 public:
     void attach(Callback<void()> cb);
     void detach();
-    void getBuffer(const char* buff, int* len);
+    void getBuffer(char* buff, int* len);
     void start();
     void stop();
 	static ESP8266Simulated* instance();

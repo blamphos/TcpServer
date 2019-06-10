@@ -16,7 +16,7 @@ public:
     void attach(Callback<void()> cb, Serial::IrqTypeT iqrType);
     void detach();
     bool readable();
-    void printf(const char*, ...);
+    void printf(const char* format, ...);
     void putc(char c);
     char getc();
 

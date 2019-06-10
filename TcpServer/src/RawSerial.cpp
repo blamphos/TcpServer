@@ -27,11 +27,19 @@ void RawSerial::detach()
 void RawSerial::rxIsr()
 {
     int len = 0;
-    char* buff;
-    //ESP8266Simulated::instance()->getBuffer(buff, &len);
+    char buff[2048] = {'\0'};
+    ESP8266Simulated::instance()->getBuffer(buff, &len);
 
     printf("RX data available: %d bytes\n", len);
-    //printf(buff);
+
+    char c;
+    for (int i = 0; i < len; ++i) {
+        c = buff[i];
+        if (c == '\0') {
+            break;
+        }
+        std::cout << c;
+    }
 }
 
 bool RawSerial::readable()
@@ -39,9 +47,12 @@ bool RawSerial::readable()
     return false;
 }
 
-void RawSerial::printf(const char* buff, ...)
+void RawSerial::printf(const char* format, ...)
 {
-
+   va_list args;
+   va_start (args, format);
+   vprintf (format, args);
+   va_end (args);
 }
 
 void RawSerial::putc(char c)
