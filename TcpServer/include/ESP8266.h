@@ -9,6 +9,7 @@ const char pwd[16] = "kasperi12";
 class ESP8266 : public RawSerial {
 public:
 	ESP8266();
+	~ESP8266();
 	void initialize();
 	void handleMessage();
 

@@ -14,20 +14,26 @@ ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 
 }
 
+ESP8266::~ESP8266()
+{
+
+}
+
 void ESP8266::initialize()
 {
-	printf("ESP8266 initializing...\r\n");
+	printf("ESP8266 initializing...\n");
 
 	_esp_reset->write(0);
-	wait(2);
+	//wait(2);
 	this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
 	_esp_reset->write(1);
-	wait(2);
+	//wait(2);
 
 	esp_rx_flush();
 
 	_cmd_index = 0;
 	//sendNextCommand();
+	printf("ESP8266 initialized\n");
 }
 
 void ESP8266::esp_rx_flush()
@@ -43,9 +49,10 @@ void ESP8266::esp_rx_isr()
 	while (this->readable()) {
 		c = this->getc();
 		//pc.putc(c);
+		std::cout << c;
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
-			EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
+			//EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
 		}
 		++_buf_index &= 0x1FF;
 	}

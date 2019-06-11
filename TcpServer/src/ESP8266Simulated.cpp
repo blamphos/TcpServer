@@ -55,6 +55,7 @@ void ESP8266Simulated::stop()
 {
     closesocket(_listen_socket);
     WSACleanup();
+    printf("TCP server stopped.\n");
 }
 
 void ESP8266Simulated::handleConnection()
@@ -68,11 +69,12 @@ void ESP8266Simulated::handleConnection()
 		if (iResult > 0) {
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
-			//printf(recvbuf);
+			//printf(_buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 //printf("%02X ", recvbuf[i]);
                 printf("%c", _buffer[i]);
 			}*/
+			break;
 		}
 		else if (iResult == 0)
 			printf("Connection closing...\n");

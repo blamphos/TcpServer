@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <conio.h>
 #include "RawSerial.h"
 #include "DigitalOut.h"
 #include "Ticker.h"
