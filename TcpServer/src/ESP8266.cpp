@@ -7,7 +7,7 @@ extern BusOut leds;
 
 ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 		_esp_reset(new DigitalOut(ESP8266_RST_PIN, 1)),
-		_expected_response(AT_OK),
+		_expected_response(AT_IPD_RECEIVED),
 		_buf_index(0),
 		_cmd_index(0)
 {
@@ -38,20 +38,20 @@ void ESP8266::initialize()
 
 void ESP8266::esp_rx_flush()
 {
-	while (this->readable()) {
-		this->getc();
+	while (readable()) {
+		getc();
 	}
 }
 
 void ESP8266::esp_rx_isr()
 {
 	char c = 0;
-	while (this->readable()) {
-		c = this->getc();
+	while (readable()) {
+		c = getc();
 		//pc.putc(c);
-		std::cout << c;
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
+            std::cout << _rx_buf;
 			//EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
 		}
 		++_buf_index &= 0x1FF;

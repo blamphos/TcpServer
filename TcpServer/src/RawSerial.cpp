@@ -24,23 +24,21 @@ RawSerial::~RawSerial()
 
 void RawSerial::attach(Callback<void()> cb, Serial::IrqTypeT iqrType)
 {
-    onDataReceived = cb;
+    onSocketDataReceived = cb;
 }
 
 void RawSerial::detach()
 {
-    onDataReceived = NULL;
+    onSocketDataReceived = NULL;
     //ESP8266Simulated::instance()->detach();
 }
 
 void RawSerial::rxIsr()
 {
-    int len = 0;
-
     memset(_buff, '\0', BUFFER_LEN);
-    ESP8266Simulated::instance()->readBuffer(_buff, &len);
+    ESP8266Simulated::instance()->readBuffer(_buff, &_len);
 
-    //printf("RX data available: %d bytes\n", len);
+    printf("RX data available: %d bytes\n", _len);
     //printf(_buff);
 
     /*char c;
@@ -51,17 +49,21 @@ void RawSerial::rxIsr()
         }
         std::cout << c;
     }*/
+    std::cout << _buff;
+    _rp = _buff;
     _readable = true;
-    onDataReceived();
+    //onSocketDataReceived();
 
     memset(_buff, '\0', BUFFER_LEN);
 
     // Send response no here
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
+        int i = 0;
 	    char c;
+	    char* wp = _buff;
         while ((c = fgetc(fp)) != EOF) {
-            strcat(_buff, &c);
+            *wp++ = c;
         }
         fclose(fp);
 	}
@@ -89,13 +91,13 @@ void RawSerial::printf(const char* format, ...)
 
 void RawSerial::putc(char c)
 {
-    *_wp = c;
+    //*_wp = c;
 }
 
 char RawSerial::getc()
 {
     char c = *_rp++;
-    if ((*_rp == '\0') || (_rp == (_buff + BUFFER_LEN))) {
+    if (--_len == 0) {
         _rp = _buff;
         _readable = false;
     }

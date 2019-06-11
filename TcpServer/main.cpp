@@ -3,15 +3,14 @@
 #include "HttpServer.h"
 
 BusOut leds;
-//RawSerial pc(p5, p6, 115200);
+SerialPc pc(p5, p6, 115200);
 
 int main()
 {
     ESP8266 esp;
     HttpServer http;
 
-	printf("GeVol 2.0 TFT\r\n");
-
+	pc.printf("GeVol 2.0 TFT\r\n");
 	esp.initialize();
 
 	while (1) {

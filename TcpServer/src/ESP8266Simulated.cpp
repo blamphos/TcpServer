@@ -18,7 +18,7 @@ void ESP8266Simulated::detach()
 void ESP8266Simulated::readBuffer(char* buff, int* len)
 {
     memcpy(buff, _buffer, DEFAULT_BUFLEN);
-    (*len) = DEFAULT_BUFLEN;
+    (*len) = strlen(_buffer);
 }
 
 void ESP8266Simulated::sendBuffer(const char* buff, int len)
@@ -29,6 +29,7 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
     memset(_buffer, '\0', DEFAULT_BUFLEN);
     memcpy(_buffer, buff, len);
 
+    //printf(_buffer);
     iSendResult = send(_client_socket, _buffer, strlen(_buffer), 0);
     if (iSendResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
@@ -88,6 +89,7 @@ void ESP8266Simulated::handleConnection()
 	} while (iResult > 0);
 
 	onDataReceived();
+	printf("Connection handling end.\n");
 }
 
 int ESP8266Simulated::serverThreadImp()

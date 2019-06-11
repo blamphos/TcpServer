@@ -10,7 +10,6 @@
 #include <thread>
 #include "mbed.h"
 
-#define DEFAULT_BUFLEN	2048
 #define DEFAULT_PORT	"80"
 
 class ESP8266Simulated
@@ -25,6 +24,10 @@ public:
 	static ESP8266Simulated* instance();
 
 private:
+    enum ConstantsT {
+        DEFAULT_BUFLEN = 4096
+    };
+
 	ESP8266Simulated();
 	void handleConnection();
 	int serverThreadImp();

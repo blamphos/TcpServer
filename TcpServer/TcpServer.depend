@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1560269670 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+1560274696 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
 	"mbed.h"
 	"ESP8266.h"
 	"HttpServer.h"
@@ -51,7 +51,7 @@
 	"HttpServer.h"
 	"Parameters.h"
 
-1560269731 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
+1560273181 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
@@ -59,25 +59,24 @@
 1560263889 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
-1560262845 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
+1560274852 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
 	<ws2tcpip.h>
 	<thread>
 	"mbed.h"
 
-1560269334 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
+1560276133 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
 	"ESP8266Simulated.h"
 
-1560263562 c:\data\sw_dev\tcpserver\tcpserver\include\mbed.h
-	<iostream>
-	<cstring>
+1560270641 c:\data\sw_dev\tcpserver\tcpserver\include\mbed.h
 	<conio.h>
+	"Serial.h"
 	"RawSerial.h"
 	"DigitalOut.h"
 	"Ticker.h"
 	"Timeout.h"
 	"Callback.h"
 
-1560265839 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
+1560274697 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
 1559884817 source:c:\data\sw_dev\tcpserver\tcpserver\src\eventqueue.cpp
@@ -117,7 +116,7 @@
 1533617190 c:\data\sw_dev\tcpserver\tcpserver\include\callback.h
 	<string.h>
 
-1560269554 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
+1560276095 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
 	"RawSerial.h"
 	"ESP8266Simulated.h"
 
@@ -189,4 +188,8 @@
 
 1560232085 source:c:\data\tcpserver\tcpserver\src\esp8266simulated.cpp
 	"ESP8266Simulated.h"
+
+1560271079 c:\data\sw_dev\tcpserver\tcpserver\include\serial.h
+	<stdarg.h>
+	"mbed.h"
 

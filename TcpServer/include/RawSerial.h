@@ -20,15 +20,16 @@ public:
     void printf(const char* format, ...);
     void putc(char c);
     char getc();
-    Callback<void()> onDataReceived;
+    Callback<void()> onSocketDataReceived;
 
 private:
     enum ConstantsT {
-        BUFFER_LEN = 2048
+        BUFFER_LEN = 4096
     };
 
     void rxIsr();
 
+    int _len;
     char* _rp;
     char* _wp;
     bool _readable;
