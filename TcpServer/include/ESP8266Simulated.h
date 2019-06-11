@@ -18,23 +18,15 @@ class ESP8266Simulated
 public:
     void attach(Callback<void()> cb);
     void detach();
-    void getBuffer(char* buff, int* len);
+    void readBuffer(char* buff, int* len);
     void start();
     void stop();
+    void sendBuffer(const char* buff, int len);
 	static ESP8266Simulated* instance();
 
 private:
-    enum HttpRequestTypeT {
-        NotDefined = 0,
-        Get,
-        Post
-    };
-
 	ESP8266Simulated();
-	void parseCharValue(char* buff, const char* tag, int* value);
-	void handleConnection(SOCKET ClientSocket);
-	void setVolumeLevel(char* buff, int volume);
-	void setButtonState(char* buff, bool enabled);
+	void handleConnection();
 	int serverThreadImp();
 	Callback<void()> onDataReceived;
 

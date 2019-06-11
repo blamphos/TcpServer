@@ -28,7 +28,7 @@ void RawSerial::rxIsr()
 {
     int len = 0;
     char buff[2048] = {'\0'};
-    ESP8266Simulated::instance()->getBuffer(buff, &len);
+    ESP8266Simulated::instance()->readBuffer(buff, &len);
 
     printf("RX data available: %d bytes\n", len);
 

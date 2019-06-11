@@ -15,10 +15,35 @@ void ESP8266Simulated::detach()
     onDataReceived = NULL;
 }
 
-void ESP8266Simulated::getBuffer(char* buff, int* len)
+void ESP8266Simulated::readBuffer(char* buff, int* len)
 {
     memcpy(buff, _buffer, DEFAULT_BUFLEN);
     (*len) = DEFAULT_BUFLEN;
+}
+
+void ESP8266Simulated::sendBuffer(const char* buff, int len)
+{
+    int iResult;
+    int iSendResult;
+
+    memset(_buffer, '\0', DEFAULT_BUFLEN);
+    memcpy(_buffer, buff, len);
+
+    iSendResult = send(_client_socket, _buffer, strlen(_buffer), 0);
+    if (iSendResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        //closesocket(ClientSocket);
+        //WSACleanup();
+        //break;
+    }
+
+	// shutdown the connection since we're done
+	iResult = shutdown(_client_socket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+	}
+
+	closesocket(_client_socket);
 }
 
 void ESP8266Simulated::start()
@@ -32,70 +57,14 @@ void ESP8266Simulated::stop()
     WSACleanup();
 }
 
-void ESP8266Simulated::parseCharValue(char* buff, const char* tag, int* value)
+void ESP8266Simulated::handleConnection()
 {
-	const int CHAR_BUFF_LEN = 3;
-
-	char* c = strstr(buff, tag);
-	if (c != NULL) {
-		c += strlen(tag);
-
-		char str[CHAR_BUFF_LEN] = { '\0' };
-		char* wp = str;
-		int len = CHAR_BUFF_LEN;
-
-		while ((*c != '\0') && --len) {
-			*wp++ = *c++;
-		}
-
-		if (value != NULL) {
-			*value = atoi(str);
-		}
-	}
-}
-
-void ESP8266Simulated::setButtonState(char* buff, bool enabled)
-{
-	if (buff == NULL) {
-		return;
-	}
-
-	char* c = strstr(buff, " button");
-	if (c != NULL) {
-		c += 7;
-		*c = (enabled) ? '1' : '2';
-	}
-}
-
-void ESP8266Simulated::setVolumeLevel(char* buff, int volume)
-{
-	if (buff == NULL) {
-		return;
-	}
-
-	char* c = strstr(buff, "value=\"");
-	if (c != NULL) {
-		c += 7;
-		*c++ = (volume / 10) + 48;
-		*c = (volume % 10) + 48;
-	}
-}
-
-void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
-{
-    int volume = 0;//Parameters::instance()->current_level;
-    bool auto_find = true;//Parameters::instance()->auto_find;
-    int input = 0;//Parameters::instance()->current_input;
-
 	int iResult;
-	int iSendResult;
-
-	HttpRequestTypeT requestType = NotDefined;
 
 	// Receive until the peer shuts down the connection
 	do {
 		memset(_buffer, '\0', DEFAULT_BUFLEN);
-		iResult = recv(ClientSocket, _buffer, DEFAULT_BUFLEN, 0);
+		iResult = recv(_client_socket, _buffer, DEFAULT_BUFLEN, 0);
 		if (iResult > 0) {
 			//printf("\r\n");
 			//printf("Bytes received: %d\n", iResult);
@@ -104,26 +73,12 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
                 //printf("%02X ", recvbuf[i]);
                 printf("%c", _buffer[i]);
 			}*/
-
-			if (requestType == NotDefined) {
-				if (strstr(_buffer, "GET") != NULL) {
-					requestType = Get;
-				}
-				else if (strstr(_buffer, "POST") != NULL) {
-					requestType = Post;
-				}
-			}
-
-			if (strstr(_buffer, "\r\n\r\n") != NULL) {
-                //printf("HTTP header received\n");
-				break;
-			}
 		}
 		else if (iResult == 0)
 			printf("Connection closing...\n");
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
+			closesocket(_client_socket);
 			//WSACleanup();
 			return;
 		}
@@ -131,97 +86,6 @@ void ESP8266Simulated::handleConnection(SOCKET ClientSocket)
 	} while (iResult > 0);
 
 	onDataReceived();
-
-	// Parse input data
-	if (requestType == Post) {
-		parseCharValue(_buffer, "pot=", &volume);
-		if ((volume >= 0) && (volume < 100)) {
-			printf("Volume: %d\r\n", volume);
-			//SystemControl::instance()->onVolumeChanged(volume);
-		}
-		else {
-			return;
-		}
-
-		int temp_value = -1;
-		parseCharValue(_buffer, "spdif=", &temp_value);
-
-		switch (temp_value) {
-		case 0:
-		case 1:
-		case 2:
-			auto_find = false;
-			input = temp_value;
-			//SystemControl::instance()->onInputChanged(static_cast<Spdif::InputTypeT>(input));
-			break;
-		case 3:
-			auto_find = !auto_find;
-			break;
-		default:
-			break;
-		}
-	}
-
-    //Parameters::instance()->auto_find = auto_find;
-
-	// Build up response to the client
-	memset(_buffer, '\0', DEFAULT_BUFLEN);
-
-	FILE* fp = fopen("/local/index.html", "r");
-	if (fp != NULL) {
-		char ch;
-		char* wp = _buffer;
-		int line = 0;
-		while ((ch = fgetc(fp)) != EOF) {
-			*wp++ = ch;
-			if (ch == '\n') {
-				// Process line
-				++line;
-
-				switch(line) {
-				case 26:
-					setVolumeLevel(_buffer, volume);
-					break;
-				case 28:
-					setButtonState(_buffer, input == 0);
-					break;
-				case 29:
-					setButtonState(_buffer, input == 1);
-					break;
-				case 30:
-					setButtonState(_buffer, input == 2);
-					break;
-				case 31:
-					setButtonState(_buffer, auto_find);
-					break;
-				default:
-					break;
-				}
-
-				iSendResult = send(ClientSocket, _buffer, strlen(_buffer), 0);
-				if (iSendResult == SOCKET_ERROR) {
-					printf("send failed with error: %d\n", WSAGetLastError());
-					closesocket(ClientSocket);
-					WSACleanup();
-					break;
-				}
-				//printf("Bytes sent: %d\n", iSendResult);
-				//printf(recvbuf);
-				memset(_buffer, '\0', DEFAULT_BUFLEN);
-				wp = _buffer;
-			}
-		}
-	}
-
-	fclose(fp);
-
-	// shutdown the connection since we're done
-	iResult = shutdown(ClientSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-	}
-
-	closesocket(ClientSocket);
 }
 
 int ESP8266Simulated::serverThreadImp()
@@ -290,7 +154,7 @@ int ESP8266Simulated::serverThreadImp()
         while (_client_socket == INVALID_SOCKET){
             _client_socket = accept(_listen_socket, NULL, NULL);
         }
-        std::thread t1(&ESP8266Simulated::handleConnection, this, _client_socket);
+        std::thread t1(&ESP8266Simulated::handleConnection, this);
         t1.join();
     }
 
