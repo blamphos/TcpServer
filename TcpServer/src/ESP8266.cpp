@@ -48,7 +48,7 @@ void ESP8266::esp_rx_isr()
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		pc.putc(c);
+		//pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
@@ -151,8 +151,8 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
-	pc.printf("processLine\n");
-    //std::cout << _rx_buf;
+	pc.printf("|");
+    std::cout << _rx_buf << std::endl;
 	switch(_expected_response) {
 	case AT_OK:
 		c = strstr(_rx_buf, "OK");

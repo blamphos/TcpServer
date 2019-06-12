@@ -56,10 +56,11 @@ void RawSerial::rxIsr()
     memset(_buff, '\0', BUFFER_LEN);
     for (int i = 0; i < _len; ++i) {
         *wp++ = temp_buff[i];
-        if (i > 0 && (i % 16) == 0) {
+        if (temp_buff[i] == '\n') {
             _rp = _buff;
             _readable = true;
             onSocketDataReceived();
+            wait_ms(10);
             while (_readable) {
                 wait_ms(10);
             }
@@ -115,6 +116,7 @@ void RawSerial::putc(char c)
 
 char RawSerial::getc()
 {
+    wait_ms(1);
     char c = *_rp++;
     if (*_rp == '\0') {
         _rp = _buff;
