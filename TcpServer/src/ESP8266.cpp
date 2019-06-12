@@ -152,7 +152,7 @@ void ESP8266::processLine()
 {
 	const char* c = NULL;
 	pc.printf("|");
-    std::cout << _rx_buf << std::endl;
+    //std::cout << _rx_buf << std::endl;
 	switch(_expected_response) {
 	case AT_OK:
 		c = strstr(_rx_buf, "OK");
@@ -176,6 +176,7 @@ void ESP8266::processLine()
 	case AT_IPD_RECEIVED:
 		c = strstr(_rx_buf, "+IPD");
 		if (c != NULL) {
+            std::cout << _rx_buf << std::endl;
 			_expected_response = AT_IP_CONN_CLOSED;
 			return;
 			this->attach(NULL, Serial::RxIrq);

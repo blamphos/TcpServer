@@ -40,20 +40,12 @@ void RawSerial::rxIsr()
     memset(temp_buff, '\0', BUFFER_LEN);
     ESP8266Simulated::instance()->readBuffer(temp_buff, &_len);
 
-    printf("RX data available: %d bytes\n", _len);
-    //printf(_buff);
+    //printf("RX data available: %d bytes\n", _len);
 
-    /*char c;
-    for (int i = 0; i < len; ++i) {
-        c = buff[i];
-        if (c == '\0') {
-            break;
-        }
-        std::cout << c;
-    }*/
-    //std::cout << _buff;
-    char* wp = _buff;
     memset(_buff, '\0', BUFFER_LEN);
+    sprintf(_buff, "+IPD,0,%d:", _len);
+    char* wp = _buff + strlen(_buff);
+
     for (int i = 0; i < _len; ++i) {
         *wp++ = temp_buff[i];
         if (temp_buff[i] == '\n') {
@@ -69,15 +61,8 @@ void RawSerial::rxIsr()
         }
     }
 
-
-	/*char ch = 0;
-	while (readable()) {
-		std::cout << getc();
-	}*/
-
+    // Semd response to client
     memset(_buff, '\0', BUFFER_LEN);
-
-    // Send response no here
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
 	    char c;
