@@ -2,7 +2,7 @@
 #include "EventQueue.h"
 #include "IO_mapping.h"
 
-extern RawSerial pc;
+extern SerialDebug pc;
 extern BusOut leds;
 
 ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
@@ -11,7 +11,7 @@ ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 		_buf_index(0),
 		_cmd_index(0)
 {
-
+    memset(_rx_buf, '\0', sizeof(_rx_buf));
 }
 
 ESP8266::~ESP8266()
@@ -47,12 +47,11 @@ void ESP8266::esp_rx_isr()
 {
 	char c = 0;
 	while (readable()) {
-		c = getc();
-		//pc.putc(c);
+		c = this->getc();
+		pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
-            std::cout << _rx_buf;
-			//EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
+			EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
 		}
 		++_buf_index &= 0x1FF;
 	}
@@ -152,7 +151,8 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
-
+	pc.printf("processLine\n");
+    //std::cout << _rx_buf;
 	switch(_expected_response) {
 	case AT_OK:
 		c = strstr(_rx_buf, "OK");

@@ -2,11 +2,12 @@
 #define SERIAL_H
 
 #include <stdarg.h>
+#include <iostream>
 #include "mbed.h"
 
-class SerialPc {
+class SerialDebug {
 public:
-    SerialPc(PinName TxPin, PinName RxPin, int baudrate)
+    SerialDebug(PinName TxPin, PinName RxPin, int baudrate)
     {
     }
 

@@ -2,7 +2,6 @@
 #define TICKER_H
 
 #include <thread>
-#include <iostream>
 #include "mbed.h"
 
 class Worker {

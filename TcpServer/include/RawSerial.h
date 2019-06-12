@@ -8,7 +8,7 @@ namespace Serial {
         RxIrq,
         TxIrq,
     };
-}
+};
 
 class RawSerial {
 public:

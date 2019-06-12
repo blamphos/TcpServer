@@ -2,7 +2,6 @@
 #define TIMEOUT_H
 
 #include <thread>
-#include <iostream>
 #include "mbed.h"
 
 class TimeoutWorker {

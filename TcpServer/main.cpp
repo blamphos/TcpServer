@@ -1,9 +1,10 @@
+#include <conio.h>
 #include "mbed.h"
 #include "ESP8266.h"
 #include "HttpServer.h"
 
 BusOut leds;
-SerialPc pc(p5, p6, 115200);
+SerialDebug pc(p5, p6, 115200);
 
 int main()
 {
