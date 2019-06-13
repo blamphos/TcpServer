@@ -126,7 +126,7 @@ void ESP8266::sendNextCommand()
 		_expected_response = AT_OK;
 		// Build query message using TX buf
 		memset(_tx_buf, '\0', sizeof(_tx_buf));
-		sprintf(_tx_buf, "GET /Status HTTP/1.1\r\nHost: 192.168.1.31\r\nConnection: close\r\n\r\n");
+		//sprintf(_tx_buf, "GET /Status HTTP/1.1\r\nHost: 192.168.1.31\r\nConnection: close\r\n\r\n");
 		this->printf("AT+CIPSEND=0,%d\r\n", strlen(_tx_buf));
 		break;
 	case 7:
@@ -179,9 +179,9 @@ void ESP8266::processLine()
             //std::cout << _rx_buf << std::endl;
 			_expected_response = AT_IP_CONN_CLOSED;
 			return;
-			this->attach(NULL, Serial::RxIrq);
-			_buf_index = 0;
-			this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
+			//this->attach(NULL, Serial::RxIrq);
+			//_buf_index = 0;
+			//this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
 		}
 		break;
 	default:

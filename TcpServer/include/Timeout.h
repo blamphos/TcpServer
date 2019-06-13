@@ -2,6 +2,7 @@
 #define TIMEOUT_H
 
 #include "mbed.h"
+#include "Callback.h"
 
 class TimeoutWorker;
 

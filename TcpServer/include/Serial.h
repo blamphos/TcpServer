@@ -13,10 +13,10 @@ public:
 
     void printf(const char* format, ...)
     {
-        va_list args;
+        /*va_list args;
         va_start (args, format);
         vprintf (format, args);
-        va_end (args);
+        va_end (args);*/
     }
 
     void putc(char c)

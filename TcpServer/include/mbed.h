@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "Serial.h"
 #include "RawSerial.h"
 #include "DigitalOut.h"

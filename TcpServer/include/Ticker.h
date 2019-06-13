@@ -1,57 +1,23 @@
 #ifndef TICKER_H
 #define TICKER_H
 
-#include <thread>
 #include "mbed.h"
 
-class Worker {
-public:
-    Worker() {
-
-    }
-
-    void doWork() {
-        while(attached) {
-            cb.call();
-            wait_us(t);
-        }
-    }
-
-public:
-    unsigned int t;
-    bool attached;
-
-    Callback<void()> cb;
-};
+class TickerWorker;
 
 class Ticker {
 public:
-    Ticker() {
-
-    }
-
-    void attach_us(void (*isr_func)(), unsigned int t) {
-        _worker.cb = callback(isr_func);
-        _worker.attached = true;
-        _worker.t = t;
-        _thread = new std::thread(&Worker::doWork, &_worker);
-    }
+    Ticker();
+    void attach(Callback<void()> cb, unsigned int t);
+    void attach(void (*isr_func)(), unsigned int t);
+    void attach_us(void (*isr_func)(), unsigned int t);
 
     template<typename T>
-    void attach_us(T* tptr, void (T::*mptr)(), unsigned int t) {
-        _worker.cb = callback(tptr, mptr);
-        _worker.attached = true;
-        _worker.t = t;
-        _thread = new std::thread(&Worker::doWork, &_worker);
-    }
-
-    void detach() {
-        _worker.attached = false;
-    }
+    void attach_us(T* tptr, void (T::*mptr)(), unsigned int t);
+    void detach();
 
 private:
-    std::thread *_thread;
-    Worker _worker;
+    TickerWorker* _worker;
 };
 
 #endif

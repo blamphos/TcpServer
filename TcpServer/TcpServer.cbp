@@ -25,6 +25,7 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="include/Callback.h" />
+		<Unit filename="include/DebugPrint.h" />
 		<Unit filename="include/DigitalOut.h" />
 		<Unit filename="include/ESP8266.h" />
 		<Unit filename="include/ESP8266Simulated.h" />
@@ -41,6 +42,7 @@
 		<Unit filename="include/Timeout.h" />
 		<Unit filename="include/mbed.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/DebugPrint.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
 		<Unit filename="src/ESP8266Simulated.cpp" />
 		<Unit filename="src/EventQueue.cpp" />
@@ -48,6 +50,7 @@
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/RawSerial.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
+		<Unit filename="src/Ticker.cpp" />
 		<Unit filename="src/Timeout.cpp" />
 		<Unit filename="src/mbed.cpp" />
 		<Extensions>
