@@ -2,7 +2,7 @@
 #define SERIAL_H
 
 #include <stdarg.h>
-#include <iostream>
+//#include <iostream>
 #include "mbed.h"
 
 class SerialDebug {
@@ -21,7 +21,7 @@ public:
 
     void putc(char c)
     {
-        std::cout << c;
+        //std::cout << c;
     }
 
 private:

@@ -48,6 +48,7 @@
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/RawSerial.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
+		<Unit filename="src/Timeout.cpp" />
 		<Unit filename="src/mbed.cpp" />
 		<Extensions>
 			<code_completion />

@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include "RawSerial.h"
 #include "ESP8266Simulated.h"
 
@@ -20,7 +20,7 @@ RawSerial::RawSerial(PinName TxPin, PinName RxPin, int baudrate) :
 RawSerial::~RawSerial()
 {
     ESP8266Simulated::instance()->stop();
-    std::cin.get();
+    //std::cin.get();
 }
 
 void RawSerial::attach(Callback<void()> cb, Serial::IrqTypeT iqrType)
@@ -91,7 +91,7 @@ void RawSerial::printf(const char* format, ...)
     vsprintf (buff, format, args);
     va_end (args);
 
-    std::cout << buff;
+    //std::cout << buff;
 }
 
 void RawSerial::putc(char c)
