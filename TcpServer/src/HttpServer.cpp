@@ -1,6 +1,6 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #include "HttpServer.h"
 #include "Parameters.h"
 
@@ -12,6 +12,13 @@ HttpServer::HttpServer() :
 
 void HttpServer::handleRequest(char* buff, int len)
 {
+    if (strstr(buff, "\r\n\r\n") == NULL) {
+        return;
+
+    }
+    printf("HTTP header received\n");
+    printf(buff);
+
     _requestType = NotDefined;
 
     if (_requestType == NotDefined) {
@@ -23,10 +30,7 @@ void HttpServer::handleRequest(char* buff, int len)
         }
     }
 
-    if (strstr(buff, "\r\n\r\n") != NULL) {
-        //printf("HTTP header received\n");
-        //break;
-    }
+
 
     int volume = Parameters::instance()->current_level;
     bool auto_find = Parameters::instance()->auto_find;

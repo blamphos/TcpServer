@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1560486009 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+1560542878 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
 	"mbed.h"
 	"ESP8266.h"
 	"HttpServer.h"
@@ -16,12 +16,12 @@
 1559851256 source:c:\data\sw_dev\tcpserver\tcpserver\src\systemcontrol.cpp
 	"SystemControl.h"
 
-1560262845 c:\data\sw_dev\tcpserver\tcpserver\include\httpserver.h
+1560542325 c:\data\sw_dev\tcpserver\tcpserver\include\httpserver.h
 
-1560262845 source:c:\data\sw_dev\tcpserver\tcpserver\src\httpserver.cpp
-	<string.h>
-	<stdlib.h>
-	<stdio.h>
+1560543213 source:c:\data\sw_dev\tcpserver\tcpserver\src\httpserver.cpp
+	<cstring>
+	<cstdlib>
+	<cstdio>
 	"HttpServer.h"
 	"Parameters.h"
 
@@ -51,20 +51,21 @@
 	"HttpServer.h"
 	"Parameters.h"
 
-1560486022 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
+1560543075 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
+	"HttpServer.h"
 	"EventQueue.h"
 	"IO_mapping.h"
 
-1560484107 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
+1560542899 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
-1560274852 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
+1560541660 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
 	<ws2tcpip.h>
-	<thread>
 	"mbed.h"
 
-1560276133 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
+1560541660 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266simulated.cpp
+	<thread>
 	"ESP8266Simulated.h"
 
 1560487216 c:\data\sw_dev\tcpserver\tcpserver\include\mbed.h
@@ -114,7 +115,7 @@
 
 1560484985 c:\data\sw_dev\tcpserver\tcpserver\include\callback.h
 
-1560486182 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
+1560541660 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
 	"RawSerial.h"
 	"ESP8266Simulated.h"
 
@@ -185,7 +186,7 @@
 	<thread>
 	"ESP8266Simulated.h"
 
-1560487120 c:\data\sw_dev\tcpserver\tcpserver\include\serial.h
+1560541750 c:\data\sw_dev\tcpserver\tcpserver\include\serial.h
 	"mbed.h"
 
 1560516693 c:\data\tcpserver\tcpserver\include\serial.h
@@ -214,7 +215,7 @@
 	<thread>
 	"Ticker.h"
 
-1560485862 source:c:\data\sw_dev\tcpserver\tcpserver\src\serial.cpp
+1560541750 source:c:\data\sw_dev\tcpserver\tcpserver\src\serial.cpp
 	<iostream>
 	<cstdarg>
 	"conio.h"

@@ -1,11 +1,13 @@
 #include "ESP8266.h"
+#include "HttpServer.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
 
 extern Serial pc;
 extern BusOut leds;
 
-ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
+ESP8266::ESP8266(HttpServer* http) : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
+        _httpServer(http),
 		_esp_reset(new DigitalOut(ESP8266_RST_PIN, 1)),
 		_expected_response(AT_IPD_RECEIVED),
 		_buf_index(0),
@@ -69,7 +71,8 @@ void ESP8266::handleMessage()
 	if (EventQueue::instance()->getNext(msg)) {
 		switch (msg.event) {
 		case EVENT_SERIAL_CMD_RECEIVED:
-			processLine();
+			//processLine();
+			_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
 			break;
 		case EVENT_SERIAL_CMD_SEND:
 			_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);

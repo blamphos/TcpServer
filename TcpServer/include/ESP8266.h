@@ -6,9 +6,11 @@
 const char ssid[16] = "Kuhaverkko";
 const char pwd[16] = "kasperi12";
 
+class HttpServer;
+
 class ESP8266 : public RawSerial {
 public:
-	ESP8266();
+	ESP8266(HttpServer* http);
 	~ESP8266();
 	void initialize();
 	void handleMessage();
@@ -34,16 +36,14 @@ private:
 	void sendNextCommand();
 	void processLine();
 	void queryStatus();
+	HttpServer* _httpServer;
 
 	DigitalOut* _esp_reset;
 	Timeout _timeout;
 	ResponseTypeT _expected_response;
-
 	char _rx_buf[SERIAL_RX_BUF_SIZE];
 	char _tx_buf[SERIAL_TX_BUF_SIZE];
-
 	volatile uint32_t _buf_index;
-
 	int _cmd_index;
 };
 

@@ -9,7 +9,7 @@ public:
     ~Serial();
     void printf(const char* format, ...);
     void putc(char c);
-    void readFromFile(const char* filename, char* buff);
+    void readFromFile(const char* filename, char* buff, int len);
     int waitKeyPress();
 
 private:

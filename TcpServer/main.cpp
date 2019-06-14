@@ -7,10 +7,10 @@ Serial pc(p5, p6, 115200);
 
 int main()
 {
-    ESP8266 esp;
-    HttpServer http;
-
 	pc.printf("GeVol 2.0 TFT\r\n");
+
+    HttpServer http;
+    ESP8266 esp(&http);
 	esp.initialize();
 
 	while (1) {
