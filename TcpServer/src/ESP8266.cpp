@@ -21,7 +21,7 @@ ESP8266::~ESP8266()
 
 void ESP8266::initialize()
 {
-	printf("ESP8266 initializing...\n");
+	pc.printf("ESP8266 initializing...\n");
 
 	_esp_reset->write(0);
 	//wait(2);
@@ -33,7 +33,7 @@ void ESP8266::initialize()
 
 	_cmd_index = 0;
 	//sendNextCommand();
-	printf("ESP8266 initialized\n");
+	pc.printf("ESP8266 initialized\n");
 }
 
 void ESP8266::esp_rx_flush()

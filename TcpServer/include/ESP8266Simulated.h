@@ -7,7 +7,6 @@
 #define _WIN32_WINNT 0x501
 
 #include <ws2tcpip.h>
-#include <thread>
 #include "mbed.h"
 
 #define DEFAULT_PORT	"80"
@@ -35,7 +34,6 @@ private:
 
 	SOCKET _listen_socket;
     SOCKET _client_socket;
-	std::thread* _serverThread;
 	char _buffer[DEFAULT_BUFLEN];
 };
 

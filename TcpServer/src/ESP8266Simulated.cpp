@@ -1,3 +1,4 @@
+#include <thread>
 #include "ESP8266Simulated.h"
 
 ESP8266Simulated::ESP8266Simulated()
@@ -17,8 +18,11 @@ void ESP8266Simulated::detach()
 
 void ESP8266Simulated::readBuffer(char* buff, int* len)
 {
-    memcpy(buff, _buffer, DEFAULT_BUFLEN);
-    (*len) = strlen(_buffer);
+    //memcpy(buff, _buffer, DEFAULT_BUFLEN);
+    memset(buff, '\0', DEFAULT_BUFLEN);
+
+    sprintf(buff, "+IPD,0,%d:%s", strlen(_buffer), _buffer);
+    (*len) = strlen(buff);
 }
 
 void ESP8266Simulated::sendBuffer(const char* buff, int len)
@@ -27,7 +31,21 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
     int iSendResult;
 
     memset(_buffer, '\0', DEFAULT_BUFLEN);
+
+    // REMOVE THIS
+#if 1
+	FILE* fp = fopen("/local/index.html", "r");
+	if (fp != NULL) {
+	    char c;
+	    char* wp = _buffer;
+        while ((c = fgetc(fp)) != EOF) {
+            *wp++ = c;
+        }
+        fclose(fp);
+	}
+#else
     memcpy(_buffer, buff, len);
+#endif
 
     //printf(_buffer);
     iSendResult = send(_client_socket, _buffer, strlen(_buffer), 0);
@@ -49,7 +67,7 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
 
 void ESP8266Simulated::start()
 {
-    _serverThread = new std::thread(&ESP8266Simulated::serverThreadImp, this);
+    new std::thread(&ESP8266Simulated::serverThreadImp, this);
 }
 
 void ESP8266Simulated::stop()
@@ -172,4 +190,3 @@ ESP8266Simulated* ESP8266Simulated::instance()
     static ESP8266Simulated inst;
     return &inst;
 }
-

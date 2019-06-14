@@ -8,6 +8,11 @@ Serial::Serial(PinName TxPin, PinName RxPin, int baudrate)
 
 }
 
+Serial::~Serial()
+{
+    std::cin.get();
+}
+
 void Serial::printf(const char* format, ...)
 {
     va_list args;
