@@ -26,6 +26,21 @@ void Serial::putc(char c)
     //std::cout << c;
 }
 
+void Serial::readFromFile(const char* filename, char* buff)
+{
+    memset(buff, '\0', sizeof(buff));
+
+	FILE* fp = fopen(filename, "r");
+	if (fp != NULL) {
+	    char c;
+	    char* wp = buff;
+        while ((c = fgetc(fp)) != EOF) {
+            *wp++ = c;
+        }
+        fclose(fp);
+	}
+}
+
 int Serial::waitKeyPress()
 {
     return _kbhit();

@@ -1,4 +1,3 @@
-
 #include "RawSerial.h"
 #include "ESP8266Simulated.h"
 
@@ -86,7 +85,6 @@ void RawSerial::putc(char c)
 
 char RawSerial::getc()
 {
-    //wait_us(1);
     char c = *_rp++;
     if (*_rp == '\0') {
         _rp = _buff;
