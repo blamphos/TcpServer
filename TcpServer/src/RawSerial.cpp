@@ -42,7 +42,7 @@ void RawSerial::rxIsr()
     memset(temp_buff, '\0', BUFFER_LEN);
     ESP8266Simulated::instance()->readBuffer(temp_buff, &_len);
 
-    //printf("RX data available: %d bytes\n", _len);
+    pc.printf("RX data available: %d bytes\n", _len);
 
     memset(_buff, '\0', BUFFER_LEN);
     sprintf(_buff, "+IPD,0,%d:", _len);
@@ -93,7 +93,7 @@ void RawSerial::printf(const char* format, ...)
     vsprintf (buff, format, args);
     va_end (args);
 
-    //std::cout << buff;
+    pc.printf(buff);
 }
 
 void RawSerial::putc(char c)
