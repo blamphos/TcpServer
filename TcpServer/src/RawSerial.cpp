@@ -1,6 +1,7 @@
-//#include <iostream>
 #include "RawSerial.h"
 #include "ESP8266Simulated.h"
+
+extern Serial pc;
 
 RawSerial::RawSerial(PinName TxPin, PinName RxPin, int baudrate) :
     _rp(_buff), _wp(_buff), _readable(false)
@@ -15,6 +16,7 @@ RawSerial::RawSerial(PinName TxPin, PinName RxPin, int baudrate) :
 	}
 
 	memset(_buff, '\0', BUFFER_LEN);
+	//Serial::
 }
 
 RawSerial::~RawSerial()
@@ -23,7 +25,7 @@ RawSerial::~RawSerial()
     //std::cin.get();
 }
 
-void RawSerial::attach(Callback<void()> cb, Serial::IrqTypeT iqrType)
+void RawSerial::attach(Callback<void()> cb, IrqTypeT iqrType)
 {
     onSocketDataReceived = cb;
 }

@@ -1,8 +1,6 @@
 #ifndef CALLBACK_H
 #define CALLBACK_H
 
-#include <cstring>
-
 template <typename F>
 class Callback;
 

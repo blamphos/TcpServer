@@ -2,7 +2,7 @@
 #include "EventQueue.h"
 #include "IO_mapping.h"
 
-extern SerialDebug pc;
+extern Serial pc;
 extern BusOut leds;
 
 ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
@@ -25,7 +25,7 @@ void ESP8266::initialize()
 
 	_esp_reset->write(0);
 	//wait(2);
-	this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
+	this->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
 	_esp_reset->write(1);
 	//wait(2);
 

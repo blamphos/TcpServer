@@ -1,3 +1,5 @@
+#include <new>
+#include <cstring>
 #include <cstddef>
 #include <cstdint>
 #include "Serial.h"

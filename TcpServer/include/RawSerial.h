@@ -3,18 +3,16 @@
 
 #include "mbed.h"
 
-namespace Serial {
+class RawSerial {
+public:
     enum IrqTypeT {
         RxIrq,
         TxIrq,
     };
-};
 
-class RawSerial {
-public:
     RawSerial(PinName TxPin, PinName RxPin, int baudrate);
     ~RawSerial();
-    void attach(Callback<void()> cb, Serial::IrqTypeT iqrType);
+    void attach(Callback<void()> cb, IrqTypeT iqrType);
     void detach();
     bool readable();
     void printf(const char* format, ...);

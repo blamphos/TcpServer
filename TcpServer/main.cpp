@@ -1,10 +1,9 @@
-#include <conio.h>
 #include "mbed.h"
 #include "ESP8266.h"
 #include "HttpServer.h"
 
 BusOut leds;
-SerialDebug pc(p5, p6, 115200);
+Serial pc(p5, p6, 115200);
 
 int main()
 {
@@ -16,7 +15,7 @@ int main()
 
 	while (1) {
 		esp.handleMessage();
-        if (_kbhit() != 0) {
+        if (pc.waitKeyPress() != 0) {
             break;
         }
         wait_ms(10);

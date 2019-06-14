@@ -49,6 +49,7 @@
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/RawSerial.cpp" />
+		<Unit filename="src/Serial.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
 		<Unit filename="src/Ticker.cpp" />
 		<Unit filename="src/Timeout.cpp" />
