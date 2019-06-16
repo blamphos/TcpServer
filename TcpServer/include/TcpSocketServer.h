@@ -11,7 +11,7 @@
 
 #define DEFAULT_PORT	"80"
 
-class ESP8266Simulated
+class TcpSocketServer
 {
 public:
     void attach(Callback<void()> cb);
@@ -20,18 +20,19 @@ public:
     void start();
     void stop();
     void sendBuffer(const char* buff, int len);
-	static ESP8266Simulated* instance();
+	static TcpSocketServer* instance();
 
 private:
     enum ConstantsT {
         DEFAULT_BUFLEN = 4096
     };
 
-	ESP8266Simulated();
-	void handleConnection();
+	TcpSocketServer();
+	void handleConnection(SOCKET socket);
 	int serverThreadImp();
 	Callback<void()> onDataReceived;
 
+	bool _connection_handled;
 	SOCKET _listen_socket;
     SOCKET _client_socket;
 	char _buffer[DEFAULT_BUFLEN];

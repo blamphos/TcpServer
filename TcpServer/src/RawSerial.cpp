@@ -1,20 +1,21 @@
+#include <cstdarg>
 #include "RawSerial.h"
-#include "ESP8266Simulated.h"
+#include "TcpSocketServer.h"
 
 extern Serial pc;
 
 RawSerial::RawSerial(PinName TxPin, PinName RxPin, int baudrate) :
     _rp(_buff), _wp(_buff), _readable(false)
 {
-    ESP8266Simulated::instance()->attach(callback(this, RawSerial::rxIsr));
-    ESP8266Simulated::instance()->start();
+    TcpSocketServer::instance()->attach(callback(this, RawSerial::rxIsr));
+    TcpSocketServer::instance()->start();
 
 	memset(_buff, '\0', BUFFER_LEN);
 }
 
 RawSerial::~RawSerial()
 {
-    ESP8266Simulated::instance()->stop();
+    TcpSocketServer::instance()->stop();
 }
 
 void RawSerial::attach(Callback<void()> cb, IrqTypeT iqrType)
@@ -31,7 +32,7 @@ void RawSerial::detach()
 void RawSerial::rxIsr()
 {
     char temp_buff[BUFFER_LEN];
-    ESP8266Simulated::instance()->readBuffer(temp_buff, &_len);
+    TcpSocketServer::instance()->readBuffer(temp_buff, &_len);
 
     pc.printf("RX data available: %d bytes\n", _len);
 
@@ -45,9 +46,9 @@ void RawSerial::rxIsr()
             _rp = _buff;
             _readable = true;
             onSocketDataReceived();
-            wait_ms(1);
+            wait_ms(10);
             while (_readable) {
-                wait_ms(1);
+                wait_ms(10);
             }
             memset(_buff, '\0', BUFFER_LEN);
             wp = _buff;
@@ -55,9 +56,7 @@ void RawSerial::rxIsr()
     }
 
     // Semd response to client
-
-
-	ESP8266Simulated::instance()->sendBuffer(_buff, BUFFER_LEN);
+	//ESP8266Simulated::instance()->sendBuffer(_buff, BUFFER_LEN);
 }
 
 bool RawSerial::readable()
@@ -65,8 +64,23 @@ bool RawSerial::readable()
     return _readable;
 }
 
+
 void RawSerial::printf(const char* format, ...)
 {
+    if (strstr(format, "AT") != NULL) {
+        va_list args;
+        va_start (args, format);
+        pc.print_args (format, args);
+        va_end (args);
+
+        memset(_buff, '\0', BUFFER_LEN);
+        Serial::str2buff(_buff, "OK\r\n");
+        _rp = _buff;
+        _readable = true;
+        onSocketDataReceived();
+    } else {
+        TcpSocketServer::instance()->sendBuffer(format, strlen(format));
+    }
     /*char buff[BUFFER_LEN];
     memset(buff, '\0', BUFFER_LEN);
 

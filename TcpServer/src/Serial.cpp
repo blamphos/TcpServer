@@ -21,9 +21,14 @@ void Serial::printf(const char* format, ...)
     va_end (args);
 }
 
+void Serial::print_args(const char* format, va_list args)
+{
+    vprintf (format, args);
+}
+
 void Serial::putc(char c)
 {
-    //std::cout << c;
+    std::cout << c;
 }
 
 void Serial::readFromFile(const char* filename, char* buff, int len)
@@ -39,6 +44,11 @@ void Serial::readFromFile(const char* filename, char* buff, int len)
         }
         fclose(fp);
 	}
+}
+
+void Serial::str2buff(char* buff, const char* str)
+{
+    sprintf(buff, str);
 }
 
 int Serial::waitKeyPress()

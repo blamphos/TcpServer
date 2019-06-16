@@ -8,6 +8,7 @@
 #include "Ticker.h"
 #include "Timeout.h"
 #include "Callback.h"
+#include "EventQueue.h"
 
 #ifndef MBED_H
 #define MBED_H

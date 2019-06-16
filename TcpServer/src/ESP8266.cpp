@@ -1,15 +1,13 @@
 #include "ESP8266.h"
-#include "HttpServer.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
 
 extern Serial pc;
 extern BusOut leds;
 
-ESP8266::ESP8266(HttpServer* http) : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
-        _httpServer(http),
+ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 		_esp_reset(new DigitalOut(ESP8266_RST_PIN, 1)),
-		_expected_response(AT_IPD_RECEIVED),
+		_expected_response(AT_OK),
 		_buf_index(0),
 		_cmd_index(0)
 {
@@ -23,8 +21,6 @@ ESP8266::~ESP8266()
 
 void ESP8266::initialize()
 {
-	pc.printf("ESP8266 initializing...\n");
-
 	_esp_reset->write(0);
 	//wait(2);
 	this->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
@@ -34,8 +30,18 @@ void ESP8266::initialize()
 	esp_rx_flush();
 
 	_cmd_index = 0;
-	//sendNextCommand();
-	pc.printf("ESP8266 initialized\n");
+	sendNextCommand();
+}
+
+void ESP8266::readBuffer(char** buff, int* len)
+{
+    (*buff) = _rx_buf;
+    *len = SERIAL_RX_BUF_SIZE;
+}
+
+void ESP8266::sendBuffer()
+{
+    this->printf(_rx_buf);
 }
 
 void ESP8266::esp_rx_flush()
@@ -50,10 +56,10 @@ void ESP8266::esp_rx_isr()
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		//pc.putc(c);
+		pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
-			EventQueue::instance()->post(EVENT_SERIAL_CMD_RECEIVED);
+			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 		}
 		++_buf_index &= 0x1FF;
 	}
@@ -65,23 +71,20 @@ void ESP8266::queryStatus()
 	EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
 }
 
-void ESP8266::handleMessage()
+void ESP8266::handleMessage(message_t msg)
 {
-	message_t msg;
-	if (EventQueue::instance()->getNext(msg)) {
-		switch (msg.event) {
-		case EVENT_SERIAL_CMD_RECEIVED:
-			//processLine();
-			_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
-			break;
-		case EVENT_SERIAL_CMD_SEND:
-			_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
-			//sendNextCommand();
-			break;
-		default:
-			break;
-		}
-	}
+    switch (msg.event) {
+    case EVENT_SERIAL_DATA_RECEIVED:
+        processLine();
+        //_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
+        break;
+    case EVENT_SERIAL_CMD_SEND:
+        _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
+        //sendNextCommand();
+        break;
+    default:
+        break;
+    }
 }
 
 void ESP8266::sendNextCommand()
@@ -124,19 +127,19 @@ void ESP8266::sendNextCommand()
 		//expected_response = AT_OK;
 		this->printf("AT+CIPSTART=0,\"TCP\",\"192.168.1.31\",11000\r\n");
 		break;
-	case 6:
+	/*case 6:
 		leds = 0x3;
 		_expected_response = AT_OK;
 		// Build query message using TX buf
 		memset(_tx_buf, '\0', sizeof(_tx_buf));
 		//sprintf(_tx_buf, "GET /Status HTTP/1.1\r\nHost: 192.168.1.31\r\nConnection: close\r\n\r\n");
 		this->printf("AT+CIPSEND=0,%d\r\n", strlen(_tx_buf));
-		break;
-	case 7:
+		break;*/
+	case 6:
 		leds = 0x7;
-		_expected_response = AT_IP_CONN_CLOSED;
-		this->printf(_tx_buf);
-		this->printf("\r\n");
+		_expected_response = AT_IPD_RECEIVED;
+		//this->printf(_tx_buf);
+		//this->printf("\r\n");
 		//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
 		//return;
 		//expected_response = AT_OK;
@@ -154,7 +157,7 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
-	pc.printf("|");
+	//pc.printf("|");
     //std::cout << _rx_buf << std::endl;
 	switch(_expected_response) {
 	case AT_OK:
@@ -180,7 +183,8 @@ void ESP8266::processLine()
 		c = strstr(_rx_buf, "+IPD");
 		if (c != NULL) {
             //std::cout << _rx_buf << std::endl;
-			_expected_response = AT_IP_CONN_CLOSED;
+			//_expected_response = AT_OK;
+            EventQueue::instance()->post(EVENT_HTTP_REQUEST);
 			return;
 			//this->attach(NULL, Serial::RxIrq);
 			//_buf_index = 0;

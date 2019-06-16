@@ -1,22 +1,22 @@
 #include <thread>
-#include "ESP8266Simulated.h"
+#include "TcpSocketServer.h"
 
-ESP8266Simulated::ESP8266Simulated()
+TcpSocketServer::TcpSocketServer()
 {
     _listen_socket = INVALID_SOCKET;
 }
 
-void ESP8266Simulated::attach(Callback<void()> cb)
+void TcpSocketServer::attach(Callback<void()> cb)
 {
     onDataReceived = cb;
 }
 
-void ESP8266Simulated::detach()
+void TcpSocketServer::detach()
 {
     onDataReceived = NULL;
 }
 
-void ESP8266Simulated::readBuffer(char* buff, int* len)
+void TcpSocketServer::readBuffer(char* buff, int* len)
 {
     //memcpy(buff, _buffer, DEFAULT_BUFLEN);
     memset(buff, '\0', DEFAULT_BUFLEN);
@@ -25,7 +25,7 @@ void ESP8266Simulated::readBuffer(char* buff, int* len)
     (*len) = strlen(buff);
 }
 
-void ESP8266Simulated::sendBuffer(const char* buff, int len)
+void TcpSocketServer::sendBuffer(const char* buff, int len)
 {
     int iResult;
     int iSendResult;
@@ -33,7 +33,7 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
     memset(_buffer, '\0', DEFAULT_BUFLEN);
 
     // REMOVE THIS
-#if 1
+#if 0
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
 	    char c;
@@ -56,6 +56,8 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
         //break;
     }
 
+    return;
+
 	// shutdown the connection since we're done
 	iResult = shutdown(_client_socket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
@@ -65,20 +67,22 @@ void ESP8266Simulated::sendBuffer(const char* buff, int len)
 	closesocket(_client_socket);
 }
 
-void ESP8266Simulated::start()
+void TcpSocketServer::start()
 {
-    new std::thread(&ESP8266Simulated::serverThreadImp, this);
+    new std::thread(&TcpSocketServer::serverThreadImp, this);
 }
 
-void ESP8266Simulated::stop()
+void TcpSocketServer::stop()
 {
     closesocket(_listen_socket);
     WSACleanup();
     printf("TCP server stopped.\n");
 }
 
-void ESP8266Simulated::handleConnection()
+void TcpSocketServer::handleConnection(SOCKET socket)
 {
+    _connection_handled = false;
+    _client_socket = socket;
 	int iResult;
 
 	// Receive until the peer shuts down the connection
@@ -107,10 +111,13 @@ void ESP8266Simulated::handleConnection()
 	} while (iResult > 0);
 
 	onDataReceived();
-	printf("Connection handling end.\n");
+
+	while (!_connection_handled) {
+        wait_ms(10);
+	}
 }
 
-int ESP8266Simulated::serverThreadImp()
+int TcpSocketServer::serverThreadImp()
 {
 	WSADATA wsaData;
 	int iResult;
@@ -170,13 +177,15 @@ int ESP8266Simulated::serverThreadImp()
 
     printf("TCP server started!\n\n");
 
+    SOCKET socket;
     while (true) {
-        _client_socket = INVALID_SOCKET;
+        socket = INVALID_SOCKET;
         // Accept a Connection
-        while (_client_socket == INVALID_SOCKET){
-            _client_socket = accept(_listen_socket, NULL, NULL);
+        while (socket == INVALID_SOCKET){
+            socket = accept(_listen_socket, NULL, NULL);
         }
-        std::thread t1(&ESP8266Simulated::handleConnection, this);
+
+        std::thread t1(&TcpSocketServer::handleConnection, this, socket);
         t1.join();
     }
 
@@ -185,8 +194,8 @@ int ESP8266Simulated::serverThreadImp()
 	closesocket(_listen_socket);
 }
 
-ESP8266Simulated* ESP8266Simulated::instance()
+TcpSocketServer* TcpSocketServer::instance()
 {
-    static ESP8266Simulated inst;
+    static TcpSocketServer inst;
     return &inst;
 }

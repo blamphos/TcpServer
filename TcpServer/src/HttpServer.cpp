@@ -2,22 +2,40 @@
 #include <cstdlib>
 #include <cstdio>
 #include "HttpServer.h"
+#include "ESP8266.h"
 #include "Parameters.h"
 
 HttpServer::HttpServer() :
-    _requestType(NotDefined)
+    _esp(new ESP8266), _requestType(NotDefined)
 {
-
+	_esp->initialize();
 }
 
-void HttpServer::handleRequest(char* buff, int len)
+void HttpServer::handleMessage(message_t msg)
 {
-    if (strstr(buff, "\r\n\r\n") == NULL) {
+    switch (msg.event) {
+    case EVENT_HTTP_REQUEST:
+        //_esp->handleMessage(msg);
+        //processLine();
+        handleRequest();
+        break;
+    default:
+        _esp->handleMessage(msg);
+        break;
+    }
+}
+
+void HttpServer::handleRequest()
+{
+    char* buff;
+    int len;
+    _esp->readBuffer(&buff, &len);
+
+    if ((_requestType != NotDefined) || (strstr(buff, "\r\n\r\n") == NULL)) {
         return;
 
     }
-    printf("HTTP header received\n");
-    printf(buff);
+    //printf(buff);
 
     _requestType = NotDefined;
 
@@ -29,8 +47,6 @@ void HttpServer::handleRequest(char* buff, int len)
             _requestType = Post;
         }
     }
-
-
 
     int volume = Parameters::instance()->current_level;
     bool auto_find = Parameters::instance()->auto_find;
@@ -69,16 +85,19 @@ void HttpServer::handleRequest(char* buff, int len)
         Parameters::instance()->auto_find = auto_find;
         Parameters::instance()->current_input = static_cast<Spdif::InputTypeT>(input);
 	}
+
+	sendResponse();
 }
 
 void HttpServer::sendResponse()
 {
-    char buff[BUFFER_LEN];
-
-    //Parameters::instance()->auto_find = auto_find;
+    char* buff;
+    int len;
+    _esp->readBuffer(&buff, &len);
+    //char buff[BUFFER_LEN];
 
 	// Build up response to the client
-	memset(buff, '\0', BUFFER_LEN);
+	memset(buff, '\0', len);
 
 	FILE* fp = fopen("/local/index.html", "r");
 	if (fp != NULL) {
@@ -111,6 +130,7 @@ void HttpServer::sendResponse()
 					break;
 				}
 
+				_esp->sendBuffer();
 				/*iSendResult = send(ClientSocket, buff, strlen(buff), 0);
 				if (iSendResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
@@ -121,13 +141,15 @@ void HttpServer::sendResponse()
 
 				//printf("Bytes sent: %d\n", iSendResult);
 				//printf(recvbuf);
-				memset(buff, '\0', BUFFER_LEN);
+				memset(buff, '\0', len);
 				wp = buff;
 			}
 		}
 	}
 
 	fclose(fp);
+
+	_requestType = NotDefined;
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)

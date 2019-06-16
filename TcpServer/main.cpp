@@ -1,5 +1,4 @@
 #include "mbed.h"
-#include "ESP8266.h"
 #include "HttpServer.h"
 
 BusOut leds;
@@ -10,11 +9,13 @@ int main()
 	pc.printf("GeVol 2.0 TFT\r\n");
 
     HttpServer http;
-    ESP8266 esp(&http);
-	esp.initialize();
 
 	while (1) {
-		esp.handleMessage();
+        message_t msg;
+        if (EventQueue::instance()->getNext(msg)) {
+            http.handleMessage(msg);
+        }
+
         if (pc.waitKeyPress() != 0) {
             break;
         }
