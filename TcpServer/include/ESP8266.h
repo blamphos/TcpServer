@@ -14,6 +14,7 @@ public:
 	void handleMessage(message_t msg);
 	void readBuffer(char** buff, int* len);
 	void sendBuffer();
+	void closeConnection();
 
 private:
 	enum ConstantsT {

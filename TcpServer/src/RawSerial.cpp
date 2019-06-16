@@ -64,7 +64,6 @@ bool RawSerial::readable()
     return _readable;
 }
 
-
 void RawSerial::printf(const char* format, ...)
 {
     if (strstr(format, "AT") != NULL) {
@@ -74,7 +73,14 @@ void RawSerial::printf(const char* format, ...)
         va_end (args);
 
         memset(_buff, '\0', BUFFER_LEN);
-        Serial::str2buff(_buff, "OK\r\n");
+        if (strstr(format, "CIPCLOSE") != NULL) {
+            TcpSocketServer::instance()->closeConnection();
+        } else if (strstr(format, "CIPCLOSE") != NULL) {
+            Serial::str2buff(_buff, "OK\r\n>\r\n");
+        } else {
+            Serial::str2buff(_buff, "OK\r\n");
+        }
+
         _rp = _buff;
         _readable = true;
         onSocketDataReceived();

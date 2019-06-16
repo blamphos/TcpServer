@@ -19,6 +19,7 @@ public:
     void readBuffer(char* buff, int* len);
     void start();
     void stop();
+    void closeConnection();
     void sendBuffer(const char* buff, int len);
 	static TcpSocketServer* instance();
 

@@ -55,16 +55,6 @@ void TcpSocketServer::sendBuffer(const char* buff, int len)
         //WSACleanup();
         //break;
     }
-
-    return;
-
-	// shutdown the connection since we're done
-	iResult = shutdown(_client_socket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-	}
-
-	closesocket(_client_socket);
 }
 
 void TcpSocketServer::start()
@@ -77,6 +67,19 @@ void TcpSocketServer::stop()
     closesocket(_listen_socket);
     WSACleanup();
     printf("TCP server stopped.\n");
+}
+
+void TcpSocketServer::closeConnection()
+{
+    // shutdown the connection since we're done
+	int iResult = shutdown(_client_socket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+	}
+
+	closesocket(_client_socket);
+
+	_connection_handled = true;
 }
 
 void TcpSocketServer::handleConnection(SOCKET socket)

@@ -33,6 +33,11 @@ void ESP8266::initialize()
 	sendNextCommand();
 }
 
+void ESP8266::closeConnection()
+{
+    this->printf("AT+CIPCLOSE=0\r\n");
+}
+
 void ESP8266::readBuffer(char** buff, int* len)
 {
     (*buff) = _rx_buf;
@@ -41,7 +46,9 @@ void ESP8266::readBuffer(char** buff, int* len)
 
 void ESP8266::sendBuffer()
 {
-    this->printf(_rx_buf);
+    _expected_response = AT_READY_TO_SEND;
+    this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_rx_buf));
+    //this->printf(_rx_buf);
 }
 
 void ESP8266::esp_rx_flush()
@@ -63,12 +70,6 @@ void ESP8266::esp_rx_isr()
 		}
 		++_buf_index &= 0x1FF;
 	}
-}
-
-void ESP8266::queryStatus()
-{
-	_cmd_index = 5;
-	EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
 }
 
 void ESP8266::handleMessage(message_t msg)
@@ -121,12 +122,12 @@ void ESP8266::sendNextCommand()
 		//esp->printf("AT+CWLAP\r\n");
 		this->printf("AT+CWJAP=\"%s\",\"%s\"\r\n", ssid, pwd);
 		break;
-	case 5:
+	/*case 5:
 		leds = 0x1;
 		_expected_response = AT_OK;
 		//expected_response = AT_OK;
 		this->printf("AT+CIPSTART=0,\"TCP\",\"192.168.1.31\",11000\r\n");
-		break;
+		break;*/
 	/*case 6:
 		leds = 0x3;
 		_expected_response = AT_OK;
@@ -135,7 +136,7 @@ void ESP8266::sendNextCommand()
 		//sprintf(_tx_buf, "GET /Status HTTP/1.1\r\nHost: 192.168.1.31\r\nConnection: close\r\n\r\n");
 		this->printf("AT+CIPSEND=0,%d\r\n", strlen(_tx_buf));
 		break;*/
-	case 6:
+	case 5:
 		leds = 0x7;
 		_expected_response = AT_IPD_RECEIVED;
 		//this->printf(_tx_buf);

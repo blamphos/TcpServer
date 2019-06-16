@@ -150,6 +150,7 @@ void HttpServer::sendResponse()
 	fclose(fp);
 
 	_requestType = NotDefined;
+	_esp->closeConnection();
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)
