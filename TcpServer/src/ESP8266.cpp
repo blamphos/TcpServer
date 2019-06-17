@@ -19,6 +19,26 @@ ESP8266::~ESP8266()
 
 }
 
+void ESP8266::handleMessage(message_t msg)
+{
+    switch (msg.event) {
+    case EVENT_SERIAL_DATA_RECEIVED:
+        processLine();
+        //_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
+        break;
+    case EVENT_SERIAL_DATA_SEND:
+        _expected_response = AT_OK;
+        this->printf(_tx_buf);
+        break;
+    case EVENT_SERIAL_CMD_SEND:
+        _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
+        //sendNextCommand();
+        break;
+    default:
+        break;
+    }
+}
+
 void ESP8266::initialize()
 {
 	_esp_reset->write(0);
@@ -38,17 +58,22 @@ void ESP8266::closeConnection()
     this->printf("AT+CIPCLOSE=0\r\n");
 }
 
-void ESP8266::readBuffer(char** buff, int* len)
+void ESP8266::getRxBuffer(char** buff, int* len)
 {
     (*buff) = _rx_buf;
     *len = SERIAL_RX_BUF_SIZE;
 }
 
-void ESP8266::sendBuffer()
+void ESP8266::getTxBuffer(char** buff, int* len)
+{
+    (*buff) = _tx_buf;
+    *len = SERIAL_TX_BUF_SIZE;
+}
+
+void ESP8266::sendTxBuffer()
 {
     _expected_response = AT_READY_TO_SEND;
     this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_rx_buf));
-    //this->printf(_rx_buf);
 }
 
 void ESP8266::esp_rx_flush()
@@ -70,22 +95,6 @@ void ESP8266::esp_rx_isr()
 		}
 		++_buf_index &= 0x1FF;
 	}
-}
-
-void ESP8266::handleMessage(message_t msg)
-{
-    switch (msg.event) {
-    case EVENT_SERIAL_DATA_RECEIVED:
-        processLine();
-        //_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
-        break;
-    case EVENT_SERIAL_CMD_SEND:
-        _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
-        //sendNextCommand();
-        break;
-    default:
-        break;
-    }
 }
 
 void ESP8266::sendNextCommand()
@@ -170,14 +179,14 @@ void ESP8266::processLine()
 	case AT_READY_TO_SEND:
 		c = strstr(_rx_buf, ">");
 		if (c != NULL) {
-			EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
+			EventQueue::instance()->post(EVENT_SERIAL_DATA_SEND);
 		}
 		break;
 	case AT_IP_CONN_CLOSED:
 		c = strstr(_rx_buf, "CLOSED");
 		if (c != NULL) {
 			//_client->processResponse(_rx_buf);
-			_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
+			//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
 		}
 		break;
 	case AT_IPD_RECEIVED:

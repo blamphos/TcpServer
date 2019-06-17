@@ -29,7 +29,7 @@ void HttpServer::handleRequest()
 {
     char* buff;
     int len;
-    _esp->readBuffer(&buff, &len);
+    _esp->getRxBuffer(&buff, &len);
 
     if ((_requestType != NotDefined) || (strstr(buff, "\r\n\r\n") == NULL)) {
         return;
@@ -93,7 +93,7 @@ void HttpServer::sendResponse()
 {
     char* buff;
     int len;
-    _esp->readBuffer(&buff, &len);
+    _esp->getTxBuffer(&buff, &len);
     //char buff[BUFFER_LEN];
 
 	// Build up response to the client
@@ -130,7 +130,7 @@ void HttpServer::sendResponse()
 					break;
 				}
 
-				_esp->sendBuffer();
+				_esp->sendTxBuffer();
 				/*iSendResult = send(ClientSocket, buff, strlen(buff), 0);
 				if (iSendResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());

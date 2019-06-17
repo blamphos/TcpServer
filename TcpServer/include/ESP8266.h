@@ -12,15 +12,16 @@ public:
 	~ESP8266();
 	void initialize();
 	void handleMessage(message_t msg);
-	void readBuffer(char** buff, int* len);
-	void sendBuffer();
+	void getRxBuffer(char** buff, int* len);
+	void getTxBuffer(char** buff, int* len);
+	void sendTxBuffer();
 	void closeConnection();
 
 private:
 	enum ConstantsT {
 		ESP_BAUD_RATE = 115200,
 		SERIAL_RX_BUF_SIZE = 512,
-		SERIAL_TX_BUF_SIZE = 64,
+		SERIAL_TX_BUF_SIZE = 128,
 		MSG_BUF_SIZE = 16
 	};
 
@@ -36,7 +37,6 @@ private:
 	void esp_rx_flush();
 	void sendNextCommand();
 	void processLine();
-	void queryStatus();
 
 	DigitalOut* _esp_reset;
 	Timeout _timeout;
