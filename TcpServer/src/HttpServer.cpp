@@ -19,6 +19,9 @@ void HttpServer::handleMessage(message_t msg)
         //processLine();
         handleRequest();
         break;
+    case EVENT_HTTP_RESPONSE:
+        sendResponse();
+        break;
     default:
         _esp->handleMessage(msg);
         break;
@@ -31,20 +34,15 @@ void HttpServer::handleRequest()
     int len;
     _esp->getRxBuffer(&buff, &len);
 
-    if ((_requestType != NotDefined) || (strstr(buff, "\r\n\r\n") == NULL)) {
-        return;
-
-    }
-    //printf(buff);
-
-    _requestType = NotDefined;
-
     if (_requestType == NotDefined) {
-        if (strstr(buff, "GET") != NULL) {
+        if (strstr(buff, "GET") != NULL && strstr(buff, "\r\n\r\n") != NULL) {
             _requestType = Get;
         }
-        else if (strstr(buff, "POST") != NULL) {
+        else if (strstr(buff, "POST") != NULL && strstr(buff, "pot=") != NULL) {
             _requestType = Post;
+        }
+        else {
+            return;
         }
     }
 
@@ -86,71 +84,72 @@ void HttpServer::handleRequest()
         Parameters::instance()->current_input = static_cast<Spdif::InputTypeT>(input);
 	}
 
-	sendResponse();
+	sendResponse(true);
 }
 
-void HttpServer::sendResponse()
+void HttpServer::sendResponse(bool firstSegment)
 {
-    char* buff;
-    int len;
+    static FILE* fp = NULL;
+    static char* buff = NULL;
+    static int line = 0;
+    static int len = -1;
+
+    if (_requestType == NotDefined) {
+        return;
+    }
+
+    if (firstSegment) {
+        fp = fopen("/local/index.html", "r");
+        if (fp == NULL) {
+            return;
+        }
+
+        line = 0;
+    }
+
     _esp->getTxBuffer(&buff, &len);
-    //char buff[BUFFER_LEN];
+    memset(buff, '\0', len);
 
-	// Build up response to the client
-	memset(buff, '\0', len);
+    char ch;
+    char* wp = buff;
+    while ((ch = fgetc(fp)) != EOF) {
+        *wp++ = ch;
 
-	FILE* fp = fopen("/local/index.html", "r");
-	if (fp != NULL) {
-		char ch;
-		char* wp = buff;
-		int line = 0;
-		while ((ch = fgetc(fp)) != EOF) {
-			*wp++ = ch;
-			if (ch == '\n') {
-				// Process line
-				++line;
+        // Process line
+        if (ch == '\n') {
+            ++line;
 
-				switch(line) {
-				case 26:
-					setVolumeLevel(buff, Parameters::instance()->current_level);
-					break;
-				case 28:
-					setButtonState(buff, Parameters::instance()->current_input == 0);
-					break;
-				case 29:
-					setButtonState(buff, Parameters::instance()->current_input == 1);
-					break;
-				case 30:
-					setButtonState(buff, Parameters::instance()->current_input == 2);
-					break;
-				case 31:
-					setButtonState(buff, Parameters::instance()->auto_find);
-					break;
-				default:
-					break;
-				}
+            switch(line) {
+            case 26:
+                setVolumeLevel(buff, Parameters::instance()->current_level);
+                break;
+            case 28:
+                setButtonState(buff, Parameters::instance()->current_input == 0);
+                break;
+            case 29:
+                setButtonState(buff, Parameters::instance()->current_input == 1);
+                break;
+            case 30:
+                setButtonState(buff, Parameters::instance()->current_input == 2);
+                break;
+            case 31:
+                setButtonState(buff, Parameters::instance()->auto_find);
+                break;
+            default:
+                break;
+            }
 
-				_esp->sendTxBuffer();
-				/*iSendResult = send(ClientSocket, buff, strlen(buff), 0);
-				if (iSendResult == SOCKET_ERROR) {
-					printf("send failed with error: %d\n", WSAGetLastError());
-					closesocket(ClientSocket);
-					WSACleanup();
-					break;
-				}*/
-
-				//printf("Bytes sent: %d\n", iSendResult);
-				//printf(recvbuf);
-				memset(buff, '\0', len);
-				wp = buff;
-			}
-		}
+            _esp->sendTxBuffer();
+            return;
+        }
 	}
 
-	fclose(fp);
-
-	_requestType = NotDefined;
-	_esp->closeConnection();
+	if (fp != NULL) {
+        fclose(fp);
+        fp = NULL;
+        _requestType = NotDefined;
+        _esp->closeConnection();
+	}
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)

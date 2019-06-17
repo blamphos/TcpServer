@@ -9,7 +9,6 @@ class HttpServer {
 public:
     HttpServer();
     void handleRequest();
-    void sendResponse();
 	void handleMessage(message_t msg);
 
 private:
@@ -19,6 +18,7 @@ private:
         Post
     };
 
+    void sendResponse(bool firstSegment = false);
 	void parseCharValue(char* buff, const char* tag, int* value);
 	void setVolumeLevel(char* buff, int volume);
 	void setButtonState(char* buff, bool enabled);

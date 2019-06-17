@@ -37,8 +37,12 @@ void RawSerial::rxIsr()
     pc.printf("RX data available: %d bytes\n", _len);
 
     memset(_buff, '\0', BUFFER_LEN);
-    //sprintf(_buff, "+IPD,0,%d:", _len);
-    char* wp = _buff + strlen(_buff);
+    memcpy(_buff, temp_buff, BUFFER_LEN);
+    _rp = _buff;
+    _readable = true;
+    onSocketDataReceived();
+
+    /*char* wp = _buff + strlen(_buff);
 
     for (int i = 0; i < _len; ++i) {
         *wp++ = temp_buff[i];
@@ -54,6 +58,7 @@ void RawSerial::rxIsr()
             wp = _buff;
         }
     }
+    */
 
     // Semd response to client
 	//ESP8266Simulated::instance()->sendBuffer(_buff, BUFFER_LEN);
@@ -66,6 +71,8 @@ bool RawSerial::readable()
 
 void RawSerial::printf(const char* format, ...)
 {
+    memset(_buff, '\0', BUFFER_LEN);
+
     if (strstr(format, "AT") != NULL) {
         va_list args;
         va_start (args, format);
@@ -75,18 +82,20 @@ void RawSerial::printf(const char* format, ...)
         memset(_buff, '\0', BUFFER_LEN);
         if (strstr(format, "CIPCLOSE") != NULL) {
             TcpSocketServer::instance()->closeConnection();
-        } else if (strstr(format, "CIPCLOSE") != NULL) {
-            Serial::str2buff(_buff, "OK\r\n>\r\n");
+            Serial::str2buff(_buff, "0,CLOSED\r\n");
+        } else if (strstr(format, "CIPSENDBUF") != NULL) {
+            Serial::str2buff(_buff, ">\r\n");
         } else {
             Serial::str2buff(_buff, "OK\r\n");
         }
-
-        _rp = _buff;
-        _readable = true;
-        onSocketDataReceived();
     } else {
         TcpSocketServer::instance()->sendBuffer(format, strlen(format));
+        Serial::str2buff(_buff, "0,SEND OK\r\n");
     }
+
+    _rp = _buff;
+    _readable = true;
+    onSocketDataReceived();
     /*char buff[BUFFER_LEN];
     memset(buff, '\0', BUFFER_LEN);
 

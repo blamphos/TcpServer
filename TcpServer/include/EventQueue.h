@@ -12,7 +12,7 @@ public:
 
 private:
 	enum ConstantsT {
-		EVENT_QUEUE_SIZE = 16
+		EVENT_QUEUE_SIZE = 48
 	};
 
 	EventQueue(int queue_size);

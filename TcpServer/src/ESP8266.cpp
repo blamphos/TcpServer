@@ -27,7 +27,7 @@ void ESP8266::handleMessage(message_t msg)
         //_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
         break;
     case EVENT_SERIAL_DATA_SEND:
-        _expected_response = AT_OK;
+        _expected_response = AT_DATA_SEND_OK;
         this->printf(_tx_buf);
         break;
     case EVENT_SERIAL_CMD_SEND:
@@ -55,6 +55,7 @@ void ESP8266::initialize()
 
 void ESP8266::closeConnection()
 {
+    _expected_response = AT_IP_CONN_CLOSED;
     this->printf("AT+CIPCLOSE=0\r\n");
 }
 
@@ -72,8 +73,9 @@ void ESP8266::getTxBuffer(char** buff, int* len)
 
 void ESP8266::sendTxBuffer()
 {
+    esp_rx_flush();
     _expected_response = AT_READY_TO_SEND;
-    this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_rx_buf));
+    this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_tx_buf));
 }
 
 void ESP8266::esp_rx_flush()
@@ -81,6 +83,9 @@ void ESP8266::esp_rx_flush()
 	while (readable()) {
 		getc();
 	}
+
+	memset(_rx_buf, '\0', sizeof(_rx_buf));
+	_buf_index = 0;
 }
 
 void ESP8266::esp_rx_isr()
@@ -173,18 +178,31 @@ void ESP8266::processLine()
 	case AT_OK:
 		c = strstr(_rx_buf, "OK");
 		if (c != NULL) {
+            esp_rx_flush();
 			EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
+		}
+		break;
+	case AT_DATA_SEND_OK:
+		c = strstr(_rx_buf, "OK");
+		if (c != NULL) {
+            esp_rx_flush();
+			EventQueue::instance()->post(EVENT_HTTP_RESPONSE);
 		}
 		break;
 	case AT_READY_TO_SEND:
 		c = strstr(_rx_buf, ">");
 		if (c != NULL) {
-			EventQueue::instance()->post(EVENT_SERIAL_DATA_SEND);
+			//EventQueue::instance()->post(EVENT_SERIAL_DATA_SEND);
+			esp_rx_flush();
+            _expected_response = AT_DATA_SEND_OK;
+            this->printf(_tx_buf);
 		}
 		break;
 	case AT_IP_CONN_CLOSED:
 		c = strstr(_rx_buf, "CLOSED");
 		if (c != NULL) {
+            esp_rx_flush();
+            _expected_response = AT_IPD_RECEIVED;
 			//_client->processResponse(_rx_buf);
 			//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
 		}
@@ -192,10 +210,7 @@ void ESP8266::processLine()
 	case AT_IPD_RECEIVED:
 		c = strstr(_rx_buf, "+IPD");
 		if (c != NULL) {
-            //std::cout << _rx_buf << std::endl;
-			//_expected_response = AT_OK;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
-			return;
 			//this->attach(NULL, Serial::RxIrq);
 			//_buf_index = 0;
 			//this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);

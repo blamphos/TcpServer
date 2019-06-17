@@ -27,7 +27,6 @@ void TcpSocketServer::readBuffer(char* buff, int* len)
 
 void TcpSocketServer::sendBuffer(const char* buff, int len)
 {
-    int iResult;
     int iSendResult;
 
     memset(_buffer, '\0', DEFAULT_BUFLEN);

@@ -38,18 +38,19 @@
 1560152972 c:\data\tcpserver\tcpserver\include\systemcontrol.h
 	"Parameters.h"
 
-1560490589 source:c:\data\tcpserver\tcpserver\main.cpp
+1560760271 source:c:\data\tcpserver\tcpserver\main.cpp
 	"mbed.h"
+	"HttpServer.h"
+
+1560782192 c:\data\tcpserver\tcpserver\include\httpserver.h
+	"EventQueue.h"
+
+1560786810 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
+	<cstring>
+	<cstdlib>
+	<cstdio>
+	"HttpServer.h"
 	"ESP8266.h"
-	"HttpServer.h"
-
-1560254513 c:\data\tcpserver\tcpserver\include\httpserver.h
-
-1560254802 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
-	<string.h>
-	<stdlib.h>
-	<stdio.h>
-	"HttpServer.h"
 	"Parameters.h"
 
 1560749418 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
@@ -121,7 +122,7 @@
 	"RawSerial.h"
 	"TcpSocketServer.h"
 
-1560490406 c:\data\tcpserver\tcpserver\include\mbed.h
+1560760271 c:\data\tcpserver\tcpserver\include\mbed.h
 	<new>
 	<cstring>
 	<cstddef>
@@ -132,6 +133,7 @@
 	"Ticker.h"
 	"Timeout.h"
 	"Callback.h"
+	"EventQueue.h"
 
 1560490406 c:\data\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
@@ -147,26 +149,26 @@
 
 1560490406 c:\data\tcpserver\tcpserver\include\callback.h
 
-1560319588 c:\data\tcpserver\tcpserver\include\esp8266.h
+1560785977 c:\data\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
 1560517810 c:\data\tcpserver\tcpserver\include\esp8266simulated.h
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560517612 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
+1560785816 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
 
-1560342534 c:\data\tcpserver\tcpserver\include\eventqueue.h
+1560785536 c:\data\tcpserver\tcpserver\include\eventqueue.h
 	"Fifo.h"
 	"EmbeddedMessages.h"
 
 1560152972 c:\data\tcpserver\tcpserver\include\fifo.h
 	"mbed.h"
 
-1560152972 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
+1560782765 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
 	"mbed.h"
 
 1560152972 c:\data\tcpserver\tcpserver\include\io_mapping.h
@@ -180,9 +182,10 @@
 	<thread>
 	"mbed.h"
 
-1560519428 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
+1560787391 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
+	<cstdarg>
 	"RawSerial.h"
-	"ESP8266Simulated.h"
+	"TcpSocketServer.h"
 
 1560519504 source:c:\data\tcpserver\tcpserver\src\esp8266simulated.cpp
 	<thread>
@@ -192,8 +195,9 @@
 	"mbed.h"
 	<cstdarg>
 
-1560516693 c:\data\tcpserver\tcpserver\include\serial.h
+1560760271 c:\data\tcpserver\tcpserver\include\serial.h
 	"mbed.h"
+	<cstdarg>
 
 1560412873 source:c:\data\tcpserver\tcpserver\src\task.cpp
 	"Task.h"
@@ -229,7 +233,7 @@
 
 1560490406 c:\data\tcpserver\tcpserver\include\debugprint.h
 
-1560516693 source:c:\data\tcpserver\tcpserver\src\serial.cpp
+1560760271 source:c:\data\tcpserver\tcpserver\src\serial.cpp
 	<iostream>
 	<cstdarg>
 	"conio.h"
@@ -246,4 +250,12 @@
 1560699152 c:\data\sw_dev\tcpserver\tcpserver\include\tcpsocketserver.h
 	<ws2tcpip.h>
 	"mbed.h"
+
+1560760271 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
+	<ws2tcpip.h>
+	"mbed.h"
+
+1560787518 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
+	<thread>
+	"TcpSocketServer.h"
 

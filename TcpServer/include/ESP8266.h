@@ -20,13 +20,14 @@ public:
 private:
 	enum ConstantsT {
 		ESP_BAUD_RATE = 115200,
-		SERIAL_RX_BUF_SIZE = 512,
+		SERIAL_RX_BUF_SIZE = 1024,
 		SERIAL_TX_BUF_SIZE = 128,
 		MSG_BUF_SIZE = 16
 	};
 
 	enum ResponseTypeT {
 		AT_OK = 0,
+		AT_DATA_SEND_OK,
 		AT_READY_TO_SEND,
 		AT_IP_CONN_CLOSED,
 		AT_IPD_RECEIVED
