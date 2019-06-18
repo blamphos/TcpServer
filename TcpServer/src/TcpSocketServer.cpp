@@ -3,6 +3,7 @@
 
 TcpSocketServer::TcpSocketServer()
 {
+	memset(_buffer, '\0', DEFAULT_BUFLEN);
     _listen_socket = INVALID_SOCKET;
 }
 
@@ -97,10 +98,6 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 	} while (iResult > 0);
 
 	onDataReceived();
-
-	while (!_connection_handled) {
-        //wait_ms(10);
-	}
 }
 
 int TcpSocketServer::serverThreadImp()

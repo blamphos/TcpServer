@@ -84,7 +84,7 @@ void ESP8266::esp_rx_flush()
 		getc();
 	}
 
-	memset(_rx_buf, '\0', sizeof(_rx_buf));
+	memset(_rx_buf, '\0', SERIAL_RX_BUF_SIZE);
 	_buf_index = 0;
 }
 
