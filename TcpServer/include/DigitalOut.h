@@ -7,6 +7,7 @@ class DigitalOut {
 public:
     DigitalOut(PinName pin, int init_state = 0) {}
     void write(int value) {}
+    int read() { return 0; }
 };
 
 #endif

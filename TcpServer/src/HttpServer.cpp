@@ -4,6 +4,7 @@
 #include "HttpServer.h"
 #include "ESP8266.h"
 #include "Parameters.h"
+#include "VolumeControl.h"
 
 HttpServer::HttpServer() :
     _esp(new ESP8266), _requestType(NotDefined)
@@ -20,8 +21,6 @@ void HttpServer::handleMessage(message_t msg)
 {
     switch (msg.event) {
     case EVENT_HTTP_REQUEST:
-        //_esp->handleMessage(msg);
-        //processLine();
         handleRequest();
         break;
     case EVENT_HTTP_RESPONSE:
@@ -58,9 +57,11 @@ void HttpServer::handleRequest()
 	// Parse input data
 	if (_requestType == Post) {
 		parseCharValue(buff, "pot=", &volume);
-		if ((volume >= 0) && (volume < 100)) {
-			printf("Volume: %d\r\n", volume);
+		if ((VolumeControl::VALUE_MIN >= 0) && (volume <= VolumeControl::VALUE_MAX)) {
+			//printf("Volume: %d\r\n", volume);
 			//SystemControl::instance()->onVolumeChanged(volume);
+			Parameters::instance()->current_level = volume;
+			EventQueue::instance()->post(EVENT_VOLUME_COMMAND, VolumeControl::Update);
 		}
 		else {
 			return;
@@ -84,7 +85,6 @@ void HttpServer::handleRequest()
 			break;
 		}
 
-        Parameters::instance()->current_level = volume;
         Parameters::instance()->auto_find = auto_find;
         Parameters::instance()->current_input = static_cast<Spdif::InputTypeT>(input);
 	}

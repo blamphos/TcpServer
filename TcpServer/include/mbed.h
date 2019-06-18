@@ -2,21 +2,31 @@
 #include <cstring>
 #include <cstddef>
 #include <cstdint>
+#include "Timer.h"
+#include "BusOut.h"
 #include "Serial.h"
 #include "RawSerial.h"
+#include "DigitalIn.h"
 #include "DigitalOut.h"
 #include "Ticker.h"
 #include "Timeout.h"
 #include "Callback.h"
 #include "EventQueue.h"
 
+#define SIMULATED
+
 #ifndef MBED_H
 #define MBED_H
 
 typedef int PinName;
-typedef int BusOut;
+
+enum PullModeT {
+    PullUp,
+    PullDown
+};
 
 enum Pins {
+    NC = 0,
     p5 = 5,
     p6,
     p7,
@@ -42,7 +52,13 @@ enum Pins {
     p27,
     p28,
     p29,
-    p30
+    p30,
+    LED1,
+    LED2,
+    LED3,
+    LED4,
+    USBTX,
+    USBRX
 };
 
 void wait(int value);

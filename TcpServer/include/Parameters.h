@@ -1,18 +1,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include "stdint.h"
-
-namespace Spdif {
-const int INPUT_COUNT = 3;
-
-enum InputTypeT {
-	Coax1 = 0,
-	Coax2,
-	Opt1,
-	Auto
-};
-}
+#include "Spdif_defs.h"
 
 class Parameters {
 public:

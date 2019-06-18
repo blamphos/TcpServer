@@ -29,29 +29,38 @@
 1560152972 source:c:\data\tcpserver\tcpserver\src\parameters.cpp
 	"Parameters.h"
 
-1560152972 c:\data\tcpserver\tcpserver\include\parameters.h
-	"stdint.h"
+1560869350 c:\data\tcpserver\tcpserver\include\parameters.h
+	"Spdif_defs.h"
 
-1560152972 source:c:\data\tcpserver\tcpserver\src\systemcontrol.cpp
-	"SystemControl.h"
-
-1560152972 c:\data\tcpserver\tcpserver\include\systemcontrol.h
-	"Parameters.h"
-
-1560865234 source:c:\data\tcpserver\tcpserver\main.cpp
+1560872680 source:c:\data\tcpserver\tcpserver\src\systemcontrol.cpp
 	"mbed.h"
+	"SystemControl.h"
+	"SpdifSwitch.h"
+	"VolumeControl.h"
 	"HttpServer.h"
+
+1560871749 c:\data\tcpserver\tcpserver\include\systemcontrol.h
+	"IO_mapping.h"
+	"Spdif_defs.h"
+	"Parameters.h"
+	"EmbeddedMessages.h"
+	"HttpServer.h"
+
+1560871749 source:c:\data\tcpserver\tcpserver\main.cpp
+	"mbed.h"
+	"SystemControl.h"
 
 1560862142 c:\data\tcpserver\tcpserver\include\httpserver.h
 	"EventQueue.h"
 
-1560866368 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
+1560872950 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
 	<cstring>
 	<cstdlib>
 	<cstdio>
 	"HttpServer.h"
 	"ESP8266.h"
 	"Parameters.h"
+	"VolumeControl.h"
 
 1560832529 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
@@ -122,13 +131,16 @@
 	"RawSerial.h"
 	"TcpSocketServer.h"
 
-1560864953 c:\data\tcpserver\tcpserver\include\mbed.h
+1560871930 c:\data\tcpserver\tcpserver\include\mbed.h
 	<new>
 	<cstring>
 	<cstddef>
 	<cstdint>
+	"Timer.h"
+	"BusOut.h"
 	"Serial.h"
 	"RawSerial.h"
+	"DigitalIn.h"
 	"DigitalOut.h"
 	"Ticker.h"
 	"Timeout.h"
@@ -138,7 +150,7 @@
 1560866832 c:\data\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
-1560152972 c:\data\tcpserver\tcpserver\include\digitalout.h
+1560870744 c:\data\tcpserver\tcpserver\include\digitalout.h
 	"mbed.h"
 
 1560864614 c:\data\tcpserver\tcpserver\include\ticker.h
@@ -168,10 +180,10 @@
 1560152972 c:\data\tcpserver\tcpserver\include\fifo.h
 	"mbed.h"
 
-1560782765 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
+1560872680 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
 	"mbed.h"
 
-1560152972 c:\data\tcpserver\tcpserver\include\io_mapping.h
+1560872040 c:\data\tcpserver\tcpserver\include\io_mapping.h
 	"mbed.h"
 
 1560152972 source:c:\data\tcpserver\tcpserver\src\eventqueue.cpp
@@ -256,7 +268,7 @@
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560866910 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
+1560867466 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
 	"TcpSocketServer.h"
 
@@ -273,4 +285,91 @@
 1560863414 source:c:\data\tcpserver\tcpserver\src\taskbase.cpp
 	"TaskBase.h"
 	"WorkerBase.h"
+
+1559539254 c:\data\tcpserver\tcpserver\include\spdif_defs.h
+	"mbed.h"
+
+1560870434 c:\data\tcpserver\tcpserver\include\digitalin.h
+	"mbed.h"
+
+1533562924 c:\data\tcpserver\tcpserver\include\timer.h
+	<chrono>
+
+1559805113 c:\data\tcpserver\tcpserver\include\spdifswitch.h
+	"mbed.h"
+	"Spdif_defs.h"
+
+1557149779 c:\data\tcpserver\tcpserver\include\irreceiver.h
+	"IO_mapping.h"
+
+1555500876 c:\data\tcpserver\tcpserver\include\spdifdecoder.h
+	"Spdif_defs.h"
+
+1557149739 c:\data\tcpserver\tcpserver\include\pushbuttonswitch.h
+	"ButtonBase.h"
+
+1557149739 c:\data\tcpserver\tcpserver\include\buttonbase.h
+	"mbed.h"
+	"EventQueue.h"
+
+1557149739 c:\data\tcpserver\tcpserver\include\rotaryencoderswitch.h
+	"ButtonBase.h"
+
+1560872779 c:\data\tcpserver\tcpserver\include\volumecontrol.h
+	"mbed.h"
+
+1559806681 c:\data\tcpserver\tcpserver\include\display.h
+	"ST7735S.h"
+	"EmbeddedMessages.h"
+
+1556607996 c:\data\tcpserver\tcpserver\include\st7735s.h
+	"ST7735S_defs.h"
+	"IO_mapping.h"
+	"FastIO.h"
+
+1554974571 c:\data\tcpserver\tcpserver\include\st7735s_defs.h
+
+1560870141 c:\data\tcpserver\tcpserver\include\fastio.h
+
+1560872762 source:c:\data\tcpserver\tcpserver\src\volumecontrol.cpp
+	"VolumeControl.h"
+	"Parameters.h"
+
+1560872017 c:\data\tcpserver\tcpserver\include\softspi.h
+	"IO_mapping.h"
+
+1560870557 c:\data\tcpserver\tcpserver\include\i2c.h
+	"mbed.h"
+
+1560870565 source:c:\data\tcpserver\tcpserver\src\ak4113.cpp
+	"AK4113.h"
+
+1560870475 c:\data\tcpserver\tcpserver\include\ak4113.h
+	"mbed.h"
+
+1533562924 c:\data\tcpserver\tcpserver\include\busout.h
+	"mbed.h"
+	"DigitalOut.h"
+
+1560870579 source:c:\data\tcpserver\tcpserver\src\spdifdecoder.cpp
+	"SpdifDecoder.h"
+	"IO_mapping.h"
+	"EventQueue.h"
+	"AK4113.h"
+
+1559808360 source:c:\data\tcpserver\tcpserver\src\spdifswitch.cpp
+	"SpdifSwitch.h"
+	"EventQueue.h"
+	"Parameters.h"
+
+1560870719 source:c:\data\tcpserver\tcpserver\src\busout.cpp
+	"BusOut.h"
+
+1556802530 source:c:\data\tcpserver\tcpserver\src\irreceiver.cpp
+	"IrReceiver.h"
+	"EventQueue.h"
+	"IrReceiver_defs.h"
+	"VolumeControl.h"
+
+1556616977 c:\data\tcpserver\tcpserver\include\irreceiver_defs.h
 
