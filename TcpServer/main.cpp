@@ -19,7 +19,6 @@ int main()
         if (pc.waitKeyPress() != 0) {
             break;
         }
-        wait_ms(10);
 	}
 
 	return 0;
