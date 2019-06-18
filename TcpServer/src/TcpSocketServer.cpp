@@ -115,7 +115,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 	onDataReceived();
 
 	while (!_connection_handled) {
-        wait_ms(10);
+        //wait_ms(10);
 	}
 }
 

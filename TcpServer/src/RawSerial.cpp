@@ -34,7 +34,7 @@ void RawSerial::rxIsr()
     char temp_buff[BUFFER_LEN];
     TcpSocketServer::instance()->readBuffer(temp_buff, &_len);
 
-    pc.printf("RX data available: %d bytes\n", _len);
+    //pc.printf("RX data available: %d bytes\n", _len);
 
     memset(_buff, '\0', BUFFER_LEN);
     memcpy(_buff, temp_buff, BUFFER_LEN);
@@ -74,11 +74,12 @@ void RawSerial::printf(const char* format, ...)
     memset(_buff, '\0', BUFFER_LEN);
 
     if (strstr(format, "AT") != NULL) {
+#if 0
         va_list args;
         va_start (args, format);
         pc.print_args (format, args);
         va_end (args);
-
+#endif
         memset(_buff, '\0', BUFFER_LEN);
         if (strstr(format, "CIPCLOSE") != NULL) {
             TcpSocketServer::instance()->closeConnection();

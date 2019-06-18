@@ -54,7 +54,7 @@ void HttpServer::handleRequest()
 	if (_requestType == Post) {
 		parseCharValue(buff, "pot=", &volume);
 		if ((volume >= 0) && (volume < 100)) {
-			printf("Volume: %d\r\n", volume);
+			//printf("Volume: %d\r\n", volume);
 			//SystemControl::instance()->onVolumeChanged(volume);
 		}
 		else {
