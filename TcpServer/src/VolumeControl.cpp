@@ -16,7 +16,9 @@ VolumeControl::VolumeControl(PinName cs) :
 void VolumeControl::handleCommand(uint32_t command)
 {
 	if (command == Update) {
-        setGain(command);
+	    _scaled_gain = Parameters::instance()->current_level;
+        int gain = (_scaled_gain * 255) / 100;
+        setGain(gain);
 	} else {
 		_guard_timer.stop();
 		uint32_t cmd_period_ms = _guard_timer.read_ms();
