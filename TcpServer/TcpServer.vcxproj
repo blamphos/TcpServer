@@ -13,18 +13,21 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8FC8B5F2-0FA2-44E9-B1AB-0DA6173D5303}</ProjectGuid>
     <RootNamespace>TcpServer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -36,7 +39,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Data\sw_dev\TcpServer\TcpServer\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <SourcePath>C:\Data\sw_dev\TcpServer\TcpServer\src;$(SourcePath)</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -44,6 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -61,6 +70,35 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\ESP8266.cpp" />
+    <ClCompile Include="src\EventQueue.cpp" />
+    <ClCompile Include="src\HttpServer.cpp" />
+    <ClCompile Include="src\mbed.cpp" />
+    <ClCompile Include="src\Parameters.cpp" />
+    <ClCompile Include="src\RawSerial.cpp" />
+    <ClCompile Include="src\Serial.cpp" />
+    <ClCompile Include="src\SystemControl.cpp" />
+    <ClCompile Include="src\TcpSocketServer.cpp" />
+    <ClCompile Include="src\Ticker.cpp" />
+    <ClCompile Include="src\Timeout.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Callback.h" />
+    <ClInclude Include="include\DigitalOut.h" />
+    <ClInclude Include="include\EmbeddedMessages.h" />
+    <ClInclude Include="include\ESP8266.h" />
+    <ClInclude Include="include\EventQueue.h" />
+    <ClInclude Include="include\Fifo.h" />
+    <ClInclude Include="include\HttpServer.h" />
+    <ClInclude Include="include\IO_mapping.h" />
+    <ClInclude Include="include\mbed.h" />
+    <ClInclude Include="include\Parameters.h" />
+    <ClInclude Include="include\RawSerial.h" />
+    <ClInclude Include="include\Serial.h" />
+    <ClInclude Include="include\SystemControl.h" />
+    <ClInclude Include="include\TcpSocketServer.h" />
+    <ClInclude Include="include\Ticker.h" />
+    <ClInclude Include="include\Timeout.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

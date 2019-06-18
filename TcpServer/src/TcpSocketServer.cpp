@@ -27,27 +27,11 @@ void TcpSocketServer::readBuffer(char* buff, int* len)
 
 void TcpSocketServer::sendBuffer(const char* buff, int len)
 {
-    int iSendResult;
-
     memset(_buffer, '\0', DEFAULT_BUFLEN);
-
-    // REMOVE THIS
-#if 0
-	FILE* fp = fopen("/local/index.html", "r");
-	if (fp != NULL) {
-	    char c;
-	    char* wp = _buffer;
-        while ((c = fgetc(fp)) != EOF) {
-            *wp++ = c;
-        }
-        fclose(fp);
-	}
-#else
     memcpy(_buffer, buff, len);
-#endif
 
     //printf(_buffer);
-    iSendResult = send(_client_socket, _buffer, strlen(_buffer), 0);
+    int iSendResult = send(_client_socket, _buffer, strlen(_buffer), 0);
     if (iSendResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
         //closesocket(ClientSocket);

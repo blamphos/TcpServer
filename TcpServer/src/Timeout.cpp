@@ -3,7 +3,7 @@
 
 class TimeoutWorker {
 public:
-    TimeoutWorker()
+	TimeoutWorker() : t(0), attached(false), _thread(NULL)
     {
 
     }
@@ -20,11 +20,12 @@ public:
         //}
     }
 
-    unsigned int t;
+	Callback<void()> cb;
+	unsigned int t;
     bool attached;
-    std::thread* _thread;
 
-    Callback<void()> cb;
+private:
+    std::thread* _thread;
 };
 
 Timeout::Timeout()

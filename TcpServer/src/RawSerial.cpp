@@ -7,7 +7,7 @@ extern Serial pc;
 RawSerial::RawSerial(PinName TxPin, PinName RxPin, int baudrate) :
     _rp(_buff), _wp(_buff), _readable(false)
 {
-    TcpSocketServer::instance()->attach(callback(this, RawSerial::rxIsr));
+    TcpSocketServer::instance()->attach(callback(this, &RawSerial::rxIsr));
     TcpSocketServer::instance()->start();
 
 	memset(_buff, '\0', BUFFER_LEN);
