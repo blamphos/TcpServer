@@ -38,14 +38,14 @@
 1560152972 c:\data\tcpserver\tcpserver\include\systemcontrol.h
 	"Parameters.h"
 
-1560760271 source:c:\data\tcpserver\tcpserver\main.cpp
+1560865234 source:c:\data\tcpserver\tcpserver\main.cpp
 	"mbed.h"
 	"HttpServer.h"
 
-1560782192 c:\data\tcpserver\tcpserver\include\httpserver.h
+1560862142 c:\data\tcpserver\tcpserver\include\httpserver.h
 	"EventQueue.h"
 
-1560786810 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
+1560866368 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
 	<cstring>
 	<cstdlib>
 	<cstdio>
@@ -122,7 +122,7 @@
 	"RawSerial.h"
 	"TcpSocketServer.h"
 
-1560760271 c:\data\tcpserver\tcpserver\include\mbed.h
+1560864953 c:\data\tcpserver\tcpserver\include\mbed.h
 	<new>
 	<cstring>
 	<cstddef>
@@ -135,28 +135,28 @@
 	"Callback.h"
 	"EventQueue.h"
 
-1560490406 c:\data\tcpserver\tcpserver\include\rawserial.h
+1560866832 c:\data\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
 1560152972 c:\data\tcpserver\tcpserver\include\digitalout.h
 	"mbed.h"
 
-1560490406 c:\data\tcpserver\tcpserver\include\ticker.h
+1560864614 c:\data\tcpserver\tcpserver\include\ticker.h
 	"mbed.h"
 
-1560433858 c:\data\tcpserver\tcpserver\include\timeout.h
+1560860415 c:\data\tcpserver\tcpserver\include\timeout.h
 	"mbed.h"
 
 1560490406 c:\data\tcpserver\tcpserver\include\callback.h
 
-1560785977 c:\data\tcpserver\tcpserver\include\esp8266.h
+1560865086 c:\data\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
 1560517810 c:\data\tcpserver\tcpserver\include\esp8266simulated.h
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560785816 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
+1560867170 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
@@ -182,7 +182,7 @@
 	<thread>
 	"mbed.h"
 
-1560787391 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
+1560866876 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
 	<cstdarg>
 	"RawSerial.h"
 	"TcpSocketServer.h"
@@ -195,19 +195,20 @@
 	"mbed.h"
 	<cstdarg>
 
-1560760271 c:\data\tcpserver\tcpserver\include\serial.h
+1560855009 c:\data\tcpserver\tcpserver\include\serial.h
 	"mbed.h"
 	<cstdarg>
 
-1560412873 source:c:\data\tcpserver\tcpserver\src\task.cpp
+1560863113 source:c:\data\tcpserver\tcpserver\src\task.cpp
 	"Task.h"
+	"WorkerBase.h"
 
-1560412969 c:\data\tcpserver\tcpserver\include\task.h
-	<thread>
+1560863113 c:\data\tcpserver\tcpserver\include\task.h
+	"mbed.h"
 
-1560434038 source:c:\data\tcpserver\tcpserver\src\timeout.cpp
-	<thread>
+1560861777 source:c:\data\tcpserver\tcpserver\src\timeout.cpp
 	"Timeout.h"
+	"WorkerBase.h"
 
 1560484335 source:c:\data\sw_dev\tcpserver\tcpserver\src\timeout.cpp
 	<thread>
@@ -233,15 +234,15 @@
 
 1560490406 c:\data\tcpserver\tcpserver\include\debugprint.h
 
-1560760271 source:c:\data\tcpserver\tcpserver\src\serial.cpp
+1560855009 source:c:\data\tcpserver\tcpserver\src\serial.cpp
 	<iostream>
 	<cstdarg>
 	"conio.h"
 	"Serial.h"
 
-1560490406 source:c:\data\tcpserver\tcpserver\src\ticker.cpp
-	<thread>
+1560864808 source:c:\data\tcpserver\tcpserver\src\ticker.cpp
 	"Ticker.h"
+	"WorkerBase.h"
 
 1560832062 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
@@ -251,11 +252,25 @@
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560760271 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
+1560860464 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560787518 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
+1560866910 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
 	"TcpSocketServer.h"
+
+1560864629 c:\data\tcpserver\tcpserver\include\workerbase.h
+	<thread>
+	"mbed.h"
+
+1560864330 source:c:\data\tcpserver\tcpserver\src\workerbase.cpp
+	"WorkerBase.h"
+
+1560863415 c:\data\tcpserver\tcpserver\include\taskbase.h
+	"mbed.h"
+
+1560863414 source:c:\data\tcpserver\tcpserver\src\taskbase.cpp
+	"TaskBase.h"
+	"WorkerBase.h"
 

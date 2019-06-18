@@ -31,21 +31,6 @@ void Serial::putc(char c)
     std::cout << c;
 }
 
-void Serial::readFromFile(const char* filename, char* buff, int len)
-{
-    memset(buff, '\0', len);
-
-	FILE* fp = fopen(filename, "r");
-	if (fp != NULL) {
-	    char c;
-	    char* wp = buff;
-        while ((c = fgetc(fp)) != EOF) {
-            *wp++ = c;
-        }
-        fclose(fp);
-	}
-}
-
 void Serial::str2buff(char* buff, const char* str)
 {
     sprintf(buff, str);

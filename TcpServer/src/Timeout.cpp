@@ -1,36 +1,9 @@
-#include <thread>
 #include "Timeout.h"
-
-class TimeoutWorker {
-public:
-	TimeoutWorker() : t(0), attached(false), _thread(NULL)
-    {
-
-    }
-
-    void run()
-    {
-        _thread = new std::thread(&TimeoutWorker::threadFunc, this);
-    }
-
-    void threadFunc() {
-        //while(attached) {
-            wait_us(t);
-            cb.call();
-        //}
-    }
-
-	Callback<void()> cb;
-	unsigned int t;
-    bool attached;
-
-private:
-    std::thread* _thread;
-};
+#include "WorkerBase.h"
 
 Timeout::Timeout()
 {
-    _worker = new TimeoutWorker();
+    _worker = new WorkerBase(false);
 }
 
 void Timeout::attach(Callback<void()> cb, unsigned int t) {

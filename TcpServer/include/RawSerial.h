@@ -11,7 +11,7 @@ public:
     };
 
     RawSerial(PinName TxPin, PinName RxPin, int baudrate);
-    ~RawSerial();
+    virtual ~RawSerial();
     void attach(Callback<void()> cb, IrqTypeT iqrType);
     void detach();
     bool readable();

@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-class TickerWorker;
+class WorkerBase;
 
 class Ticker {
 public:
@@ -17,7 +17,7 @@ public:
     void detach();
 
 private:
-    TickerWorker* _worker;
+    WorkerBase* _worker;
 };
 
 #endif

@@ -39,6 +39,7 @@
 		<Unit filename="include/TcpSocketServer.h" />
 		<Unit filename="include/Ticker.h" />
 		<Unit filename="include/Timeout.h" />
+		<Unit filename="include/WorkerBase.h" />
 		<Unit filename="include/mbed.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
@@ -51,6 +52,7 @@
 		<Unit filename="src/TcpSocketServer.cpp" />
 		<Unit filename="src/Ticker.cpp" />
 		<Unit filename="src/Timeout.cpp" />
+		<Unit filename="src/WorkerBase.cpp" />
 		<Unit filename="src/mbed.cpp" />
 		<Extensions>
 			<code_completion />

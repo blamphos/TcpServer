@@ -33,10 +33,10 @@ private:
 	int serverThreadImp();
 	Callback<void()> onDataReceived;
 
-	bool _connection_handled;
 	SOCKET _listen_socket;
     SOCKET _client_socket;
 	char _buffer[DEFAULT_BUFLEN];
+	bool _is_running;
 };
 
 #endif

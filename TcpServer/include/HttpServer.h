@@ -8,6 +8,7 @@ class ESP8266;
 class HttpServer {
 public:
     HttpServer();
+    ~HttpServer();
     void handleRequest();
 	void handleMessage(message_t msg);
 

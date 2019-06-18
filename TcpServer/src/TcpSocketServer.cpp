@@ -1,10 +1,12 @@
 #include <thread>
 #include "TcpSocketServer.h"
 
-TcpSocketServer::TcpSocketServer()
+TcpSocketServer::TcpSocketServer() :
+    _listen_socket(INVALID_SOCKET),
+    _client_socket(INVALID_SOCKET),
+    _is_running(false)
 {
 	memset(_buffer, '\0', DEFAULT_BUFLEN);
-    _listen_socket = INVALID_SOCKET;
 }
 
 void TcpSocketServer::attach(Callback<void()> cb)
@@ -48,9 +50,9 @@ void TcpSocketServer::start()
 
 void TcpSocketServer::stop()
 {
+    _is_running = false;
     closesocket(_listen_socket);
     WSACleanup();
-    printf("TCP server stopped.\n");
 }
 
 void TcpSocketServer::closeConnection()
@@ -62,13 +64,10 @@ void TcpSocketServer::closeConnection()
 	}
 
 	closesocket(_client_socket);
-
-	_connection_handled = true;
 }
 
 void TcpSocketServer::handleConnection(SOCKET socket)
 {
-    _connection_handled = false;
     _client_socket = socket;
 	int iResult;
 
@@ -77,12 +76,10 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 		memset(_buffer, '\0', DEFAULT_BUFLEN);
 		iResult = recv(_client_socket, _buffer, DEFAULT_BUFLEN, 0);
 		if (iResult > 0) {
-			//printf("\r\n");
-			//printf("Bytes received: %d\n", iResult);
 			//printf(_buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
-                //printf("%02X ", recvbuf[i]);
-                printf("%c", _buffer[i]);
+                printf("%02X ", _buffer[i]);
+                //printf("%c", _buffer[i]);
 			}*/
 			break;
 		}
@@ -158,23 +155,27 @@ int TcpSocketServer::serverThreadImp()
 		return 1;
 	}
 
-    printf("TCP server started!\n\n");
-
     SOCKET socket;
-    while (true) {
+    _is_running = true;
+    while (_is_running) {
         socket = INVALID_SOCKET;
         // Accept a Connection
-        while (socket == INVALID_SOCKET){
+        while (_is_running && socket == INVALID_SOCKET){
             socket = accept(_listen_socket, NULL, NULL);
         }
 
-        std::thread t1(&TcpSocketServer::handleConnection, this, socket);
-        t1.join();
+        if (_is_running) {
+            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
+            t1.join();
+        }
     }
 
-	printf("server thread exit...\n");
 	// No longer need server socket
-	closesocket(_listen_socket);
+    closesocket(_listen_socket);
+    WSACleanup();
+    printf("TCP server stopped.\n");
+
+    return 0;
 }
 
 TcpSocketServer* TcpSocketServer::instance()

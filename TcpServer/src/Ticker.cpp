@@ -1,37 +1,9 @@
-#include <thread>
 #include "Ticker.h"
-
-class TickerWorker {
-public:
-    TickerWorker() : t(0), attached(false), _thread(NULL)
-    {
-
-    }
-
-    void run()
-    {
-        _thread = new std::thread(&TickerWorker::threadFunc, this);
-    }
-
-    void threadFunc() {
-        while(attached) {
-            wait_us(t);
-            cb.call();
-        }
-    }
-
-	Callback<void()> cb;
-
-    unsigned int t;
-    bool attached;
-
-private:
-    std::thread* _thread;
-};
+#include "WorkerBase.h"
 
 Ticker::Ticker()
 {
-    _worker = new TickerWorker();
+    _worker = new WorkerBase(true);
 }
 
 void Ticker::attach(Callback<void()> cb, unsigned int t) {
@@ -66,3 +38,5 @@ void Ticker::attach_us(T* tptr, void (T::*mptr)(), unsigned int t) {
 void Ticker::detach() {
     _worker->attached = false;
 }
+
+

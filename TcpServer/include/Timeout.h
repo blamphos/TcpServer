@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-class TimeoutWorker;
+class WorkerBase;
 
 class Timeout {
 public:
@@ -17,7 +17,7 @@ public:
     void detach();
 
 private:
-    TimeoutWorker* _worker;
+    WorkerBase* _worker;
 };
 
 #endif

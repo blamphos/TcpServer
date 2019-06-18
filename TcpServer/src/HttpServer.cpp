@@ -11,6 +11,11 @@ HttpServer::HttpServer() :
 	_esp->initialize();
 }
 
+HttpServer::~HttpServer()
+{
+    delete _esp;
+}
+
 void HttpServer::handleMessage(message_t msg)
 {
     switch (msg.event) {
@@ -54,7 +59,7 @@ void HttpServer::handleRequest()
 	if (_requestType == Post) {
 		parseCharValue(buff, "pot=", &volume);
 		if ((volume >= 0) && (volume < 100)) {
-			//printf("Volume: %d\r\n", volume);
+			printf("Volume: %d\r\n", volume);
 			//SystemControl::instance()->onVolumeChanged(volume);
 		}
 		else {
@@ -115,7 +120,7 @@ void HttpServer::sendResponse(bool firstSegment)
     while ((ch = fgetc(fp)) != EOF) {
         *wp++ = ch;
 
-        // Process line
+        // Process next line
         if (ch == '\n') {
             ++line;
 

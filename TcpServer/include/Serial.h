@@ -11,7 +11,6 @@ public:
     void printf(const char* format, ...);
     void print_args(const char* format, va_list args);
     void putc(char c);
-    void readFromFile(const char* filename, char* buff, int len);
     int waitKeyPress();
     static void str2buff(char* buff, const char* str);
 

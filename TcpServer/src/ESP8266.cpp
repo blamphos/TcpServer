@@ -16,7 +16,7 @@ ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 
 ESP8266::~ESP8266()
 {
-
+    this->~RawSerial();
 }
 
 void ESP8266::handleMessage(message_t msg)
@@ -24,7 +24,6 @@ void ESP8266::handleMessage(message_t msg)
     switch (msg.event) {
     case EVENT_SERIAL_DATA_RECEIVED:
         processLine();
-        //_httpServer->handleRequest(_rx_buf, SERIAL_RX_BUF_SIZE);
         break;
     case EVENT_SERIAL_DATA_SEND:
         _expected_response = AT_DATA_SEND_OK;
@@ -32,7 +31,6 @@ void ESP8266::handleMessage(message_t msg)
         break;
     case EVENT_SERIAL_CMD_SEND:
         _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
-        //sendNextCommand();
         break;
     default:
         break;
@@ -93,13 +91,15 @@ void ESP8266::esp_rx_isr()
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		//pc.putc(c);
+		pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 		}
 		++_buf_index &= 0x1FF;
 	}
+
+	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 }
 
 void ESP8266::sendNextCommand()
@@ -117,7 +117,6 @@ void ESP8266::sendNextCommand()
 	case 1:
 		leds = 0x1;
 		_expected_response = AT_OK;
-		//esp->printf("AT+GMR\r\n");
 		this->printf("AT+RFPOWER=20\r\n");
 		break;
 	case 2:
@@ -133,35 +132,14 @@ void ESP8266::sendNextCommand()
 	case 4:
 		leds = 0xF;
 		_expected_response = AT_OK;
-		//esp->printf("AT+CWLAP\r\n");
 		this->printf("AT+CWJAP=\"%s\",\"%s\"\r\n", ssid, pwd);
 		break;
-	/*case 5:
-		leds = 0x1;
-		_expected_response = AT_OK;
-		//expected_response = AT_OK;
-		this->printf("AT+CIPSTART=0,\"TCP\",\"192.168.1.31\",11000\r\n");
-		break;*/
-	/*case 6:
-		leds = 0x3;
-		_expected_response = AT_OK;
-		// Build query message using TX buf
-		memset(_tx_buf, '\0', sizeof(_tx_buf));
-		//sprintf(_tx_buf, "GET /Status HTTP/1.1\r\nHost: 192.168.1.31\r\nConnection: close\r\n\r\n");
-		this->printf("AT+CIPSEND=0,%d\r\n", strlen(_tx_buf));
-		break;*/
 	case 5:
 		leds = 0x7;
 		_expected_response = AT_IPD_RECEIVED;
-		//this->printf(_tx_buf);
-		//this->printf("\r\n");
-		//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
-		//return;
-		//expected_response = AT_OK;
-		//esp->printf("AT+CIPSTATUS\r\n");
+		pc.printf("Initialization OK.\r\n");
 		break;
 	default:
-		//pc.printf("Sequence completed.\r\n");
 		leds = 0;
 		return;
 	}
@@ -172,8 +150,7 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
-	//pc.printf("|");
-    //std::cout << _rx_buf << std::endl;
+
 	switch(_expected_response) {
 	case AT_OK:
 		c = strstr(_rx_buf, "OK");
@@ -192,7 +169,6 @@ void ESP8266::processLine()
 	case AT_READY_TO_SEND:
 		c = strstr(_rx_buf, ">");
 		if (c != NULL) {
-			//EventQueue::instance()->post(EVENT_SERIAL_DATA_SEND);
 			esp_rx_flush();
             _expected_response = AT_DATA_SEND_OK;
             this->printf(_tx_buf);
@@ -203,8 +179,7 @@ void ESP8266::processLine()
 		if (c != NULL) {
             esp_rx_flush();
             _expected_response = AT_IPD_RECEIVED;
-			//_client->processResponse(_rx_buf);
-			//_timeout.attach(callback(this, &ESP8266::queryStatus), 1);
+            pc.printf("Ready for action\n");
 		}
 		break;
 	case AT_IPD_RECEIVED:

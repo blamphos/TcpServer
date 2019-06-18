@@ -31,37 +31,14 @@ void RawSerial::detach()
 
 void RawSerial::rxIsr()
 {
-    char temp_buff[BUFFER_LEN];
-    TcpSocketServer::instance()->readBuffer(temp_buff, &_len);
+    memset(_buff, '\0', BUFFER_LEN);
+    TcpSocketServer::instance()->readBuffer(_buff, &_len);
 
     //pc.printf("RX data available: %d bytes\n", _len);
 
-    memset(_buff, '\0', BUFFER_LEN);
-    memcpy(_buff, temp_buff, BUFFER_LEN);
     _rp = _buff;
     _readable = true;
     onSocketDataReceived();
-
-    /*char* wp = _buff + strlen(_buff);
-
-    for (int i = 0; i < _len; ++i) {
-        *wp++ = temp_buff[i];
-        if (temp_buff[i] == '\n') {
-            _rp = _buff;
-            _readable = true;
-            onSocketDataReceived();
-            wait_ms(10);
-            while (_readable) {
-                wait_ms(10);
-            }
-            memset(_buff, '\0', BUFFER_LEN);
-            wp = _buff;
-        }
-    }
-    */
-
-    // Semd response to client
-	//ESP8266Simulated::instance()->sendBuffer(_buff, BUFFER_LEN);
 }
 
 bool RawSerial::readable()
@@ -74,7 +51,7 @@ void RawSerial::printf(const char* format, ...)
     memset(_buff, '\0', BUFFER_LEN);
 
     if (strstr(format, "AT") != NULL) {
-#if 0
+#if 1
         va_list args;
         va_start (args, format);
         pc.print_args (format, args);
@@ -97,15 +74,6 @@ void RawSerial::printf(const char* format, ...)
     _rp = _buff;
     _readable = true;
     onSocketDataReceived();
-    /*char buff[BUFFER_LEN];
-    memset(buff, '\0', BUFFER_LEN);
-
-    va_list args;
-    va_start (args, format);
-    vsprintf (buff, format, args);
-    va_end (args);
-
-    pc.printf(buff);*/
 }
 
 void RawSerial::putc(char c)
