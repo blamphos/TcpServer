@@ -21,9 +21,6 @@ void TcpSocketServer::detach()
 
 void TcpSocketServer::readBuffer(char* buff, int* len)
 {
-    //memcpy(buff, _buffer, DEFAULT_BUFLEN);
-    memset(buff, '\0', DEFAULT_BUFLEN);
-
     sprintf(buff, "+IPD,0,%d:%s", strlen(_buffer), _buffer);
     (*len) = strlen(buff);
 }
