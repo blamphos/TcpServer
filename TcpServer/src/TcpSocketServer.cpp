@@ -47,6 +47,8 @@ void TcpSocketServer::start()
 
 void TcpSocketServer::stop()
 {
+    closeConnection();
+
     _is_running = false;
     closesocket(_listen_socket);
     WSACleanup();
@@ -55,14 +57,18 @@ void TcpSocketServer::stop()
 
 void TcpSocketServer::closeConnection()
 {
-    // shutdown the connection since we're done
-	int iResult = shutdown(_client_socket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-	}
+    if (_client_socket != INVALID_SOCKET) {
+        // shutdown the connection since we're done
+        printf("Closing socket %d\n", _client_socket);
+        int iResult = shutdown(_client_socket, SD_SEND);
+        if (iResult == SOCKET_ERROR) {
+            printf("shutdown failed with error: %d\n", WSAGetLastError());
+        }
 
-	closesocket(_client_socket);
-	_client_socket = INVALID_SOCKET;
+        closesocket(_client_socket);
+        _client_socket = INVALID_SOCKET;
+    }
+
 	_connection_handled = true;
 }
 
@@ -101,7 +107,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 
 	onDataReceived();
 	while (!_connection_handled) {
-
+        wait_ms(10);
 	}
 }
 
@@ -169,18 +175,16 @@ int TcpSocketServer::serverThreadImp()
         socket = INVALID_SOCKET;
         // Accept a Connection
         while (_is_running && socket == INVALID_SOCKET){
-            if (_client_socket == INVALID_SOCKET) {
-                socket = accept(_listen_socket, NULL, NULL);
-            }
+            socket = accept(_listen_socket, NULL, NULL);
+            printf("Socket %d accepted\n", socket);
         }
 
         if (_is_running) {
-            new std::thread(&TcpSocketServer::handleConnection, this, socket);
-            //t1.join();
+            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
+            t1.join();
         }
     }
-
-	// No longer need server socket
+    // No longer need server socket
     closesocket(_listen_socket);
     WSACleanup();
     printf("TCP server stopped.\n");

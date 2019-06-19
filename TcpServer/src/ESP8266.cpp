@@ -15,11 +15,6 @@ ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
     memset(_rx_buf, '\0', sizeof(_rx_buf));
 }
 
-ESP8266::~ESP8266()
-{
-    this->~RawSerial();
-}
-
 void ESP8266::handleMessage(message_t msg)
 {
     switch (msg.event) {
@@ -95,13 +90,13 @@ void ESP8266::esp_rx_isr()
 		c = this->getc();
 		pc.putc(c);
 		_rx_buf[_buf_index] = c;
-		if (c == '\n') {
+		/*if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
-		}
+		}*/
 		++_buf_index &= 0x3FF;
 	}
 
-	//EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
+	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 }
 
 void ESP8266::sendNextCommand()
@@ -208,7 +203,8 @@ void ESP8266::processLine()
                 //_buf_index = 0;
                 //this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
             }
-        } else if (_buf_index >= _expected_data_len) {
+        }
+        if (_expected_data_len != 0 && _buf_index >= _expected_data_len) {
             _expected_response = AT_NACK;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
         }
