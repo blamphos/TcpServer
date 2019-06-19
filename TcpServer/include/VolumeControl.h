@@ -40,6 +40,7 @@ private:
 
 	int spiWrite(int value);
 	void setGain(int value);
+	void setScaledGain();
 	void toggleMute();
 
 	//SoftSPI* _spi;

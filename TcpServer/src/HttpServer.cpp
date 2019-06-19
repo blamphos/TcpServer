@@ -48,6 +48,8 @@ void HttpServer::handleRequest()
         else {
             return;
         }
+    } else {
+        return;
     }
 
     int volume = Parameters::instance()->current_level;
@@ -58,7 +60,7 @@ void HttpServer::handleRequest()
 	if (_requestType == Post) {
 		parseCharValue(buff, "pot=", &volume);
 		if ((VolumeControl::VALUE_MIN >= 0) && (volume <= VolumeControl::VALUE_MAX)) {
-			//printf("Volume: %d\r\n", volume);
+			printf("Volume: %d\r\n", volume);
 			//SystemControl::instance()->onVolumeChanged(volume);
 			Parameters::instance()->current_level = volume;
 			EventQueue::instance()->post(EVENT_VOLUME_COMMAND, VolumeControl::Update);

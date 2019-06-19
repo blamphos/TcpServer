@@ -62,6 +62,10 @@ void SystemControl::handleMessage()
 			break;
 		}
 	}
+
+    if (EventQueue::instance()->isEmpty()) {
+        wait_ms(1);
+    }
 }
 
 void SystemControl::ticker_isr()

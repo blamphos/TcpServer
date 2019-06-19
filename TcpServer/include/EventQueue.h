@@ -8,6 +8,7 @@ class EventQueue {
 public:
 	void post(EventIdT event, uint32_t data = 0);
 	bool getNext(message_t& msg);
+	bool isEmpty();
 	static EventQueue* instance();
 
 private:

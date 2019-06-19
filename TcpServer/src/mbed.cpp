@@ -1,6 +1,5 @@
 #include <chrono>
 #include <thread>
-#include "mbed.h"
 
 void wait(int t)
 {

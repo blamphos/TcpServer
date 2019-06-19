@@ -5,6 +5,11 @@ EventQueue::EventQueue(int queue_size) : _fifo(new Fifo<message_t>(queue_size))
 
 }
 
+bool EventQueue::isEmpty()
+{
+    return _fifo->empty();
+}
+
 void EventQueue::post(EventIdT event, uint32_t data)
 {
 	message_t msg;

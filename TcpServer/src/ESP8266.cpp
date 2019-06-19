@@ -91,7 +91,7 @@ void ESP8266::esp_rx_isr()
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		pc.putc(c);
+		//pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);

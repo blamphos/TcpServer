@@ -2,6 +2,8 @@
 #include "Parameters.h"
 //#include "SoftSPI.h"
 
+extern Serial pc;
+
 VolumeControl::VolumeControl(PinName cs) :
 		_cs(cs), _gain_value(INIT_GAIN_VALUE), _muted(false)
 {
@@ -16,9 +18,8 @@ VolumeControl::VolumeControl(PinName cs) :
 void VolumeControl::handleCommand(uint32_t command)
 {
 	if (command == Update) {
-	    _scaled_gain = Parameters::instance()->current_level;
-        int gain = (_scaled_gain * 255) / 100;
-        setGain(gain);
+        unmute();
+        setScaledGain();
 	} else {
 		_guard_timer.stop();
 		uint32_t cmd_period_ms = _guard_timer.read_ms();
@@ -79,6 +80,28 @@ void VolumeControl::unmute()
 	if (_muted) {
 		_muted = false;
 		setGain(_previous_gain);
+	}
+}
+
+void VolumeControl::setScaledGain()
+{
+    _gain_value = (Parameters::instance()->current_level * 256) / 100;
+
+	// Value range check
+	if (_gain_value <= VALUE_MIN) {
+		_gain_value = VALUE_MIN;
+	} else if (_gain_value >= VALUE_MAX) {
+		_gain_value = VALUE_MAX;
+	}
+
+	// Store new gain value only if not muted
+	if (!_muted) {
+		_previous_gain = _gain_value;
+	}
+
+	int response = spiWrite(_gain_value);
+	if (response != _gain_value) {
+		//pc.printf("SPI error: %d != %d\n", _gain_value, response);
 	}
 }
 
