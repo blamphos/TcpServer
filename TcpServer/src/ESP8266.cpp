@@ -152,6 +152,12 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
+    c = strstr(_rx_buf, "ERROR");
+    if (c != NULL) {
+        esp_rx_flush();
+        _expected_response = AT_IPD_RECEIVED;
+        return;
+    }
 
 	switch(_expected_response) {
 	case AT_OK:

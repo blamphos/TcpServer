@@ -50,6 +50,7 @@ void TcpSocketServer::stop()
     _is_running = false;
     closesocket(_listen_socket);
     WSACleanup();
+    printf("Server listen socket closed.\n");
 }
 
 void TcpSocketServer::closeConnection()
@@ -62,10 +63,12 @@ void TcpSocketServer::closeConnection()
 
 	closesocket(_client_socket);
 	_client_socket = INVALID_SOCKET;
+	_connection_handled = true;
 }
 
 void TcpSocketServer::handleConnection(SOCKET socket)
 {
+    _connection_handled = false;
     _client_socket = socket;
 	int iResult;
 
@@ -83,20 +86,23 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 		}
 		else if (iResult == 0) {
 			printf("Connection closing...\n");
+			sprintf(_buffer, "ERROR\r\n");
 			closeConnection();
-			return;
 			break;
 		}
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
-			closesocket(_client_socket);
-			//WSACleanup();
-			return;
+			sprintf(_buffer, "ERROR\r\n");
+			closeConnection();
+			break;
 		}
 
 	} while (iResult > 0);
 
 	onDataReceived();
+	while (!_connection_handled) {
+
+	}
 }
 
 int TcpSocketServer::serverThreadImp()
@@ -169,8 +175,8 @@ int TcpSocketServer::serverThreadImp()
         }
 
         if (_is_running) {
-            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
-            t1.join();
+            new std::thread(&TcpSocketServer::handleConnection, this, socket);
+            //t1.join();
         }
     }
 

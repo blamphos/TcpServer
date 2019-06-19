@@ -37,6 +37,7 @@ private:
     SOCKET _client_socket;
 	char _buffer[DEFAULT_BUFLEN];
 	bool _is_running;
+	bool _connection_handled;
 };
 
 #endif
