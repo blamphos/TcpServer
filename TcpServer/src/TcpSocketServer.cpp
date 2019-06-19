@@ -83,6 +83,8 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 		}
 		else if (iResult == 0) {
 			printf("Connection closing...\n");
+			closeConnection();
+			return;
 			break;
 		}
 		else {

@@ -20,6 +20,7 @@ class HttpServer;
 
 class SystemControl {
 public:
+    ~SystemControl();
 	void handleMessage();
 	static SystemControl* instance();
 

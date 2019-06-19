@@ -27,11 +27,12 @@ private:
 	};
 
 	enum ResponseTypeT {
-		AT_OK = 0,
+	    AT_NACK,
+		AT_OK,
 		AT_DATA_SEND_OK,
 		AT_READY_TO_SEND,
 		AT_IP_CONN_CLOSED,
-		AT_IPD_RECEIVED
+		AT_IPD_RECEIVED,
 	};
 
 

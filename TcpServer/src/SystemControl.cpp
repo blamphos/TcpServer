@@ -24,6 +24,11 @@ SystemControl::SystemControl()
 	//_system_ticker.attach_us(callback(this, &SystemControl::ticker_isr), TIMER_SYSTEM_TICK_US);
 }
 
+SystemControl::~SystemControl()
+{
+    delete _http;
+}
+
 void SystemControl::handleMessage()
 {
 	message_t msg;

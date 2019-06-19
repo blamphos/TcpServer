@@ -101,7 +101,7 @@ void ESP8266::esp_rx_isr()
 		++_buf_index &= 0x3FF;
 	}
 
-	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
+	//EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 }
 
 void ESP8266::sendNextCommand()
@@ -181,7 +181,6 @@ void ESP8266::processLine()
 		if (c != NULL) {
             esp_rx_flush();
             _expected_response = AT_IPD_RECEIVED;
-            pc.printf("Ready for action\n");
 		}
 		break;
 	case AT_IPD_RECEIVED:
@@ -204,6 +203,7 @@ void ESP8266::processLine()
                 //this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
             }
         } else if (_buf_index >= _expected_data_len) {
+            _expected_response = AT_NACK;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
         }
 		break;
