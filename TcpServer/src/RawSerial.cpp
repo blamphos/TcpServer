@@ -51,7 +51,7 @@ void RawSerial::printf(const char* format, ...)
     memset(_buff, '\0', BUFFER_LEN);
 
     if (strstr(format, "AT") != NULL) {
-#if 0
+#if 1
         va_list args;
         va_start (args, format);
         pc.print_args (format, args);

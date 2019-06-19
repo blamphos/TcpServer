@@ -21,6 +21,7 @@ private:
 	enum ConstantsT {
 		ESP_BAUD_RATE = 115200,
 		SERIAL_RX_BUF_SIZE = 1024,
+		SERIAL_RX_BUF_INDEX_LEN_MASK = SERIAL_RX_BUF_SIZE - 1,
 		SERIAL_TX_BUF_SIZE = 128,
 		MSG_BUF_SIZE = 16
 	};
@@ -46,6 +47,7 @@ private:
 	char _tx_buf[SERIAL_TX_BUF_SIZE];
 	volatile uint32_t _buf_index;
 	int _cmd_index;
+	uint32_t _expected_data_len;
 };
 
 #endif

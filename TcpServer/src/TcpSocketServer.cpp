@@ -61,6 +61,7 @@ void TcpSocketServer::closeConnection()
 	}
 
 	closesocket(_client_socket);
+	_client_socket = INVALID_SOCKET;
 }
 
 void TcpSocketServer::handleConnection(SOCKET socket)
@@ -80,8 +81,10 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 			}*/
 			break;
 		}
-		else if (iResult == 0)
+		else if (iResult == 0) {
 			printf("Connection closing...\n");
+			break;
+		}
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
 			closesocket(_client_socket);
@@ -158,7 +161,9 @@ int TcpSocketServer::serverThreadImp()
         socket = INVALID_SOCKET;
         // Accept a Connection
         while (_is_running && socket == INVALID_SOCKET){
-            socket = accept(_listen_socket, NULL, NULL);
+            if (_client_socket == INVALID_SOCKET) {
+                socket = accept(_listen_socket, NULL, NULL);
+            }
         }
 
         if (_is_running) {

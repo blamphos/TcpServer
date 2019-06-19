@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "ESP8266.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
@@ -84,6 +85,7 @@ void ESP8266::esp_rx_flush()
 
 	memset(_rx_buf, '\0', SERIAL_RX_BUF_SIZE);
 	_buf_index = 0;
+	_expected_data_len = 0;
 }
 
 void ESP8266::esp_rx_isr()
@@ -91,12 +93,12 @@ void ESP8266::esp_rx_isr()
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		//pc.putc(c);
+		pc.putc(c);
 		_rx_buf[_buf_index] = c;
 		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 		}
-		++_buf_index &= 0x1FF;
+		++_buf_index &= 0x3FF;
 	}
 
 	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
@@ -183,13 +185,27 @@ void ESP8266::processLine()
 		}
 		break;
 	case AT_IPD_RECEIVED:
-		c = strstr(_rx_buf, "+IPD");
-		if (c != NULL) {
+        if (_expected_data_len == 0) {
+            c = strstr(_rx_buf, "+IPD");
+            if (c != NULL) {
+                c += 7;
+                const int CHAR_BUFF_LEN = 5;
+
+                char str[CHAR_BUFF_LEN] = { '\0' };
+                char* wp = str;
+                int len = CHAR_BUFF_LEN;
+
+                while ((*c != ':') && --len) {
+                    *wp++ = *c++;
+                }
+                _expected_data_len = atoi(str) + (c - _rx_buf);
+                //this->attach(NULL, Serial::RxIrq);
+                //_buf_index = 0;
+                //this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
+            }
+        } else if (_buf_index >= _expected_data_len) {
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
-			//this->attach(NULL, Serial::RxIrq);
-			//_buf_index = 0;
-			//this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
-		}
+        }
 		break;
 	default:
 		break;

@@ -39,7 +39,11 @@ void HttpServer::handleRequest()
     _esp->getRxBuffer(&buff, &len);
 
     if (_requestType == NotDefined) {
-        if (strstr(buff, "GET") != NULL && strstr(buff, "\r\n\r\n") != NULL) {
+        if (strstr(buff, "\r\n\r\n") == NULL) {
+            return;
+        }
+
+        if (strstr(buff, "GET") != NULL) {
             _requestType = Get;
         }
         else if (strstr(buff, "POST") != NULL && strstr(buff, "pot=") != NULL) {
