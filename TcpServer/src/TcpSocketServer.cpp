@@ -90,7 +90,17 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 		memset(_buffer, '\0', DEFAULT_BUFLEN);
 		iResult = recv(_client_socket, _buffer, DEFAULT_BUFLEN, 0);
 		if (iResult > 0) {
-			printf(_buffer);
+		    char* rp = _buffer;
+            while(*rp != '\n') {
+                putchar(*rp++);
+            }
+            putchar('\n');
+            rp = strstr(_buffer, "\r\n\r\n");
+            rp += 4;
+            while(*rp != '\0') {
+                putchar(*rp++);
+            }
+			//printf(_buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 printf("%02X ", _buffer[i]);
                 //printf("%c", _buffer[i]);
