@@ -38,6 +38,7 @@ private:
 	char _buffer[DEFAULT_BUFLEN];
 	bool _is_running;
 	bool _connection_handled;
+	Timeout _timeout;
 };
 
 #endif

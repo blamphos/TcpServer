@@ -21,7 +21,12 @@ void TcpSocketServer::detach()
 
 void TcpSocketServer::readBuffer(char* buff, int* len)
 {
-    sprintf(buff, "+IPD,0,%d:%s", strlen(_buffer), _buffer);
+    if (_client_socket != INVALID_SOCKET) {
+        sprintf(buff, "+IPD,0,%d:%s", strlen(_buffer), _buffer);
+    } else {
+        memcpy(buff, _buffer, strlen(_buffer));
+    }
+
     (*len) = strlen(buff);
 }
 
@@ -78,12 +83,14 @@ void TcpSocketServer::handleConnection(SOCKET socket)
     _client_socket = socket;
 	int iResult;
 
+    _timeout.attach(callback(this, &TcpSocketServer::closeConnection), 1);
+
 	// Receive until the peer shuts down the connection
 	do {
 		memset(_buffer, '\0', DEFAULT_BUFLEN);
 		iResult = recv(_client_socket, _buffer, DEFAULT_BUFLEN, 0);
 		if (iResult > 0) {
-			//printf(_buffer);
+			printf(_buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 printf("%02X ", _buffer[i]);
                 //printf("%c", _buffer[i]);
@@ -105,6 +112,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 
 	} while (iResult > 0);
 
+	_timeout.detach();
 	onDataReceived();
 	while (!_connection_handled) {
         wait_ms(10);
@@ -169,10 +177,9 @@ int TcpSocketServer::serverThreadImp()
 		return 1;
 	}
 
-    SOCKET socket;
     _is_running = true;
     while (_is_running) {
-        socket = INVALID_SOCKET;
+        SOCKET socket = INVALID_SOCKET;
         // Accept a Connection
         while (_is_running && socket == INVALID_SOCKET){
             socket = accept(_listen_socket, NULL, NULL);

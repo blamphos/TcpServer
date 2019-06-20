@@ -199,14 +199,18 @@ void ESP8266::processLine()
                     *wp++ = *c++;
                 }
                 _expected_data_len = atoi(str) + (c - _rx_buf);
+                pc.printf("Exp. len: %d\n", _expected_data_len);
+                _timeout.attach(callback(this, &ESP8266::closeConnection), 3);
                 //this->attach(NULL, Serial::RxIrq);
                 //_buf_index = 0;
                 //this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
             }
         }
         if (_expected_data_len != 0 && _buf_index >= _expected_data_len) {
+            _timeout.detach();
             _expected_response = AT_NACK;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
+            pc.printf("Send HTTP request\n");
         }
 		break;
 	default:

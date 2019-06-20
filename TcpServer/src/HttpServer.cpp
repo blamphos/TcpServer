@@ -45,14 +45,19 @@ void HttpServer::handleRequest()
 
         if (strstr(buff, "GET") != NULL) {
             _requestType = Get;
+            printf("GET\n");
         }
         else if (strstr(buff, "POST") != NULL && strstr(buff, "pot=") != NULL) {
             _requestType = Post;
+            printf("POST\n");
         }
         else {
+            printf("Unknown request\n");
+            _esp->closeConnection();
             return;
         }
     } else {
+        printf("Request type already defined\n");
         return;
     }
 
