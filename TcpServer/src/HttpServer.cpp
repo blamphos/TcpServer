@@ -114,6 +114,9 @@ void HttpServer::sendResponse(bool firstSegment)
         return;
     }
 
+    _esp->getTxBuffer(&buff, &len);
+    memset(buff, '\0', len);
+
     if (firstSegment) {
         fp = fopen("/local/index.html", "r");
         if (fp == NULL) {
@@ -121,10 +124,15 @@ void HttpServer::sendResponse(bool firstSegment)
         }
 
         line = 0;
-    }
 
-    _esp->getTxBuffer(&buff, &len);
-    memset(buff, '\0', len);
+        if (_requestType == Get) {
+            sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
+        } else if (_requestType == Post) {
+            sprintf(buff, "HTTP/1.0 201 Created\r\n\r\n");
+        }
+        _esp->sendTxBuffer();
+        return;
+    }
 
     char ch;
     char* wp = buff;
@@ -136,19 +144,19 @@ void HttpServer::sendResponse(bool firstSegment)
             ++line;
 
             switch(line) {
-            case 26:
+            case 21:
                 setVolumeLevel(buff, Parameters::instance()->current_level);
                 break;
-            case 28:
+            case 23:
                 setButtonState(buff, Parameters::instance()->current_input == 0);
                 break;
-            case 29:
+            case 24:
                 setButtonState(buff, Parameters::instance()->current_input == 1);
                 break;
-            case 30:
+            case 25:
                 setButtonState(buff, Parameters::instance()->current_input == 2);
                 break;
-            case 31:
+            case 26:
                 setButtonState(buff, Parameters::instance()->auto_find);
                 break;
             default:
