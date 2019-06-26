@@ -22,7 +22,7 @@ void TcpSocketServer::detach()
 void TcpSocketServer::readBuffer(char* buff, int* len)
 {
     if (_client_socket != INVALID_SOCKET) {
-        sprintf(buff, "+IPD,0,%d:%s", strlen(_buffer), _buffer);
+        sprintf(buff, "0,CONNECT\r\n\r\n+IPD,0,%d:%s", strlen(_buffer), _buffer);
     } else {
         memcpy(buff, _buffer, strlen(_buffer));
     }

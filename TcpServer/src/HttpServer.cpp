@@ -1,10 +1,11 @@
-#include <cstring>
-#include <cstdlib>
 #include <cstdio>
 #include "HttpServer.h"
 #include "ESP8266.h"
 #include "Parameters.h"
 #include "VolumeControl.h"
+
+extern Serial pc;
+extern BusOut leds;
 
 HttpServer::HttpServer() :
     _esp(new ESP8266), _requestType(NotDefined)
@@ -40,24 +41,26 @@ void HttpServer::handleRequest()
 
     if (_requestType == NotDefined) {
         if (strstr(buff, "\r\n\r\n") == NULL) {
+        	leds = leds | 0x8;
             return;
         }
 
         if (strstr(buff, "GET") != NULL) {
             _requestType = Get;
-            printf("GET\n");
+            pc.printf("GET\n");
         }
         else if (strstr(buff, "POST") != NULL && strstr(buff, "pot=") != NULL) {
             _requestType = Post;
-            printf("POST\n");
+            pc.printf("POST\n");
         }
         else {
-            printf("Unknown request\n");
-            _esp->closeConnection();
+            //printf("Unknown request\n");
+            //_esp->closeConnection();
+        	pc.printf(buff);
             return;
         }
     } else {
-        printf("Request type already defined\n");
+        pc.printf("Request type already defined\n");
         return;
     }
 
@@ -118,8 +121,10 @@ void HttpServer::sendResponse(bool firstSegment)
     memset(buff, '\0', len);
 
     if (firstSegment) {
-        fp = fopen("/local/index.html", "r");
+        fp = fopen("/local/index.htm", "r");
         if (fp == NULL) {
+        	pc.printf("File not open.\n");
+			_requestType = NotDefined;
             return;
         }
 
@@ -134,13 +139,12 @@ void HttpServer::sendResponse(bool firstSegment)
         return;
     }
 
-    char ch;
     char* wp = buff;
-    while ((ch = fgetc(fp)) != EOF) {
-        *wp++ = ch;
+    while (!feof(fp)) {
+        *wp = fgetc(fp);
 
         // Process next line
-        if (ch == '\n') {
+        if (*wp++ == '\n') {
             ++line;
 
             switch(line) {

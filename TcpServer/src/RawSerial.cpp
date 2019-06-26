@@ -78,6 +78,21 @@ void RawSerial::printf(const char* format, ...)
 
 void RawSerial::putc(char c)
 {
+    static char* wp = _buff;
+
+    *wp++ = c;
+
+    if (c == '\n') {
+        if (strstr(_buff, "CIPSENDBUF") != NULL) {
+            Serial::str2buff(_buff, ">\r\n");
+            wp = _buff;
+            return;
+        }
+    }
+
+    if ((wp - _buff) == BUFFER_LEN) {
+        wp = _buff;
+    }
     //*_wp = c;
 }
 

@@ -1,4 +1,3 @@
-#include "stdlib.h"
 #include "ESP8266.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
@@ -37,10 +36,10 @@ void ESP8266::initialize()
 {
 	_esp_reset->write(0);
 	//wait(2);
-	this->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
 	_esp_reset->write(1);
 	//wait(2);
 
+	this->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
 	esp_rx_flush();
 
 	_cmd_index = 0;
@@ -69,6 +68,7 @@ void ESP8266::sendTxBuffer()
 {
     esp_rx_flush();
     _expected_response = AT_READY_TO_SEND;
+    //pc.printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_tx_buf));
     this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_tx_buf));
 }
 
@@ -90,9 +90,11 @@ void ESP8266::esp_rx_isr()
 		c = this->getc();
 		//pc.putc(c);
 		_rx_buf[_buf_index] = c;
-		/*if (c == '\n') {
+#if 0
+		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
-		}*/
+		}
+#endif
 		++_buf_index &= 0x3FF;
 	}
 
@@ -132,7 +134,7 @@ void ESP8266::sendNextCommand()
 		this->printf("AT+CWJAP=\"%s\",\"%s\"\r\n", ssid, pwd);
 		break;
 	case 5:
-		leds = 0x7;
+		leds = 0x0;
 		_expected_response = AT_IPD_RECEIVED;
 		pc.printf("Initialization OK.\r\n");
 		break;
@@ -175,19 +177,27 @@ void ESP8266::processLine()
 			esp_rx_flush();
             _expected_response = AT_DATA_SEND_OK;
             this->printf(_tx_buf);
+#if 0
+            char* rp = _tx_buf;
+            while (*rp != '\0') {
+                //pc.putc(*rp);
+                this->putc(*rp++);
+            }
+#endif
 		}
 		break;
 	case AT_IP_CONN_CLOSED:
-		c = strstr(_rx_buf, "CLOSED");
+		c = strstr(_rx_buf, ",CLOSED");
 		if (c != NULL) {
             esp_rx_flush();
             _expected_response = AT_IPD_RECEIVED;
+            leds = 0x0;
 		}
 		break;
 	case AT_IPD_RECEIVED:
         if (_expected_data_len == 0) {
             c = strstr(_rx_buf, "+IPD");
-            if (c != NULL) {
+            if (c != NULL && strstr(_rx_buf, ":")) {
                 c += 7;
                 const int CHAR_BUFF_LEN = 5;
 
@@ -198,8 +208,13 @@ void ESP8266::processLine()
                 while ((*c != ':') && --len) {
                     *wp++ = *c++;
                 }
-                _expected_data_len = atoi(str) + (c - _rx_buf);
-                pc.printf("Exp. len: %d\n", _expected_data_len);
+                _expected_data_len = atoi(str);// + (c - _rx_buf);
+                if (_expected_data_len == 0) {
+                	return;
+                }
+
+                _expected_data_len += (c - _rx_buf);
+                //pc.printf("len: %d\n", _expected_data_len);
                 _timeout.attach(callback(this, &ESP8266::closeConnection), 3);
                 //this->attach(NULL, Serial::RxIrq);
                 //_buf_index = 0;
@@ -210,7 +225,9 @@ void ESP8266::processLine()
             _timeout.detach();
             _expected_response = AT_NACK;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
-            pc.printf("Send HTTP request\n");
+            leds = 0x3;
+            //pc.printf(_rx_buf);
+            //pc.printf("Send HTTP request\n");
         }
 		break;
 	default:

@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include "Timer.h"
 #include "BusOut.h"
 #include "Serial.h"
