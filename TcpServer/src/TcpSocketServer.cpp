@@ -122,11 +122,29 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 
 	} while (iResult > 0);
 
+#if 0
+    _timeout.detach();
+    if (iResult > 0) {
+        char buff[DEFAULT_BUFLEN] = {0};
+        int n = sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
+
+        FILE* fp = fopen("/local/index.htm", "r");
+        char* wp = buff + n;
+        while (!feof(fp)) {
+            *wp++ = fgetc(fp);
+        }
+        fclose(fp);
+
+        //printf(buff);
+        sendBuffer(buff, strlen(buff));
+    }
+#else
 	_timeout.detach();
 	onDataReceived();
 	while (!_connection_handled) {
         wait_ms(10);
 	}
+#endif
 }
 
 int TcpSocketServer::serverThreadImp()

@@ -216,7 +216,7 @@ void ESP8266::processLine()
         }
         if (_expected_data_len != 0 && _buf_index >= _expected_data_len) {
             _timeout.detach();
-            _expected_response = AT_NACK;
+            _expected_response = AT_IP_CONN_CLOSED;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
             leds = 0x3;
             //pc.printf(_rx_buf);
