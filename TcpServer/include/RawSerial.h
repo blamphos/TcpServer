@@ -16,6 +16,7 @@ public:
     void detach();
     bool readable();
     void printf(const char* format, ...);
+    void puts(const char* buff);
     void putc(char c);
     char getc();
     Callback<void()> onSocketDataReceived;

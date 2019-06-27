@@ -176,14 +176,7 @@ void ESP8266::processLine()
 		if (c != NULL) {
 			esp_rx_flush();
             _expected_response = AT_DATA_SEND_OK;
-            this->printf(_tx_buf);
-#if 0
-            char* rp = _tx_buf;
-            while (*rp != '\0') {
-                //pc.putc(*rp);
-                this->putc(*rp++);
-            }
-#endif
+            this->puts(_tx_buf);
 		}
 		break;
 	case AT_IP_CONN_CLOSED:

@@ -76,6 +76,11 @@ void RawSerial::printf(const char* format, ...)
     onSocketDataReceived();
 }
 
+void RawSerial::puts(const char* buff)
+{
+    printf(buff);
+}
+
 void RawSerial::putc(char c)
 {
     static char* wp = _buff;
