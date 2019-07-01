@@ -121,7 +121,7 @@ void HttpServer::sendResponse(bool firstSegment)
     memset(buff, '\0', len);
 
     if (firstSegment) {
-        fp = fopen("/local/index.htm", "r");
+        fp = fopen("/local/index.htm", "rb");
         if (fp == NULL) {
         	pc.printf("File not open.\n");
 			_requestType = NotDefined;
@@ -148,19 +148,19 @@ void HttpServer::sendResponse(bool firstSegment)
             ++line;
 
             switch(line) {
-            case 21:
+            case 18:
                 setVolumeLevel(buff, Parameters::instance()->current_level);
                 break;
-            case 23:
+            case 19:
                 setButtonState(buff, Parameters::instance()->current_input == 0);
                 break;
-            case 24:
+            case 20:
                 setButtonState(buff, Parameters::instance()->current_input == 1);
                 break;
-            case 25:
+            case 21:
                 setButtonState(buff, Parameters::instance()->current_input == 2);
                 break;
-            case 26:
+            case 22:
                 setButtonState(buff, Parameters::instance()->auto_find);
                 break;
             default:
@@ -208,9 +208,9 @@ void HttpServer::setButtonState(char* buff, bool enabled)
 		return;
 	}
 
-	char* c = strstr(buff, " button");
+	char* c = strstr(buff, " btn");
 	if (c != NULL) {
-		c += 7;
+		c += 4;
 		*c = (enabled) ? '1' : '2';
 	}
 }

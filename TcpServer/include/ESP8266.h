@@ -19,7 +19,7 @@ public:
 private:
 	enum ConstantsT {
 		ESP_BAUD_RATE = 115200,
-		SERIAL_RX_BUF_SIZE = 1024,
+		SERIAL_RX_BUF_SIZE = 896,
 		SERIAL_RX_BUF_INDEX_LEN_MASK = SERIAL_RX_BUF_SIZE - 1,
 		SERIAL_TX_BUF_SIZE = 128
 	};
@@ -38,6 +38,7 @@ private:
 	void esp_rx_flush();
 	void sendNextCommand();
 	void processLine();
+	void swapBuffers();
 
 	DigitalOut* _esp_reset;
 	Timeout _timeout;

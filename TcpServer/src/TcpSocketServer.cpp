@@ -128,7 +128,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
         char buff[DEFAULT_BUFLEN] = {0};
         int n = sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
 
-        FILE* fp = fopen("/local/index.htm", "r");
+        FILE* fp = fopen("/local/index.htm", "rb");
         char* wp = buff + n;
         while (!feof(fp)) {
             *wp++ = fgetc(fp);
