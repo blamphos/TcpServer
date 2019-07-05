@@ -8,20 +8,27 @@ const char pwd[16] = "kasperi12";
 
 class ESP8266 : public RawSerial {
 public:
+	enum BufferSizeT {
+	    LARGE_RX_BUF,
+	    LARGE_TX_BUF
+	};
+
 	ESP8266();
 	void initialize();
 	void handleMessage(message_t msg);
 	void getRxBuffer(char** buff, int* len);
 	void getTxBuffer(char** buff, int* len);
+	void initBuffers(BufferSizeT type);
 	void sendTxBuffer();
 	void closeConnection();
 
 private:
 	enum ConstantsT {
 		ESP_BAUD_RATE = 115200,
-		SERIAL_RX_BUF_SIZE = 896,
-		SERIAL_RX_BUF_INDEX_LEN_MASK = SERIAL_RX_BUF_SIZE - 1,
-		SERIAL_TX_BUF_SIZE = 128
+		SERIAL_BUF_SIZE = 2048,
+		SERIAL_RX_BUF_INDEX_LEN_MASK = SERIAL_BUF_SIZE - 1,
+		SERIAL_TINY_BUF = 32,
+		SERIAL_LARGE_BUF = SERIAL_BUF_SIZE - SERIAL_TINY_BUF
 	};
 
 	enum ResponseTypeT {
@@ -33,19 +40,19 @@ private:
 		AT_IPD_RECEIVED,
 	};
 
-
 	void esp_rx_isr();
 	void esp_rx_flush();
 	void sendNextCommand();
 	void processLine();
-	void swapBuffers();
 
 	DigitalOut* _esp_reset;
 	Timeout _timeout;
 	ResponseTypeT _expected_response;
-	char _rx_buf[SERIAL_RX_BUF_SIZE];
-	char _tx_buf[SERIAL_TX_BUF_SIZE];
-	volatile uint32_t _buf_index;
+	char _buff[SERIAL_BUF_SIZE];
+	char* _rp;
+	char* _wp;
+	int _rx_buf_len;
+	int _tx_buf_len;
 	int _cmd_index;
 	uint32_t _expected_data_len;
 };

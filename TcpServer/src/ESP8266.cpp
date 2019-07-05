@@ -8,10 +8,9 @@ extern BusOut leds;
 ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
 		_esp_reset(new DigitalOut(ESP8266_RST_PIN, 1)),
 		_expected_response(AT_OK),
-		_buf_index(0),
 		_cmd_index(0)
 {
-    memset(_rx_buf, '\0', sizeof(_rx_buf));
+    initBuffers(LARGE_RX_BUF);
 }
 
 void ESP8266::handleMessage(message_t msg)
@@ -19,10 +18,6 @@ void ESP8266::handleMessage(message_t msg)
     switch (msg.event) {
     case EVENT_SERIAL_DATA_RECEIVED:
         processLine();
-        break;
-    case EVENT_SERIAL_DATA_SEND:
-        _expected_response = AT_DATA_SEND_OK;
-        this->printf(_tx_buf);
         break;
     case EVENT_SERIAL_CMD_SEND:
         _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
@@ -54,22 +49,42 @@ void ESP8266::closeConnection()
 
 void ESP8266::getRxBuffer(char** buff, int* len)
 {
-    (*buff) = _rx_buf;
-    *len = SERIAL_RX_BUF_SIZE;
+    (*buff) = _buff;
+    *len = _rx_buf_len;
 }
 
 void ESP8266::getTxBuffer(char** buff, int* len)
 {
-    (*buff) = _tx_buf;
-    *len = SERIAL_TX_BUF_SIZE;
+    (*buff) = _buff + _rx_buf_len;
+    *len = _tx_buf_len;
 }
 
 void ESP8266::sendTxBuffer()
 {
     esp_rx_flush();
     _expected_response = AT_READY_TO_SEND;
-    //pc.printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_tx_buf));
-    this->printf("AT+CIPSENDBUF=0,%d\r\n", strlen(_tx_buf));
+        int len = strlen(_buff + _rx_buf_len);
+    this->printf("AT+CIPSENDBUF=0,%d\r\n", len);
+}
+
+void ESP8266::initBuffers(BufferSizeT type)
+{
+    memset(_buff, '\0', sizeof(SERIAL_BUF_SIZE));
+
+    switch(type) {
+    case LARGE_RX_BUF:
+        _rp = _buff;
+        _rx_buf_len = SERIAL_LARGE_BUF;
+        _wp = _buff + _rx_buf_len;
+        _tx_buf_len = SERIAL_TINY_BUF;
+        break;
+    case LARGE_TX_BUF:
+        _rp = _buff;
+        _rx_buf_len = SERIAL_TINY_BUF;
+        _wp = _buff + _rx_buf_len;
+        _tx_buf_len = SERIAL_LARGE_BUF;
+        break;
+    }
 }
 
 void ESP8266::esp_rx_flush()
@@ -78,8 +93,9 @@ void ESP8266::esp_rx_flush()
 		getc();
 	}
 
-	memset(_rx_buf, '\0', SERIAL_RX_BUF_SIZE);
-	_buf_index = 0;
+	_rp = _buff;
+	memset(_rp, '\0', _rx_buf_len);
+
 	_expected_data_len = 0;
 }
 
@@ -89,13 +105,15 @@ void ESP8266::esp_rx_isr()
 	while (readable()) {
 		c = this->getc();
 		//pc.putc(c);
-		_rx_buf[_buf_index] = c;
+		*_rp++ = c;
 #if 0
 		if (c == '\n') {
 			EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 		}
 #endif
-		++_buf_index &= 0x3FF;
+		if ((_rp - _buff) == _rx_buf_len) {
+            _rp = _buff;
+		}
 	}
 
 	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
@@ -104,8 +122,7 @@ void ESP8266::esp_rx_isr()
 void ESP8266::sendNextCommand()
 {
 	_timeout.detach();
-	memset(_rx_buf, '\0', sizeof(_rx_buf));
-	_buf_index = 0;
+	esp_rx_flush();
 
 	switch (_cmd_index) {
 	case 0:
@@ -149,7 +166,7 @@ void ESP8266::sendNextCommand()
 void ESP8266::processLine()
 {
 	const char* c = NULL;
-    c = strstr(_rx_buf, "ERROR");
+    c = strstr(_buff, "ERROR");
     if (c != NULL) {
         esp_rx_flush();
         _expected_response = AT_IPD_RECEIVED;
@@ -158,69 +175,65 @@ void ESP8266::processLine()
 
 	switch(_expected_response) {
 	case AT_OK:
-		c = strstr(_rx_buf, "OK");
+		c = strstr(_buff, "OK");
 		if (c != NULL) {
             esp_rx_flush();
 			EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
 		}
 		break;
 	case AT_DATA_SEND_OK:
-		c = strstr(_rx_buf, "OK");
+		c = strstr(_buff, "OK");
 		if (c != NULL) {
             esp_rx_flush();
-			EventQueue::instance()->post(EVENT_HTTP_RESPONSE);
+            closeConnection();
 		}
 		break;
 	case AT_READY_TO_SEND:
-		c = strstr(_rx_buf, ">");
+		c = strstr(_buff, ">");
 		if (c != NULL) {
 			esp_rx_flush();
             _expected_response = AT_DATA_SEND_OK;
-            this->puts(_tx_buf);
+            this->puts(_buff + _rx_buf_len);
 		}
 		break;
 	case AT_IP_CONN_CLOSED:
-		c = strstr(_rx_buf, ",CLOSED");
+		c = strstr(_buff, ",CLOSED");
 		if (c != NULL) {
-            esp_rx_flush();
             _expected_response = AT_IPD_RECEIVED;
+            initBuffers(LARGE_RX_BUF);
+            esp_rx_flush();
             leds = 0x0;
 		}
 		break;
 	case AT_IPD_RECEIVED:
         if (_expected_data_len == 0) {
-            c = strstr(_rx_buf, "+IPD");
-            if (c != NULL && strstr(_rx_buf, ":")) {
+            c = strstr(_buff, "+IPD");
+            if (c != NULL && strstr(_buff, ":")) {
                 c += 7;
                 const int CHAR_BUFF_LEN = 5;
 
                 char str[CHAR_BUFF_LEN] = { '\0' };
-                char* wp = str;
+                char* sp = str;
                 int len = CHAR_BUFF_LEN;
 
                 while ((*c != ':') && --len) {
-                    *wp++ = *c++;
+                    *sp++ = *c++;
                 }
-                _expected_data_len = atoi(str);// + (c - _rx_buf);
+                _expected_data_len = atoi(str);
                 if (_expected_data_len == 0) {
                 	return;
                 }
 
-                _expected_data_len += (c - _rx_buf);
+                _expected_data_len += (c - _buff);
                 //pc.printf("len: %d\n", _expected_data_len);
                 _timeout.attach(callback(this, &ESP8266::closeConnection), 3);
-                //this->attach(NULL, Serial::RxIrq);
-                //_buf_index = 0;
-                //this->attach(callback(this, &ESP8266::esp_rx_isr), Serial::RxIrq);
             }
         }
-        if (_expected_data_len != 0 && _buf_index >= _expected_data_len) {
+        if (strlen(_buff) >= _expected_data_len) {
             _timeout.detach();
             _expected_response = AT_IP_CONN_CLOSED;
             EventQueue::instance()->post(EVENT_HTTP_REQUEST);
             leds = 0x3;
-            //pc.printf(_rx_buf);
-            //pc.printf("Send HTTP request\n");
         }
 		break;
 	default:

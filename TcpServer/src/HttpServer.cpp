@@ -103,43 +103,34 @@ void HttpServer::handleRequest()
         Parameters::instance()->current_input = static_cast<Spdif::InputTypeT>(input);
 	}
 
-	sendResponse(true);
+	sendResponse();
 }
 
-void HttpServer::sendResponse(bool firstSegment)
+void HttpServer::sendResponse()
 {
-    static FILE* fp = NULL;
-    static char* buff = NULL;
-    static int line = 0;
-    static int len = -1;
-
+    char* buff = NULL;
+    int len = 0;
+    int line = 0;
     if (_requestType == NotDefined) {
         return;
     }
 
+    _esp->initBuffers(ESP8266::LARGE_TX_BUF);
     _esp->getTxBuffer(&buff, &len);
-    memset(buff, '\0', len);
 
-    if (firstSegment) {
-        fp = fopen("/local/index.htm", "rb");
-        if (fp == NULL) {
-        	pc.printf("File not open.\n");
-			_requestType = NotDefined;
-            return;
-        }
-
-        line = 0;
-
-        if (_requestType == Get) {
-            sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
-        } else if (_requestType == Post) {
-            sprintf(buff, "HTTP/1.0 201 Created\r\n\r\n");
-        }
-        _esp->sendTxBuffer();
+    FILE* fp = fopen("/local/index.htm", "rb");
+    if (fp == NULL) {
+        _requestType = NotDefined;
         return;
     }
 
-    char* wp = buff;
+    if (_requestType == Get) {
+        sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
+    } else if (_requestType == Post) {
+        sprintf(buff, "HTTP/1.0 201 Created\r\n\r\n");
+    }
+
+    char* wp = buff + strlen(buff);
     while (!feof(fp)) {
         *wp = fgetc(fp);
 
@@ -152,32 +143,32 @@ void HttpServer::sendResponse(bool firstSegment)
                 setVolumeLevel(buff, Parameters::instance()->current_level);
                 break;
             case 19:
-                setButtonState(buff, Parameters::instance()->current_input == 0);
+                setButtonState(buff, "coax1", Parameters::instance()->current_input == 0);
                 break;
             case 20:
-                setButtonState(buff, Parameters::instance()->current_input == 1);
+                setButtonState(buff, "coax2", Parameters::instance()->current_input == 1);
                 break;
             case 21:
-                setButtonState(buff, Parameters::instance()->current_input == 2);
+                setButtonState(buff, "opt1", Parameters::instance()->current_input == 2);
                 break;
             case 22:
-                setButtonState(buff, Parameters::instance()->auto_find);
+                setButtonState(buff, "auto", Parameters::instance()->auto_find);
                 break;
             default:
                 break;
             }
-
-            _esp->sendTxBuffer();
-            return;
         }
 	}
 
+	--wp;
+	*wp = '\0';
 	if (fp != NULL) {
         fclose(fp);
         fp = NULL;
-        _requestType = NotDefined;
-        _esp->closeConnection();
 	}
+
+    _requestType = NotDefined;
+    _esp->sendTxBuffer();
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)
@@ -202,16 +193,21 @@ void HttpServer::parseCharValue(char* buff, const char* tag, int* value)
 	}
 }
 
-void HttpServer::setButtonState(char* buff, bool enabled)
+void HttpServer::setButtonState(char* buff, const char* tag, bool enabled)
 {
 	if (buff == NULL) {
 		return;
 	}
 
-	char* c = strstr(buff, " btn");
+	char* c = strstr(buff, tag);
 	if (c != NULL) {
-		c += 4;
-		*c = (enabled) ? '1' : '2';
+        c += strlen(tag);
+
+        c = strstr(c, " btn");
+        if (c != NULL) {
+            c += 4;
+            *c = (enabled) ? '1' : '2';
+        }
 	}
 }
 

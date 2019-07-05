@@ -19,10 +19,10 @@ private:
         Post
     };
 
-    void sendResponse(bool firstSegment = false);
+    void sendResponse();
 	void parseCharValue(char* buff, const char* tag, int* value);
 	void setVolumeLevel(char* buff, int volume);
-	void setButtonState(char* buff, bool enabled);
+	void setButtonState(char* buff, const char* tag, bool enabled);
 
 	ESP8266* _esp;
     HttpRequestTypeT _requestType;
