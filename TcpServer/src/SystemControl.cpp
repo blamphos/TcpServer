@@ -22,6 +22,7 @@ SystemControl::SystemControl()
 	//_display = Display::instance();
 
 	//_system_ticker.attach_us(callback(this, &SystemControl::ticker_isr), TIMER_SYSTEM_TICK_US);
+	EventQueue::instance()->post(EVENT_HTTP_SERVER_INIT);
 }
 
 SystemControl::~SystemControl()
@@ -61,6 +62,9 @@ void SystemControl::handleMessage()
 			_spdif_switch->unmute();
 			_volume_control->unmute();
 			//_display->handleMessage(msg);
+			break;
+		case EVENT_HTTP_SERVER_READY:
+			//_system_ticker.attach_us(callback(this, &SystemControl::ticker_isr), TIMER_SYSTEM_TICK_US);
 			break;
 		default:
 		    _http->handleMessage(msg);

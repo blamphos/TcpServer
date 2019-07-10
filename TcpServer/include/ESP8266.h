@@ -3,8 +3,7 @@
 
 #include "mbed.h"
 
-const char ssid[16] = "Kuhaverkko";
-const char pwd[16] = "kasperi12";
+class EspStateBase;
 
 class ESP8266 : public RawSerial {
 public:
@@ -14,13 +13,14 @@ public:
 	};
 
 	ESP8266();
-	void initialize();
 	void handleMessage(message_t msg);
-	void getRxBuffer(char** buff, int* len);
-	void getTxBuffer(char** buff, int* len);
+	void initialize();
+	void getRxBuffer(char** buff, int* len = NULL);
+	void getTxBuffer(char** buff, int* len = NULL);
 	void initBuffers(BufferSizeT type);
 	void sendTxBuffer();
-	void closeConnection();
+	void rx_flush();
+	void changeState(EspStateBase* state);
 
 private:
 	enum ConstantsT {
@@ -31,30 +31,14 @@ private:
 		SERIAL_LARGE_BUF = SERIAL_BUF_SIZE - SERIAL_TINY_BUF
 	};
 
-	enum ResponseTypeT {
-	    AT_NACK,
-		AT_OK,
-		AT_DATA_SEND_OK,
-		AT_READY_TO_SEND,
-		AT_IP_CONN_CLOSED,
-		AT_IPD_RECEIVED,
-	};
+	void rx_isr();
 
-	void esp_rx_isr();
-	void esp_rx_flush();
-	void sendNextCommand();
-	void processLine();
-
-	DigitalOut* _esp_reset;
-	Timeout _timeout;
-	ResponseTypeT _expected_response;
+	EspStateBase* _state;
 	char _buff[SERIAL_BUF_SIZE];
 	char* _rp;
 	char* _wp;
 	int _rx_buf_len;
 	int _tx_buf_len;
-	int _cmd_index;
-	uint32_t _expected_data_len;
 };
 
 #endif

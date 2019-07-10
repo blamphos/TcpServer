@@ -1,75 +1,43 @@
 #include "ESP8266.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
+#include "EspStateBase.h"
+#include "EspInitState.h"
 
 extern Serial pc;
 extern BusOut leds;
 
-ESP8266::ESP8266() : RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
-		_esp_reset(new DigitalOut(ESP8266_RST_PIN, 1)),
-		_expected_response(AT_OK),
-		_cmd_index(0)
+ESP8266::ESP8266() :
+    RawSerial(SERIAL_TX, SERIAL_RX, ESP_BAUD_RATE),
+    _state(EspInitState::instance())
 {
-    initBuffers(LARGE_RX_BUF);
-}
-
-void ESP8266::handleMessage(message_t msg)
-{
-    switch (msg.event) {
-    case EVENT_SERIAL_DATA_RECEIVED:
-        processLine();
-        break;
-    case EVENT_SERIAL_CMD_SEND:
-        _timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
-        break;
-    default:
-        break;
-    }
+    this->attach(callback(this, &ESP8266::rx_isr), RxIrq);
 }
 
 void ESP8266::initialize()
 {
-	_esp_reset->write(0);
-	//wait(2);
-	_esp_reset->write(1);
-	//wait(2);
-
-	this->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
-	esp_rx_flush();
-
-	_cmd_index = 0;
-	sendNextCommand();
+    changeState(EspInitState::instance());
 }
 
-void ESP8266::closeConnection()
+void ESP8266::handleMessage(message_t msg)
 {
-    _expected_response = AT_IP_CONN_CLOSED;
-    this->printf("AT+CIPCLOSE=0\r\n");
-}
-
-void ESP8266::getRxBuffer(char** buff, int* len)
-{
-    (*buff) = _buff;
-    *len = _rx_buf_len;
-}
-
-void ESP8266::getTxBuffer(char** buff, int* len)
-{
-    (*buff) = _buff + _rx_buf_len;
-    *len = _tx_buf_len;
-}
-
-void ESP8266::sendTxBuffer()
-{
-    esp_rx_flush();
-    _expected_response = AT_READY_TO_SEND;
-        int len = strlen(_buff + _rx_buf_len);
-    this->printf("AT+CIPSENDBUF=0,%d\r\n", len);
+    _state->handleMessage(this, msg);
+    /*switch (msg.event) {
+    case EVENT_SERIAL_DATA_RECEIVED:
+        _state->processLine(this);
+        break;
+    case EVENT_SERIAL_CMD_SEND:
+        _state->sendNextCommand
+        //_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
+        break;
+    default:
+        break;
+    }*/
 }
 
 void ESP8266::initBuffers(BufferSizeT type)
 {
-    memset(_buff, '\0', sizeof(SERIAL_BUF_SIZE));
+    memset(_buff, '\0', SERIAL_BUF_SIZE);
 
     switch(type) {
     case LARGE_RX_BUF:
@@ -87,7 +55,7 @@ void ESP8266::initBuffers(BufferSizeT type)
     }
 }
 
-void ESP8266::esp_rx_flush()
+void ESP8266::rx_flush()
 {
 	while (readable()) {
 		getc();
@@ -95,16 +63,14 @@ void ESP8266::esp_rx_flush()
 
 	_rp = _buff;
 	memset(_rp, '\0', _rx_buf_len);
-
-	_expected_data_len = 0;
 }
 
-void ESP8266::esp_rx_isr()
+void ESP8266::rx_isr()
 {
 	char c = 0;
 	while (readable()) {
 		c = this->getc();
-		//pc.putc(c);
+		pc.putc(c);
 		*_rp++ = c;
 #if 0
 		if (c == '\n') {
@@ -119,124 +85,31 @@ void ESP8266::esp_rx_isr()
 	EventQueue::instance()->post(EVENT_SERIAL_DATA_RECEIVED);
 }
 
-void ESP8266::sendNextCommand()
+void ESP8266::getRxBuffer(char** buff, int* len)
 {
-	_timeout.detach();
-	esp_rx_flush();
-
-	switch (_cmd_index) {
-	case 0:
-		_expected_response = AT_OK;
-		this->printf("AT\r\n");
-		_timeout.attach(callback(this, &ESP8266::initialize), 5);
-		break;
-	case 1:
-		leds = 0x1;
-		_expected_response = AT_OK;
-		this->printf("AT+RFPOWER=20\r\n");
-		break;
-	case 2:
-		leds = 0x3;
-		_expected_response = AT_OK;
-		this->printf("AT+CIPMUX=1\r\n");
-		break;
-	case 3:
-		leds = 0x7;
-		_expected_response = AT_OK;
-		this->printf("AT+CIPSERVER=1,11000\r\n");
-		break;
-	case 4:
-		leds = 0xF;
-		_expected_response = AT_OK;
-		this->printf("AT+CWJAP=\"%s\",\"%s\"\r\n", ssid, pwd);
-		break;
-	case 5:
-		leds = 0x0;
-		_expected_response = AT_IPD_RECEIVED;
-		pc.printf("Initialization OK.\r\n");
-		break;
-	default:
-		leds = 0;
-		return;
-	}
-
-	++_cmd_index;
+    (*buff) = _buff;
+    if (len != NULL) {
+        *len = _rx_buf_len;
+    }
 }
 
-void ESP8266::processLine()
+void ESP8266::getTxBuffer(char** buff, int* len)
 {
-	const char* c = NULL;
-    c = strstr(_buff, "ERROR");
-    if (c != NULL) {
-        esp_rx_flush();
-        _expected_response = AT_IPD_RECEIVED;
-        return;
+    (*buff) = _buff + _rx_buf_len;
+    if (len != NULL) {
+        *len = _tx_buf_len;
     }
+}
 
-	switch(_expected_response) {
-	case AT_OK:
-		c = strstr(_buff, "OK");
-		if (c != NULL) {
-            esp_rx_flush();
-			EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
-		}
-		break;
-	case AT_DATA_SEND_OK:
-		c = strstr(_buff, "OK");
-		if (c != NULL) {
-            esp_rx_flush();
-            closeConnection();
-		}
-		break;
-	case AT_READY_TO_SEND:
-		c = strstr(_buff, ">");
-		if (c != NULL) {
-			esp_rx_flush();
-            _expected_response = AT_DATA_SEND_OK;
-            this->puts(_buff + _rx_buf_len);
-		}
-		break;
-	case AT_IP_CONN_CLOSED:
-		c = strstr(_buff, ",CLOSED");
-		if (c != NULL) {
-            _expected_response = AT_IPD_RECEIVED;
-            initBuffers(LARGE_RX_BUF);
-            esp_rx_flush();
-            leds = 0x0;
-		}
-		break;
-	case AT_IPD_RECEIVED:
-        if (_expected_data_len == 0) {
-            c = strstr(_buff, "+IPD");
-            if (c != NULL && strstr(_buff, ":")) {
-                c += 7;
-                const int CHAR_BUFF_LEN = 5;
+void ESP8266::sendTxBuffer()
+{
+    int len = strlen(_buff + _rx_buf_len);
+    this->printf("AT+CIPSENDBUF=0,%d\r\n", len);
+}
 
-                char str[CHAR_BUFF_LEN] = { '\0' };
-                char* sp = str;
-                int len = CHAR_BUFF_LEN;
-
-                while ((*c != ':') && --len) {
-                    *sp++ = *c++;
-                }
-                _expected_data_len = atoi(str);
-                if (_expected_data_len == 0) {
-                	return;
-                }
-
-                _expected_data_len += (c - _buff);
-                //pc.printf("len: %d\n", _expected_data_len);
-                _timeout.attach(callback(this, &ESP8266::closeConnection), 3);
-            }
-        }
-        if (strlen(_buff) >= _expected_data_len) {
-            _timeout.detach();
-            _expected_response = AT_IP_CONN_CLOSED;
-            EventQueue::instance()->post(EVENT_HTTP_REQUEST);
-            leds = 0x3;
-        }
-		break;
-	default:
-		break;
-	}
+void ESP8266::changeState(EspStateBase* state)
+{
+    _state->onStateExit(this);
+    _state = state;
+    _state->onStateEnter(this);
 }

@@ -109,13 +109,13 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 		}
 		else if (iResult == 0) {
 			printf("Connection closing...\n");
-			sprintf(_buffer, "ERROR\r\n");
+			sprintf(_buffer, "0,ERROR\r\n");
 			closeConnection();
 			break;
 		}
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
-			sprintf(_buffer, "ERROR\r\n");
+			sprintf(_buffer, "0,ERROR\r\n");
 			closeConnection();
 			break;
 		}
@@ -211,7 +211,9 @@ int TcpSocketServer::serverThreadImp()
         // Accept a Connection
         while (_is_running && socket == INVALID_SOCKET){
             socket = accept(_listen_socket, NULL, NULL);
-            printf("Socket %d accepted\n", socket);
+            if (socket < 0) {
+                printf("Socket %d accepted\n", socket);
+            }
         }
 
         if (_is_running) {

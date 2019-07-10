@@ -10,7 +10,7 @@ extern BusOut leds;
 HttpServer::HttpServer() :
     _esp(new ESP8266), _requestType(NotDefined)
 {
-	_esp->initialize();
+
 }
 
 HttpServer::~HttpServer()
@@ -21,11 +21,11 @@ HttpServer::~HttpServer()
 void HttpServer::handleMessage(message_t msg)
 {
     switch (msg.event) {
+    case EVENT_HTTP_SERVER_INIT:
+    	_esp->initialize();
+    	break;
     case EVENT_HTTP_REQUEST:
         handleRequest();
-        break;
-    case EVENT_HTTP_RESPONSE:
-        sendResponse();
         break;
     default:
         _esp->handleMessage(msg);
@@ -36,8 +36,7 @@ void HttpServer::handleMessage(message_t msg)
 void HttpServer::handleRequest()
 {
     char* buff;
-    int len;
-    _esp->getRxBuffer(&buff, &len);
+    _esp->getRxBuffer(&buff);
 
     if (_requestType == NotDefined) {
         if (strstr(buff, "\r\n\r\n") == NULL) {
@@ -47,14 +46,12 @@ void HttpServer::handleRequest()
 
         if (strstr(buff, "GET") != NULL) {
             _requestType = Get;
-            pc.printf("GET\n");
         }
         else if (strstr(buff, "POST") != NULL && strstr(buff, "pot=") != NULL) {
             _requestType = Post;
-            pc.printf("POST\n");
         }
         else {
-            //printf("Unknown request\n");
+            printf("Unknown request\n");
             //_esp->closeConnection();
         	pc.printf(buff);
             return;
