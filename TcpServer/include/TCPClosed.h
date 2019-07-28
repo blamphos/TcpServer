@@ -1,16 +1,16 @@
 #ifndef ESPCLOSEDSTATE_H
 #define ESPCLOSEDSTATE_H
 
-#include "EspStateBase.h"
+#include "TCPState.h"
 
-class EspClosedState : public EspStateBase {
+class TCPClosed : public TCPState {
 public:
-    EspClosedState();
+    TCPClosed();
     virtual void onStateEnter(ESP8266* esp);
     virtual void handleMessage(ESP8266* esp, message_t msg);
     virtual void onStateExit(ESP8266* esp);
     virtual void processLine(ESP8266* esp);
-    static EspStateBase* instance();
+    static TCPState* instance();
 
 private:
 };

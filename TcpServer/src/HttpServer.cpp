@@ -127,12 +127,12 @@ void HttpServer::sendResponse()
         sprintf(buff, "HTTP/1.0 201 Created\r\n\r\n");
     }
 
+    char c = 0;
     char* wp = buff + strlen(buff);
-    while (!feof(fp)) {
-        *wp = fgetc(fp);
-
+    while ((c = fgetc(fp)) != EOF) {
         // Process next line
-        if (*wp++ == '\n') {
+        *wp++ = c;
+        if (c == '\n') {
             ++line;
 
             switch(line) {
@@ -157,8 +157,6 @@ void HttpServer::sendResponse()
         }
 	}
 
-	--wp;
-	*wp = '\0';
 	if (fp != NULL) {
         fclose(fp);
         fp = NULL;

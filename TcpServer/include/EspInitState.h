@@ -1,16 +1,16 @@
 #ifndef ESPINITSTATE_H
 #define ESPINITSTATE_H
 
-#include "EspStateBase.h"
+#include "TCPState.h"
 
-class EspInitState : public EspStateBase {
+class EspInitState : public TCPState {
 public:
     EspInitState();
     virtual void onStateEnter(ESP8266* esp);
     virtual void handleMessage(ESP8266* esp, message_t msg);
     virtual void onStateExit(ESP8266* esp);
     virtual void processLine(ESP8266* esp);
-    static EspStateBase* instance();
+    static TCPState* instance();
 
 private:
     void initialize();

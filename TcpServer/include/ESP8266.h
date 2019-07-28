@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-class EspStateBase;
+class TCPState;
 
 class ESP8266 : public RawSerial {
 public:
@@ -20,7 +20,7 @@ public:
 	void initBuffers(BufferSizeT type);
 	void sendTxBuffer();
 	void rx_flush();
-	void changeState(EspStateBase* state);
+	void changeState(TCPState* state);
 
 private:
 	enum ConstantsT {
@@ -33,7 +33,7 @@ private:
 
 	void rx_isr();
 
-	EspStateBase* _state;
+	TCPState* _state;
 	char _buff[SERIAL_BUF_SIZE];
 	char* _rp;
 	char* _wp;

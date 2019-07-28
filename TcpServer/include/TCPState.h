@@ -6,7 +6,7 @@
 
 class ESP8266;
 
-class EspStateBase {
+class TCPState {
 public:
     virtual void onStateEnter(ESP8266* esp) = 0;
     virtual void handleMessage(ESP8266* esp, message_t msg) = 0;
@@ -22,7 +22,7 @@ protected:
 		AT_IPD_RECEIVED,
 	};
 
-    EspStateBase();
+    TCPState();
 
     char* _buff;
 	Timeout _timeout;

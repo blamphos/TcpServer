@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1560920160 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
+1562481525 source:c:\data\sw_dev\tcpserver\tcpserver\main.cpp
 	"mbed.h"
 	"SystemControl.h"
 
@@ -9,26 +9,24 @@
 1560882189 c:\data\sw_dev\tcpserver\tcpserver\include\parameters.h
 	"Spdif_defs.h"
 
-1560966536 c:\data\sw_dev\tcpserver\tcpserver\include\systemcontrol.h
+1561664899 c:\data\sw_dev\tcpserver\tcpserver\include\systemcontrol.h
 	"IO_mapping.h"
 	"Spdif_defs.h"
 	"Parameters.h"
 	"EmbeddedMessages.h"
 	"HttpServer.h"
 
-1560966536 source:c:\data\sw_dev\tcpserver\tcpserver\src\systemcontrol.cpp
+1562397974 source:c:\data\sw_dev\tcpserver\tcpserver\src\systemcontrol.cpp
 	"mbed.h"
 	"SystemControl.h"
 	"SpdifSwitch.h"
 	"VolumeControl.h"
 	"HttpServer.h"
 
-1560882189 c:\data\sw_dev\tcpserver\tcpserver\include\httpserver.h
+1562309725 c:\data\sw_dev\tcpserver\tcpserver\include\httpserver.h
 	"EventQueue.h"
 
-1561044778 source:c:\data\sw_dev\tcpserver\tcpserver\src\httpserver.cpp
-	<cstring>
-	<cstdlib>
+1563300617 source:c:\data\sw_dev\tcpserver\tcpserver\src\httpserver.cpp
 	<cstdio>
 	"HttpServer.h"
 	"ESP8266.h"
@@ -71,13 +69,14 @@
 	"Parameters.h"
 	"VolumeControl.h"
 
-1561044427 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
-	"stdlib.h"
+1564034868 source:c:\data\sw_dev\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
+	"TCPState.h"
+	"EspInitState.h"
 
-1560973381 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
+1564034868 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
 1560587071 c:\data\sw_dev\tcpserver\tcpserver\include\esp8266simulated.h
@@ -88,11 +87,12 @@
 	<thread>
 	"ESP8266Simulated.h"
 
-1560919294 c:\data\sw_dev\tcpserver\tcpserver\include\mbed.h
+1561664905 c:\data\sw_dev\tcpserver\tcpserver\include\mbed.h
 	<new>
 	<cstring>
 	<cstddef>
 	<cstdint>
+	<cstdlib>
 	"Timer.h"
 	"BusOut.h"
 	"Serial.h"
@@ -104,7 +104,7 @@
 	"Callback.h"
 	"EventQueue.h"
 
-1560882189 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
+1561665055 c:\data\sw_dev\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
 1560919869 source:c:\data\sw_dev\tcpserver\tcpserver\src\eventqueue.cpp
@@ -117,7 +117,7 @@
 1560483852 c:\data\sw_dev\tcpserver\tcpserver\include\fifo.h
 	"mbed.h"
 
-1560832062 c:\data\sw_dev\tcpserver\tcpserver\include\embeddedmessages.h
+1562615619 c:\data\sw_dev\tcpserver\tcpserver\include\embeddedmessages.h
 	"mbed.h"
 
 1560882189 c:\data\sw_dev\tcpserver\tcpserver\include\digitalout.h
@@ -138,7 +138,7 @@
 
 1560484985 c:\data\sw_dev\tcpserver\tcpserver\include\callback.h
 
-1560966536 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
+1562738948 source:c:\data\sw_dev\tcpserver\tcpserver\src\rawserial.cpp
 	<cstdarg>
 	"RawSerial.h"
 	"TcpSocketServer.h"
@@ -268,7 +268,7 @@
 	"Ticker.h"
 	"WorkerBase.h"
 
-1561043482 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpsocketserver.cpp
+1562740509 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
 	"TcpSocketServer.h"
 
@@ -423,4 +423,66 @@
 
 1560882189 source:c:\data\sw_dev\tcpserver\tcpserver\src\workerbase.cpp
 	"WorkerBase.h"
+
+1562704723 source:c:\data\sw_dev\tcpserver\tcpserver\src\espstatebase.cpp
+	"EspStateBase.h"
+
+1562704723 c:\data\sw_dev\tcpserver\tcpserver\include\espstatebase.h
+	"mbed.h"
+	"IO_mapping.h"
+
+1564038778 source:c:\data\sw_dev\tcpserver\tcpserver\src\espinitstate.cpp
+	"EspInitState.h"
+	"TCPClosed.h"
+	"ESP8266.h"
+
+1564034868 c:\data\sw_dev\tcpserver\tcpserver\include\espinitstate.h
+	"TCPState.h"
+
+1562741246 source:c:\data\sw_dev\tcpserver\tcpserver\src\espconnectstate.cpp
+	"EspConnectState.h"
+	"EspClosedState.h"
+	"ESP8266.h"
+
+1562738804 c:\data\sw_dev\tcpserver\tcpserver\include\espconnectstate.h
+	"EspStateBase.h"
+
+1562873589 source:c:\data\sw_dev\tcpserver\tcpserver\src\espclosedstate.cpp
+	"EspClosedState.h"
+	"EspConnectState.h"
+	"EspInitState.h"
+	"ESP8266.h"
+
+1562565656 c:\data\sw_dev\tcpserver\tcpserver\include\espclosedstate.h
+	"EspStateBase.h"
+
+1564034868 c:\data\sw_dev\tcpserver\tcpserver\include\tcpstate.h
+	"mbed.h"
+	"IO_mapping.h"
+
+1564034868 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpstate.cpp
+	"TCPState.h"
+
+1564035066 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpconnection.cpp
+	"TCPConnection.h"
+
+1564345028 c:\data\sw_dev\tcpserver\tcpserver\include\tcpconnection.h
+	"EventQueue.h"
+
+1564038778 c:\data\sw_dev\tcpserver\tcpserver\include\tcpclosed.h
+	"TCPState.h"
+
+1564038778 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpclosed.cpp
+	"TCPClosed.h"
+	"TCPEStablished.h"
+	"EspInitState.h"
+	"ESP8266.h"
+
+1564038778 c:\data\sw_dev\tcpserver\tcpserver\include\tcpestablished.h
+	"TCPState.h"
+
+1564038778 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpestablished.cpp
+	"TCPEStablished.h"
+	"TCPClosed.h"
+	"ESP8266.h"
 

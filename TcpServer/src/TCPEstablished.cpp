@@ -1,16 +1,16 @@
-#include "EspConnectState.h"
-#include "EspClosedState.h"
+#include "TCPEStablished.h"
+#include "TCPClosed.h"
 #include "ESP8266.h"
 
 extern Serial pc;
 extern BusOut leds;
 
-EspConnectState::EspConnectState()
+TCPEStablished::TCPEStablished()
 {
 
 }
 
-void EspConnectState::onStateEnter(ESP8266* esp)
+void TCPEStablished::onStateEnter(ESP8266* esp)
 {
     esp->initBuffers(ESP8266::LARGE_RX_BUF);
     esp->getRxBuffer(&_buff);
@@ -19,7 +19,7 @@ void EspConnectState::onStateEnter(ESP8266* esp)
     _expected_response = AT_IPD_RECEIVED;
 }
 
-void EspConnectState::handleMessage(ESP8266* esp, message_t msg)
+void TCPEStablished::handleMessage(ESP8266* esp, message_t msg)
 {
     switch (msg.event) {
     case EVENT_SERIAL_DATA_RECEIVED:
@@ -30,23 +30,23 @@ void EspConnectState::handleMessage(ESP8266* esp, message_t msg)
     }
 }
 
-void EspConnectState::onStateExit(ESP8266* esp)
+void TCPEStablished::onStateExit(ESP8266* esp)
 {
 
 }
 
-void EspConnectState::timeout()
+void TCPEStablished::timeout()
 {
     pc.printf("timeout");
 }
 
-void EspConnectState::processLine(ESP8266* esp)
+void TCPEStablished::processLine(ESP8266* esp)
 {
     const char* c = NULL;
 
     switch(_expected_response) {
     case AT_DATA_SEND_OK:
-        esp->changeState(EspClosedState::instance());
+        esp->changeState(TCPClosed::instance());
         break;
     case AT_READY_TO_SEND:
         esp->getTxBuffer(&_buff);
@@ -74,7 +74,7 @@ void EspConnectState::processLine(ESP8266* esp)
 
                 _expected_data_len += (c - _buff);
                 //pc.printf("len: %d\n", _expected_data_len);
-                _timeout.attach(callback(this, &EspConnectState::timeout), 3);
+                _timeout.attach(callback(this, &TCPEStablished::timeout), 3);
             }
         }
 
@@ -89,8 +89,8 @@ void EspConnectState::processLine(ESP8266* esp)
     }
 }
 
-EspStateBase* EspConnectState::instance()
+TCPState* TCPEStablished::instance()
 {
-    static EspConnectState inst;
+    static TCPEStablished inst;
     return &inst;
 }

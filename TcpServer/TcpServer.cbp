@@ -32,9 +32,7 @@
 		<Unit filename="include/ESP8266.h" />
 		<Unit filename="include/EmbeddedMessages.h" />
 		<Unit filename="include/EspClosedState.h" />
-		<Unit filename="include/EspConnectState.h" />
 		<Unit filename="include/EspInitState.h" />
-		<Unit filename="include/EspStateBase.h" />
 		<Unit filename="include/EventQueue.h" />
 		<Unit filename="include/Fifo.h" />
 		<Unit filename="include/HttpServer.h" />
@@ -47,6 +45,11 @@
 		<Unit filename="include/Serial.h" />
 		<Unit filename="include/Spdif_defs.h" />
 		<Unit filename="include/SystemControl.h" />
+		<Unit filename="include/TCPClosed.h" />
+		<Unit filename="include/TCPConnection.h" />
+		<Unit filename="include/TCPEstablished.h" />
+		<Unit filename="include/TCPListen.h" />
+		<Unit filename="include/TCPState.h" />
 		<Unit filename="include/TcpSocketServer.h" />
 		<Unit filename="include/Ticker.h" />
 		<Unit filename="include/Timeout.h" />
@@ -57,10 +60,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/BusOut.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
-		<Unit filename="src/EspClosedState.cpp" />
-		<Unit filename="src/EspConnectState.cpp" />
 		<Unit filename="src/EspInitState.cpp" />
-		<Unit filename="src/EspStateBase.cpp" />
 		<Unit filename="src/EventQueue.cpp" />
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
@@ -68,6 +68,11 @@
 		<Unit filename="src/Serial.cpp" />
 		<Unit filename="src/SpdifSwitch.cpp" />
 		<Unit filename="src/SystemControl.cpp" />
+		<Unit filename="src/TCPClosed.cpp" />
+		<Unit filename="src/TCPConnection.cpp" />
+		<Unit filename="src/TCPEstablished.cpp" />
+		<Unit filename="src/TCPListen.cpp" />
+		<Unit filename="src/TCPState.cpp" />
 		<Unit filename="src/TcpSocketServer.cpp" />
 		<Unit filename="src/Ticker.cpp" />
 		<Unit filename="src/Timeout.cpp" />

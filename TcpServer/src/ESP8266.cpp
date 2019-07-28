@@ -1,7 +1,7 @@
 #include "ESP8266.h"
 #include "EventQueue.h"
 #include "IO_mapping.h"
-#include "EspStateBase.h"
+#include "TCPState.h"
 #include "EspInitState.h"
 
 extern Serial pc;
@@ -22,17 +22,6 @@ void ESP8266::initialize()
 void ESP8266::handleMessage(message_t msg)
 {
     _state->handleMessage(this, msg);
-    /*switch (msg.event) {
-    case EVENT_SERIAL_DATA_RECEIVED:
-        _state->processLine(this);
-        break;
-    case EVENT_SERIAL_CMD_SEND:
-        _state->sendNextCommand
-        //_timeout.attach(callback(this, &ESP8266::sendNextCommand), 0.1);
-        break;
-    default:
-        break;
-    }*/
 }
 
 void ESP8266::initBuffers(BufferSizeT type)
@@ -107,7 +96,7 @@ void ESP8266::sendTxBuffer()
     this->printf("AT+CIPSENDBUF=0,%d\r\n", len);
 }
 
-void ESP8266::changeState(EspStateBase* state)
+void ESP8266::changeState(TCPState* state)
 {
     _state->onStateExit(this);
     _state = state;
