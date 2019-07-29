@@ -4,21 +4,32 @@
 #include "EventQueue.h"
 
 class TCPState;
+class ESP8266;
 
-class TCPConnection
-{
+class TCPConnection {
 public:
     TCPConnection();
 	void handleMessage(message_t msg);
 	void initialize();
-	void getRxBuffer(char** buff, int* len = NULL);
-	void getTxBuffer(char** buff, int* len = NULL);
+    void activeOpen();
+    void passiveOpen();
+    void close();
+    void send(const char* buff);
+    //void acknowledge();
+    //void synchronize();
+
+	//void getRxBuffer(char** buff, int* len = NULL);
+	//void getTxBuffer(char** buff, int* len = NULL);
 	//void initBuffers(BufferSizeT type);
-	void sendTxBuffer();
-	void rx_flush();
+	//void sendTxBuffer();
+	//void rx_flush();
+
+private:
+    friend class TCPState;
 	void changeState(TCPState* state);
 
-    private:
+	TCPState* _state;
+	ESP8266* _esp;
 };
 
 #endif

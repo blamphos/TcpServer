@@ -4,14 +4,14 @@
 #include "mbed.h"
 #include "IO_mapping.h"
 
-class ESP8266;
+class TCPConnection;
 
 class TCPState {
 public:
-    virtual void onStateEnter(ESP8266* esp) = 0;
-    virtual void handleMessage(ESP8266* esp, message_t msg) = 0;
-    virtual void onStateExit(ESP8266* esp) = 0;
-    virtual void processLine(ESP8266* esp) = 0;
+    virtual void onStateEnter(TCPConnection* t) = 0;
+    virtual void handleMessage(TCPConnection* t, message_t msg) = 0;
+    virtual void onStateExit(TCPConnection* t) = 0;
+    virtual void processLine(TCPConnection* t) = 0;
 
 protected:
 	enum ResponseTypeT {
@@ -23,6 +23,7 @@ protected:
 	};
 
     TCPState();
+    void changeState(TCPConnection* t, TCPState* state);
 
     char* _buff;
 	Timeout _timeout;

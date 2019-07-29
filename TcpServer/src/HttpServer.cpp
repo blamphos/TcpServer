@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "HttpServer.h"
-#include "ESP8266.h"
+#include "TCPConnection.h"
 #include "Parameters.h"
 #include "VolumeControl.h"
 
@@ -8,27 +8,27 @@ extern Serial pc;
 extern BusOut leds;
 
 HttpServer::HttpServer() :
-    _esp(new ESP8266), _requestType(NotDefined)
+    _tcp(new TCPConnection), _requestType(NotDefined)
 {
 
 }
 
 HttpServer::~HttpServer()
 {
-    delete _esp;
+    delete _tcp;
 }
 
 void HttpServer::handleMessage(message_t msg)
 {
     switch (msg.event) {
     case EVENT_HTTP_SERVER_INIT:
-    	_esp->initialize();
+    	_tcp->initialize();
     	break;
     case EVENT_HTTP_REQUEST:
         handleRequest();
         break;
     default:
-        _esp->handleMessage(msg);
+        _tcp->handleMessage(msg);
         break;
     }
 }
@@ -36,7 +36,7 @@ void HttpServer::handleMessage(message_t msg)
 void HttpServer::handleRequest()
 {
     char* buff;
-    _esp->getRxBuffer(&buff);
+    //_tcp->getRxBuffer(&buff);
 
     if (_requestType == NotDefined) {
         if (strstr(buff, "\r\n\r\n") == NULL) {
@@ -105,6 +105,7 @@ void HttpServer::handleRequest()
 
 void HttpServer::sendResponse()
 {
+#if 0
     char* buff = NULL;
     int len = 0;
     int line = 0;
@@ -112,8 +113,8 @@ void HttpServer::sendResponse()
         return;
     }
 
-    _esp->initBuffers(ESP8266::LARGE_TX_BUF);
-    _esp->getTxBuffer(&buff, &len);
+    _tcp->initBuffers(ESP8266::LARGE_TX_BUF);
+    _tcp->getTxBuffer(&buff, &len);
 
     FILE* fp = fopen("/local/index.htm", "rb");
     if (fp == NULL) {
@@ -164,6 +165,7 @@ void HttpServer::sendResponse()
 
     _requestType = NotDefined;
     _esp->sendTxBuffer();
+#endif
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)

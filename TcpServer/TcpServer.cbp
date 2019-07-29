@@ -31,8 +31,6 @@
 		<Unit filename="include/DigitalOut.h" />
 		<Unit filename="include/ESP8266.h" />
 		<Unit filename="include/EmbeddedMessages.h" />
-		<Unit filename="include/EspClosedState.h" />
-		<Unit filename="include/EspInitState.h" />
 		<Unit filename="include/EventQueue.h" />
 		<Unit filename="include/Fifo.h" />
 		<Unit filename="include/HttpServer.h" />
@@ -60,7 +58,6 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/BusOut.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
-		<Unit filename="src/EspInitState.cpp" />
 		<Unit filename="src/EventQueue.cpp" />
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />

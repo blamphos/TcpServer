@@ -3,7 +3,7 @@
 
 #include "EventQueue.h"
 
-class ESP8266;
+class TCPConnection;
 
 class HttpServer {
 public:
@@ -24,7 +24,7 @@ private:
 	void setVolumeLevel(char* buff, int volume);
 	void setButtonState(char* buff, const char* tag, bool enabled);
 
-	ESP8266* _esp;
+	TCPConnection* _tcp;
     HttpRequestTypeT _requestType;
 };
 

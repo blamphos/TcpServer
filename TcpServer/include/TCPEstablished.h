@@ -3,13 +3,13 @@
 
 #include "TCPState.h"
 
-class TCPEStablished : public TCPState {
+class TCPEstablished : public TCPState {
 public:
-    TCPEStablished();
-    virtual void onStateEnter(ESP8266* esp);
-    virtual void handleMessage(ESP8266* esp, message_t msg);
-    virtual void onStateExit(ESP8266* esp);
-    virtual void processLine(ESP8266* esp);
+    TCPEstablished();
+    virtual void onStateEnter(TCPConnection* t);
+    virtual void handleMessage(TCPConnection* t, message_t msg);
+    virtual void onStateExit(TCPConnection* t);
+    virtual void processLine(TCPConnection* t);
     static TCPState* instance();
 
 private:

@@ -1,52 +1,55 @@
-#include "TCPEStablished.h"
+#include "TCPEstablished.h"
 #include "TCPClosed.h"
-#include "ESP8266.h"
+#include "TCPConnection.h"
 
 extern Serial pc;
 extern BusOut leds;
 
-TCPEStablished::TCPEStablished()
+TCPEstablished::TCPEstablished()
 {
 
 }
 
-void TCPEStablished::onStateEnter(ESP8266* esp)
+void TCPEstablished::onStateEnter(TCPConnection* t)
 {
+#if 0
     esp->initBuffers(ESP8266::LARGE_RX_BUF);
     esp->getRxBuffer(&_buff);
 
     _expected_data_len = 0;
     _expected_response = AT_IPD_RECEIVED;
+#endif
 }
 
-void TCPEStablished::handleMessage(ESP8266* esp, message_t msg)
+void TCPEstablished::handleMessage(TCPConnection* t, message_t msg)
 {
     switch (msg.event) {
     case EVENT_SERIAL_DATA_RECEIVED:
-        processLine(esp);
+        processLine(t);
         break;
     default:
         break;
     }
 }
 
-void TCPEStablished::onStateExit(ESP8266* esp)
+void TCPEstablished::onStateExit(TCPConnection* t)
 {
 
 }
 
-void TCPEStablished::timeout()
+void TCPEstablished::timeout()
 {
     pc.printf("timeout");
 }
 
-void TCPEStablished::processLine(ESP8266* esp)
+void TCPEstablished::processLine(TCPConnection* t)
 {
+#if 0
     const char* c = NULL;
 
     switch(_expected_response) {
     case AT_DATA_SEND_OK:
-        esp->changeState(TCPClosed::instance());
+        t->changeState(TCPClosed::instance());
         break;
     case AT_READY_TO_SEND:
         esp->getTxBuffer(&_buff);
@@ -74,7 +77,7 @@ void TCPEStablished::processLine(ESP8266* esp)
 
                 _expected_data_len += (c - _buff);
                 //pc.printf("len: %d\n", _expected_data_len);
-                _timeout.attach(callback(this, &TCPEStablished::timeout), 3);
+                _timeout.attach(callback(this, &TCPEstablished::timeout), 3);
             }
         }
 
@@ -87,10 +90,11 @@ void TCPEStablished::processLine(ESP8266* esp)
     default:
         break;
     }
+#endif
 }
 
-TCPState* TCPEStablished::instance()
+TCPState* TCPEstablished::instance()
 {
-    static TCPEStablished inst;
+    static TCPEstablished inst;
     return &inst;
 }

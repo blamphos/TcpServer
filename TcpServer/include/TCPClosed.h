@@ -6,10 +6,10 @@
 class TCPClosed : public TCPState {
 public:
     TCPClosed();
-    virtual void onStateEnter(ESP8266* esp);
-    virtual void handleMessage(ESP8266* esp, message_t msg);
-    virtual void onStateExit(ESP8266* esp);
-    virtual void processLine(ESP8266* esp);
+    virtual void onStateEnter(TCPConnection* t);
+    virtual void handleMessage(TCPConnection* t, message_t msg);
+    virtual void onStateExit(TCPConnection* t);
+    virtual void processLine(TCPConnection* t);
     static TCPState* instance();
 
 private:

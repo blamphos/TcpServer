@@ -3,8 +3,6 @@
 
 #include "mbed.h"
 
-class TCPState;
-
 class ESP8266 : public RawSerial {
 public:
 	enum BufferSizeT {
@@ -13,14 +11,13 @@ public:
 	};
 
 	ESP8266();
-	void handleMessage(message_t msg);
 	void initialize();
 	void getRxBuffer(char** buff, int* len = NULL);
 	void getTxBuffer(char** buff, int* len = NULL);
 	void initBuffers(BufferSizeT type);
 	void sendTxBuffer();
 	void rx_flush();
-	void changeState(TCPState* state);
+	void sendNextCommand();
 
 private:
 	enum ConstantsT {
@@ -33,12 +30,16 @@ private:
 
 	void rx_isr();
 
-	TCPState* _state;
+    const char* _ssid = "Kuhaverkko";
+    const char* _pwd = "kasperi12";
+
+	DigitalOut* _esp_reset;
 	char _buff[SERIAL_BUF_SIZE];
 	char* _rp;
 	char* _wp;
 	int _rx_buf_len;
 	int _tx_buf_len;
+	int _cmd_index;
 };
 
 #endif

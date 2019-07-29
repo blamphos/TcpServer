@@ -41,7 +41,7 @@ void TCPListen::processLine(TCPConnection* t)
 
     c = strstr(_buff, ",CLOSED");
     if (c != NULL) {
-        t->changeState(TCPEStablished::instance());
+        changeState(t, TCPEstablished::instance());
     }
 }
 

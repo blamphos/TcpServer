@@ -1,50 +1,51 @@
 #include "TCPClosed.h"
-#include "TCPEStablished.h"
-#include "EspInitState.h"
-#include "ESP8266.h"
+#include "TCPEstablished.h"
+#include "TCPConnection.h"
 
 TCPClosed::TCPClosed()
 {
 
 }
 
-void TCPClosed::onStateEnter(ESP8266* esp)
+void TCPClosed::onStateEnter(TCPConnection* t)
 {
-    esp->initBuffers(ESP8266::LARGE_RX_BUF);
-    esp->getRxBuffer(&_buff);
+#if 0
+    t->initBuffers(ESP8266::LARGE_RX_BUF);
+    t->getRxBuffer(&_buff);
 
-    esp->printf("AT+CIPCLOSE=0\r\n");
+    t->send("AT+CIPCLOSE=0\r\n");
+#endif
 }
 
-void TCPClosed::handleMessage(ESP8266* esp, message_t msg)
+void TCPClosed::handleMessage(TCPConnection* t, message_t msg)
 {
     switch (msg.event) {
     case EVENT_SERIAL_DATA_RECEIVED:
-        processLine(esp);
+        processLine(t);
         break;
     default:
         break;
     }
 }
 
-void TCPClosed::onStateExit(ESP8266* esp)
+void TCPClosed::onStateExit(TCPConnection* t)
 {
 
 }
 
-void TCPClosed::processLine(ESP8266* esp)
+void TCPClosed::processLine(TCPConnection* t)
 {
 	const char* c = NULL;
 
     c = strstr(_buff, "ERROR");
     if (c != NULL) {
-        esp->changeState(EspInitState::instance());
+        //t->changeState(EspInitState::instance());
         return;
     }
 
     c = strstr(_buff, ",CLOSED");
     if (c != NULL) {
-        esp->changeState(TCPEStablished::instance());
+        changeState(t, TCPEstablished::instance());
     }
 }
 
