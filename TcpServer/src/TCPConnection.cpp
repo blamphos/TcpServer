@@ -26,8 +26,6 @@ void TCPConnection::handleMessage(message_t msg)
         _esp->sendNextCommand();
         //_timeout.attach(callback(this, &EspInitState::sendNextCommand), 0.1);
         break;
-    case EVENT_HTTP_SERVER_READY:
-        changeState(TCPListen::instance());
     default:
         _state->handleMessage(this, msg);
         break;
@@ -38,6 +36,11 @@ void TCPConnection::changeState(TCPState* state)
 {
     _state = state;
     _state->onStateEnter(this);
+}
+
+void TCPConnection::open()
+{
+    changeState(TCPListen::instance());
 }
 
 void TCPConnection::close()
