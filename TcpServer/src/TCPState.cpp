@@ -6,7 +6,7 @@ TCPState::TCPState()
 
 }
 
-void TCPState::open()
+void TCPState::listen()
 {
 
 }

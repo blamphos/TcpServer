@@ -25,7 +25,7 @@ void HttpServer::handleMessage(message_t msg)
     	_tcp->initialize();
     	break;
     case EVENT_HTTP_SERVER_READY:
-        _tcp->open();
+        _tcp->listen();
         break;
     case EVENT_HTTP_REQUEST:
         handleRequest();
@@ -39,7 +39,7 @@ void HttpServer::handleMessage(message_t msg)
 void HttpServer::handleRequest()
 {
     char* buff;
-    //_tcp->getRxBuffer(&buff);
+    _tcp->getRxBuffer(&buff);
 
     if (_requestType == NotDefined) {
         if (strstr(buff, "\r\n\r\n") == NULL) {
@@ -108,7 +108,6 @@ void HttpServer::handleRequest()
 
 void HttpServer::sendResponse()
 {
-#if 0
     char* buff = NULL;
     int len = 0;
     int line = 0;
@@ -168,7 +167,6 @@ void HttpServer::sendResponse()
 
     _requestType = NotDefined;
     _esp->sendTxBuffer();
-#endif
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)

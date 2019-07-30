@@ -9,9 +9,8 @@ class TCPConnection;
 class TCPState {
 public:
     virtual void onStateEnter(TCPConnection* t) = 0;
-    virtual void handleMessage(TCPConnection* t, message_t msg) = 0;
     virtual void processLine(TCPConnection* t) = 0;
-    void open();
+    void listen();
     void close();
     void send(const char* buff);
 

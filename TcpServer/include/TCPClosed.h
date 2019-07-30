@@ -7,7 +7,6 @@ class TCPClosed : public TCPState {
 public:
     TCPClosed();
     virtual void onStateEnter(TCPConnection* t);
-    virtual void handleMessage(TCPConnection* t, message_t msg);
     virtual void processLine(TCPConnection* t);
     static TCPState* instance();
 

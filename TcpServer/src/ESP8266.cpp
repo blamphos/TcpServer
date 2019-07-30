@@ -22,8 +22,6 @@ void ESP8266::initialize()
 	_esp_reset->write(1);
 	//wait(2);
 
-	//_serial->attach(callback(this, &ESP8266::esp_rx_isr), RxIrq);
-
 	_cmd_index = 0;
 	sendNextCommand();
 }

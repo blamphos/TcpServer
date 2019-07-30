@@ -9,8 +9,8 @@ TCPListen::TCPListen()
 
 void TCPListen::onStateEnter(TCPConnection* t)
 {
-    //t->initBuffers(ESP8266::LARGE_RX_BUF);
-    //t->getRxBuffer(&_buff);
+    t->initLargeRxBuffer();
+    t->getRxBuffer(&_buff);
 }
 
 void TCPListen::handleMessage(TCPConnection* t, message_t msg)

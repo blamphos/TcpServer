@@ -12,24 +12,11 @@ TCPEstablished::TCPEstablished()
 
 void TCPEstablished::onStateEnter(TCPConnection* t)
 {
-#if 0
-    esp->initBuffers(ESP8266::LARGE_RX_BUF);
-    esp->getRxBuffer(&_buff);
+    t->initLargeRxBuffer();
+    t->getRxBuffer(&_buff);
 
     _expected_data_len = 0;
     _expected_response = AT_IPD_RECEIVED;
-#endif
-}
-
-void TCPEstablished::handleMessage(TCPConnection* t, message_t msg)
-{
-    switch (msg.event) {
-    case EVENT_SERIAL_DATA_RECEIVED:
-        processLine(t);
-        break;
-    default:
-        break;
-    }
 }
 
 void TCPEstablished::timeout()

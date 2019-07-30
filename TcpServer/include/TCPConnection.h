@@ -11,15 +11,13 @@ public:
     TCPConnection();
 	void handleMessage(message_t msg);
 	void initialize();
-    void open();
+    void listen();
     void close();
     void send(const char* buff);
-    //void acknowledge();
-    //void synchronize();
-
-	//void getRxBuffer(char** buff, int* len = NULL);
-	//void getTxBuffer(char** buff, int* len = NULL);
-	//void initBuffers(BufferSizeT type);
+    void initLargeRxBuffer();
+    void initLargeTxBuffer();
+	void getRxBuffer(char** buff, int* len = NULL);
+	void getTxBuffer(char** buff, int* len = NULL);
 	//void sendTxBuffer();
 	//void rx_flush();
 
