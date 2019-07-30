@@ -39,7 +39,7 @@
 1560869350 c:\data\tcpserver\tcpserver\include\parameters.h
 	"Spdif_defs.h"
 
-1560952443 source:c:\data\tcpserver\tcpserver\src\systemcontrol.cpp
+1564473609 source:c:\data\tcpserver\tcpserver\src\systemcontrol.cpp
 	"mbed.h"
 	"SystemControl.h"
 	"SpdifSwitch.h"
@@ -57,15 +57,13 @@
 	"mbed.h"
 	"SystemControl.h"
 
-1560862142 c:\data\tcpserver\tcpserver\include\httpserver.h
+1564463772 c:\data\tcpserver\tcpserver\include\httpserver.h
 	"EventQueue.h"
 
-1560942277 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
-	<cstring>
-	<cstdlib>
+1564463772 source:c:\data\tcpserver\tcpserver\src\httpserver.cpp
 	<cstdio>
 	"HttpServer.h"
-	"ESP8266.h"
+	"TCPConnection.h"
 	"Parameters.h"
 	"VolumeControl.h"
 
@@ -141,11 +139,12 @@
 	"RawSerial.h"
 	"TcpSocketServer.h"
 
-1560871930 c:\data\tcpserver\tcpserver\include\mbed.h
+1561552279 c:\data\tcpserver\tcpserver\include\mbed.h
 	<new>
 	<cstring>
 	<cstddef>
 	<cstdint>
+	<cstdlib>
 	"Timer.h"
 	"BusOut.h"
 	"Serial.h"
@@ -157,7 +156,7 @@
 	"Callback.h"
 	"EventQueue.h"
 
-1560866832 c:\data\tcpserver\tcpserver\include\rawserial.h
+1564386958 c:\data\tcpserver\tcpserver\include\rawserial.h
 	"mbed.h"
 
 1560870744 c:\data\tcpserver\tcpserver\include\digitalout.h
@@ -171,40 +170,39 @@
 
 1560490406 c:\data\tcpserver\tcpserver\include\callback.h
 
-1560952924 c:\data\tcpserver\tcpserver\include\esp8266.h
+1564465304 c:\data\tcpserver\tcpserver\include\esp8266.h
 	"mbed.h"
 
 1560517810 c:\data\tcpserver\tcpserver\include\esp8266simulated.h
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560952924 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
-	"stdlib.h"
+1564473609 source:c:\data\tcpserver\tcpserver\src\esp8266.cpp
 	"ESP8266.h"
 	"EventQueue.h"
 	"IO_mapping.h"
 
-1560953727 c:\data\tcpserver\tcpserver\include\eventqueue.h
+1561014305 c:\data\tcpserver\tcpserver\include\eventqueue.h
 	"Fifo.h"
 	"EmbeddedMessages.h"
 
 1560152972 c:\data\tcpserver\tcpserver\include\fifo.h
 	"mbed.h"
 
-1560872680 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
+1564386958 c:\data\tcpserver\tcpserver\include\embeddedmessages.h
 	"mbed.h"
 
 1560872040 c:\data\tcpserver\tcpserver\include\io_mapping.h
 	"mbed.h"
 
-1560953222 source:c:\data\tcpserver\tcpserver\src\eventqueue.cpp
+1560953833 source:c:\data\tcpserver\tcpserver\src\eventqueue.cpp
 	"EventQueue.h"
 
 1560933702 source:c:\data\tcpserver\tcpserver\src\mbed.cpp
 	<chrono>
 	<thread>
 
-1560934786 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
+1564386958 source:c:\data\tcpserver\tcpserver\src\rawserial.cpp
 	<cstdarg>
 	"RawSerial.h"
 	"TcpSocketServer.h"
@@ -274,11 +272,11 @@
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560945229 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
+1561444945 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
 	<ws2tcpip.h>
 	"mbed.h"
 
-1560953494 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
+1564386958 source:c:\data\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
 	"TcpSocketServer.h"
 
@@ -494,6 +492,48 @@
 	"TCPEstablished.h"
 
 1564345170 c:\data\sw_dev\tcpserver\tcpserver\include\tcplisten.h
+	"TCPState.h"
+	"EventQueue.h"
+
+1564473609 c:\data\tcpserver\tcpserver\include\tcpconnection.h
+	"EventQueue.h"
+
+1564465359 source:c:\data\tcpserver\tcpserver\src\tcpestablished.cpp
+	"TCPEstablished.h"
+	"TCPClosed.h"
+	"TCPConnection.h"
+
+1564465305 c:\data\tcpserver\tcpserver\include\tcpestablished.h
+	"TCPState.h"
+
+1564473609 c:\data\tcpserver\tcpserver\include\tcpstate.h
+	"mbed.h"
+	"IO_mapping.h"
+
+1564465305 c:\data\tcpserver\tcpserver\include\tcpclosed.h
+	"TCPState.h"
+
+1564465545 source:c:\data\tcpserver\tcpserver\src\tcpstate.cpp
+	"TCPState.h"
+	"TCPConnection.h"
+
+1564465305 source:c:\data\tcpserver\tcpserver\src\tcpclosed.cpp
+	"TCPClosed.h"
+	"TCPEstablished.h"
+	"TCPConnection.h"
+
+1564465350 source:c:\data\tcpserver\tcpserver\src\tcpconnection.cpp
+	"TCPConnection.h"
+	"TCPState.h"
+	"TCPClosed.h"
+	"ESP8266.h"
+
+1564465305 source:c:\data\tcpserver\tcpserver\src\tcplisten.cpp
+	"TCPListen.h"
+	"TCPConnection.h"
+	"TCPEstablished.h"
+
+1564465337 c:\data\tcpserver\tcpserver\include\tcplisten.h
 	"TCPState.h"
 	"EventQueue.h"
 

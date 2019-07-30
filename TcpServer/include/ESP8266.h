@@ -18,6 +18,7 @@ public:
 	void sendTxBuffer();
 	void rx_flush();
 	void sendNextCommand();
+	void processLine();
 
 private:
 	enum ConstantsT {

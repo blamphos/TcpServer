@@ -11,8 +11,7 @@ public:
     TCPConnection();
 	void handleMessage(message_t msg);
 	void initialize();
-    void activeOpen();
-    void passiveOpen();
+    void open();
     void close();
     void send(const char* buff);
     //void acknowledge();

@@ -8,7 +8,6 @@ public:
     TCPEstablished();
     virtual void onStateEnter(TCPConnection* t);
     virtual void handleMessage(TCPConnection* t, message_t msg);
-    virtual void onStateExit(TCPConnection* t);
     virtual void processLine(TCPConnection* t);
     static TCPState* instance();
 

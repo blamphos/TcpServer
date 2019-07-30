@@ -24,6 +24,9 @@ void HttpServer::handleMessage(message_t msg)
     case EVENT_HTTP_SERVER_INIT:
     	_tcp->initialize();
     	break;
+    case EVENT_HTTP_SERVER_READY:
+        _tcp->open();
+        break;
     case EVENT_HTTP_REQUEST:
         handleRequest();
         break;

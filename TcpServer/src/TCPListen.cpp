@@ -24,11 +24,6 @@ void TCPListen::handleMessage(TCPConnection* t, message_t msg)
     }
 }
 
-void TCPListen::onStateExit(TCPConnection* t)
-{
-
-}
-
 void TCPListen::processLine(TCPConnection* t)
 {
 	const char* c = NULL;

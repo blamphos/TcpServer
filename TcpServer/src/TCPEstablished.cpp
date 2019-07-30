@@ -32,11 +32,6 @@ void TCPEstablished::handleMessage(TCPConnection* t, message_t msg)
     }
 }
 
-void TCPEstablished::onStateExit(TCPConnection* t)
-{
-
-}
-
 void TCPEstablished::timeout()
 {
     pc.printf("timeout");

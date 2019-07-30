@@ -107,6 +107,7 @@ void ESP8266::sendNextCommand()
 	case 5:
 		leds = 0x0;
 		pc.printf("Initialization OK.\r\n");
+		EventQueue::instance()->post(EVENT_HTTP_SERVER_READY);
 		//changeState(TCPClosed::instance());
 		break;
 	default:
@@ -115,6 +116,22 @@ void ESP8266::sendNextCommand()
 	}
 
 	++_cmd_index;
+}
+
+void ESP8266::processLine()
+{
+	const char* c = NULL;
+
+    c = strstr(_buff, "ERROR");
+    if (c != NULL) {
+        EventQueue::instance()->post(EVENT_HTTP_SERVER_INIT);
+        return;
+    }
+
+    c = strstr(_buff, "OK");
+    if (c != NULL) {
+        EventQueue::instance()->post(EVENT_SERIAL_CMD_SEND);
+    }
 }
 
 void ESP8266::getRxBuffer(char** buff, int* len)

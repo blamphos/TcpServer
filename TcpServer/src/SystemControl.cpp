@@ -64,6 +64,7 @@ void SystemControl::handleMessage()
 			//_display->handleMessage(msg);
 			break;
 		case EVENT_HTTP_SERVER_READY:
+		    _http->handleMessage(msg);
 			//_system_ticker.attach_us(callback(this, &SystemControl::ticker_isr), TIMER_SYSTEM_TICK_US);
 			break;
 		default:

@@ -28,11 +28,6 @@ void TCPClosed::handleMessage(TCPConnection* t, message_t msg)
     }
 }
 
-void TCPClosed::onStateExit(TCPConnection* t)
-{
-
-}
-
 void TCPClosed::processLine(TCPConnection* t)
 {
 	const char* c = NULL;

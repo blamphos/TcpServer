@@ -1,6 +1,7 @@
 #include "TCPConnection.h"
 #include "TCPState.h"
 #include "TCPClosed.h"
+#include "TCPListen.h"
 #include "ESP8266.h"
 
 TCPConnection::TCPConnection() :
@@ -12,7 +13,6 @@ TCPConnection::TCPConnection() :
 
 void TCPConnection::initialize()
 {
-    changeState(TCPClosed::instance());
     _esp->initialize();
 }
 
@@ -26,6 +26,8 @@ void TCPConnection::handleMessage(message_t msg)
         _esp->sendNextCommand();
         //_timeout.attach(callback(this, &EspInitState::sendNextCommand), 0.1);
         break;
+    case EVENT_HTTP_SERVER_READY:
+        changeState(TCPListen::instance());
     default:
         _state->handleMessage(this, msg);
         break;
@@ -34,9 +36,13 @@ void TCPConnection::handleMessage(message_t msg)
 
 void TCPConnection::changeState(TCPState* state)
 {
-    _state->onStateExit(this);
     _state = state;
     _state->onStateEnter(this);
+}
+
+void TCPConnection::close()
+{
+    changeState(TCPClosed::instance());
 }
 
 void TCPConnection::send(const char* buff)
