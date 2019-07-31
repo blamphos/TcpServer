@@ -18,7 +18,7 @@ public:
     void initLargeTxBuffer();
 	void getRxBuffer(char** buff, int* len = NULL);
 	void getTxBuffer(char** buff, int* len = NULL);
-	//void sendTxBuffer();
+	void sendTxBuffer();
 	//void rx_flush();
 
 private:

@@ -9,8 +9,6 @@ public:
     virtual void onStateEnter(TCPConnection* t);
     virtual void processLine(TCPConnection* t);
     static TCPState* instance();
-
-private:
 };
 
 #endif

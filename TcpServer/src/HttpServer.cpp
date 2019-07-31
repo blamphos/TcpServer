@@ -115,7 +115,8 @@ void HttpServer::sendResponse()
         return;
     }
 
-    _tcp->initBuffers(ESP8266::LARGE_TX_BUF);
+    //_tcp->initBuffers(ESP8266::LARGE_TX_BUF);
+    _tcp->initLargeTxBuffer();
     _tcp->getTxBuffer(&buff, &len);
 
     FILE* fp = fopen("/local/index.htm", "rb");
@@ -166,7 +167,7 @@ void HttpServer::sendResponse()
 	}
 
     _requestType = NotDefined;
-    _esp->sendTxBuffer();
+    _tcp->sendTxBuffer();
 }
 
 void HttpServer::parseCharValue(char* buff, const char* tag, int* value)

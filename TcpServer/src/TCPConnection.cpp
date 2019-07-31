@@ -38,7 +38,7 @@ void TCPConnection::handleMessage(message_t msg)
 void TCPConnection::changeState(TCPState* state)
 {
     _state = state;
-    _state->onStateEnter(this);
+    //_state->onStateEnter(this);
 }
 
 void TCPConnection::listen()
@@ -77,4 +77,9 @@ void TCPConnection::getRxBuffer(char** buff, int* len)
 void TCPConnection::getTxBuffer(char** buff, int* len)
 {
     _esp->getTxBuffer(buff, len);
+}
+
+void TCPConnection::sendTxBuffer()
+{
+    _esp->sendTxBuffer();
 }

@@ -11,9 +11,12 @@ class TCPListen : public TCPState
 public:
     TCPListen();
     virtual void onStateEnter(TCPConnection* t);
-    virtual void handleMessage(TCPConnection* t, message_t msg);
     virtual void processLine(TCPConnection* t);
     static TCPState* instance();
+
+private:
+    void timeout();
+	uint32_t _expected_data_len;
 };
 
 #endif
