@@ -1,2 +1,4 @@
 /Debug/
 *.vcxproj.user
+/bin/
+/obj/
