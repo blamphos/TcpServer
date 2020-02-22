@@ -6,7 +6,7 @@ TcpSocketServer::TcpSocketServer() :
     _client_socket(INVALID_SOCKET),
     _is_running(false)
 {
-	memset(_buffer, '\0', DEFAULT_BUFLEN);
+	//memset(_buffer, '\0', DEFAULT_BUFLEN);
 }
 
 void TcpSocketServer::attach(Callback<void()> cb)
@@ -22,9 +22,9 @@ void TcpSocketServer::detach()
 void TcpSocketServer::readBuffer(char* buff, int* len)
 {
     if (_client_socket != INVALID_SOCKET) {
-        sprintf(buff, "0,CONNECT\r\n\r\n+IPD,0,%d:%s", strlen(_buffer), _buffer);
+        //sprintf(buff, "0,CONNECT\r\n\r\n+IPD,0,%d:%s", strlen(_buffer), _buffer);
     } else {
-        memcpy(buff, _buffer, strlen(_buffer));
+        //memcpy(buff, _buffer, strlen(_buffer));
     }
 
     (*len) = strlen(buff);
@@ -32,6 +32,7 @@ void TcpSocketServer::readBuffer(char* buff, int* len)
 
 void TcpSocketServer::sendBuffer(const char* buff, int len)
 {
+#if 0
     memset(_buffer, '\0', DEFAULT_BUFLEN);
     memcpy(_buffer, buff, len);
 
@@ -43,6 +44,7 @@ void TcpSocketServer::sendBuffer(const char* buff, int len)
         //WSACleanup();
         //break;
     }
+#endif // 0
 }
 
 void TcpSocketServer::start()
@@ -52,7 +54,7 @@ void TcpSocketServer::start()
 
 void TcpSocketServer::stop()
 {
-    closeConnection();
+    //closeConnection();
 
     _is_running = false;
     closesocket(_listen_socket);
@@ -60,17 +62,17 @@ void TcpSocketServer::stop()
     printf("Server listen socket closed.\n");
 }
 
-void TcpSocketServer::closeConnection()
+void TcpSocketServer::closeConnection(int socket)
 {
-    if (_client_socket != INVALID_SOCKET) {
+    if (socket != INVALID_SOCKET) {
         // shutdown the connection since we're done
-        printf("Closing socket %d\n", _client_socket);
-        int iResult = shutdown(_client_socket, SD_SEND);
+        printf("Closing socket %d\n", socket);
+        int iResult = shutdown(socket, SD_SEND);
         if (iResult == SOCKET_ERROR) {
             printf("shutdown failed with error: %d\n", WSAGetLastError());
         }
 
-        closesocket(_client_socket);
+        closesocket(socket);
         _client_socket = INVALID_SOCKET;
     }
 
@@ -79,18 +81,23 @@ void TcpSocketServer::closeConnection()
 
 void TcpSocketServer::handleConnection(SOCKET socket)
 {
+    char buffer[DEFAULT_BUFLEN];
     _connection_handled = false;
-    _client_socket = socket;
+    //_client_socket = socket;
 	int iResult;
 
-    _timeout.attach(callback(this, &TcpSocketServer::closeConnection), 1);
+    //_timeout.attach(callback(this, &TcpSocketServer::closeConnection), 1);
+    printf("socket: %d\n", socket);
 
 	// Receive until the peer shuts down the connection
 	do {
-		memset(_buffer, '\0', DEFAULT_BUFLEN);
-		iResult = recv(_client_socket, _buffer, DEFAULT_BUFLEN, 0);
+        memset(buffer, '\0', DEFAULT_BUFLEN);
+		iResult = recv(socket, buffer, DEFAULT_BUFLEN, 0);
+		printf("iResult: %d\n", iResult);
 		if (iResult > 0) {
-		    char* rp = _buffer;
+#if 0
+            char* rp = _buffer;
+
             while(*rp != '\n') {
                 putchar(*rp++);
             }
@@ -100,7 +107,8 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             while(*rp != '\0') {
                 putchar(*rp++);
             }
-			//printf(_buffer);
+#endif
+			printf(buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 printf("%02X ", _buffer[i]);
                 //printf("%c", _buffer[i]);
@@ -108,35 +116,53 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 			break;
 		}
 		else if (iResult == 0) {
-			printf("Connection closing...\n");
-			sprintf(_buffer, "0,ERROR\r\n");
-			closeConnection();
+            printf("No more stuff to receive..\n");
+			//printf("Connection closing...\n");
+			//sprintf(_buffer, "0,ERROR\r\n");
+			//closeConnection();
 			break;
 		}
 		else {
 			printf("recv failed with error: %d\n", WSAGetLastError());
-			sprintf(_buffer, "0,ERROR\r\n");
-			closeConnection();
+			//sprintf(_buffer, "0,ERROR\r\n");
+			//closeConnection();
 			break;
 		}
 
 	} while (iResult > 0);
 
-#if 0
+#if 1
     _timeout.detach();
-    if (iResult > 0) {
+    //if (iResult > 0) {
+    if (1) {
         char buff[DEFAULT_BUFLEN] = {0};
         int n = sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
 
         FILE* fp = fopen("/local/index.htm", "rb");
         char* wp = buff + n;
-        while (!feof(fp)) {
+        char c = 0;
+        do {
+            c = fgetc(fp);
+            if (feof(fp)) {
+                break;
+            }
+            *wp++ = c;
+        } while (1);
+        /*while (!feof(fp)) {
             *wp++ = fgetc(fp);
-        }
+        }*/
         fclose(fp);
 
         //printf(buff);
-        sendBuffer(buff, strlen(buff));
+        //sendBuffer(buff, strlen(buff));
+        int iSendResult = send(socket, buff, strlen(buff), 0);
+        if (iSendResult == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", WSAGetLastError());
+            //closesocket(ClientSocket);
+            //WSACleanup();
+            //break;
+        }
+        closeConnection(socket);
     }
 #else
 	_timeout.detach();
@@ -217,8 +243,9 @@ int TcpSocketServer::serverThreadImp()
         }
 
         if (_is_running) {
-            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
-            t1.join();
+            //std::thread t1(&TcpSocketServer::handleConnection, this, socket);
+            handleConnection(socket);
+            //t1.join();
         }
     }
     // No longer need server socket

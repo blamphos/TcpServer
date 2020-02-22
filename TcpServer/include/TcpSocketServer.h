@@ -19,13 +19,13 @@ public:
     void readBuffer(char* buff, int* len);
     void start();
     void stop();
-    void closeConnection();
+    void closeConnection(int socket);
     void sendBuffer(const char* buff, int len);
 	static TcpSocketServer* instance();
 
 private:
     enum ConstantsT {
-        DEFAULT_BUFLEN = 4096
+        DEFAULT_BUFLEN = 2048
     };
 
 	TcpSocketServer();
@@ -35,7 +35,7 @@ private:
 
 	SOCKET _listen_socket;
     SOCKET _client_socket;
-	char _buffer[DEFAULT_BUFLEN];
+	//char _buffer[DEFAULT_BUFLEN];
 	bool _is_running;
 	bool _connection_handled;
 	Timeout _timeout;

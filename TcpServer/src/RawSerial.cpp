@@ -59,7 +59,7 @@ void RawSerial::printf(const char* format, ...)
 #endif
         memset(_buff, '\0', BUFFER_LEN);
         if (strstr(format, "CIPCLOSE") != NULL) {
-            TcpSocketServer::instance()->closeConnection();
+            //TcpSocketServer::instance()->closeConnection(_client_socket);
             Serial::str2buff(_buff, "0,CLOSED\r\n");
         } else if (strstr(format, "CIPSENDBUF") != NULL) {
             Serial::str2buff(_buff, ">\r\n");
