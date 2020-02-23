@@ -119,7 +119,8 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             printf("No more stuff to receive..\n");
 			//printf("Connection closing...\n");
 			//sprintf(_buffer, "0,ERROR\r\n");
-			//closeConnection();
+			closeConnection(socket);
+			return;
 			break;
 		}
 		else {
@@ -135,34 +136,134 @@ void TcpSocketServer::handleConnection(SOCKET socket)
     _timeout.detach();
     //if (iResult > 0) {
     if (1) {
+        FILE* fp = NULL;
         char buff[DEFAULT_BUFLEN] = {0};
-        int n = sprintf(buff, "HTTP/1.0 200 OK\r\n\r\n");
-
-        FILE* fp = fopen("/local/index.htm", "rb");
+        int n = sprintf(buff, "HTTP/1.1 200 OK\r\n");
         char* wp = buff + n;
-        char c = 0;
-        do {
-            c = fgetc(fp);
-            if (feof(fp)) {
-                break;
-            }
-            *wp++ = c;
-        } while (1);
-        /*while (!feof(fp)) {
-            *wp++ = fgetc(fp);
-        }*/
-        fclose(fp);
+        size_t buflen = 0;
 
-        //printf(buff);
-        //sendBuffer(buff, strlen(buff));
-        int iSendResult = send(socket, buff, strlen(buff), 0);
-        if (iSendResult == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", WSAGetLastError());
-            //closesocket(ClientSocket);
-            //WSACleanup();
-            //break;
+        if (strstr(buffer, "GET /script.js") != NULL) {
+            wp += sprintf(wp, "Content-Type: text/javascript\r\n");
+            wp += sprintf(wp, "Cache-Control: max-age=86400\r\n");
+            wp += sprintf(wp, "ETag: \"1\"\r\n\r\n");
+            //printf(buff);
+            buflen = wp - buff;
+            int iSendResult = send(socket, buff, buflen, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+            }
+
+            fp = fopen("/local/script.js", "rb");
+            while (1) {
+                buflen = fread(buff, 1, sizeof(buff), fp);
+                if (buflen < 1) {
+                    if (!feof(fp)) {
+                        // a read error occured...
+                    }
+                    break;
+                }
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    //closesocket(ClientSocket);
+                    //WSACleanup();
+                    //break;
+                }
+            }
+            closeConnection(socket);
         }
-        closeConnection(socket);
+        else if (strstr(buffer, "GET /style.css") != NULL) {
+            wp += sprintf(wp, "Content-Type: text/css\r\n");
+            wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
+
+            buflen = wp - buff;
+            int iSendResult = send(socket, buff, buflen, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+            }
+
+            fp = fopen("/local/style.css", "rb");
+            while (1) {
+                buflen = fread(buff, 1, sizeof(buff), fp);
+                if (buflen < 1) {
+                    if (!feof(fp)) {
+                        // a read error occured...
+                    }
+                    break;
+                }
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    //closesocket(ClientSocket);
+                    //WSACleanup();
+                    //break;
+                }
+            }
+            closeConnection(socket);
+        }
+        else if (strstr(buffer, "GET /background.png") != NULL) {
+            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
+            wp += sprintf(wp, "Connection: Keep-Alive\r\n");
+            wp += sprintf(wp, "Content-Length: 110226\r\n");
+            wp += sprintf(wp, "Content-Type: image/png\r\n");
+            wp += sprintf(wp, "Date: Sun, 23 Feb 2020 14:13:22 GMT\r\n");
+            wp += sprintf(wp, "ETag: \"123\"\r\n");
+            wp += sprintf(wp, "Last-Modified: Sun, 23 Feb 2020 14:10:37 GMT\r\n");
+            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
+
+            buflen = wp - buff;
+            int iSendResult = send(socket, buff, buflen, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+            }
+
+            fp = fopen("/local/background.png", "rb");
+            while (1) {
+                buflen = fread(buff, 1, sizeof(buff), fp);
+                if (buflen < 1) {
+                    if (!feof(fp)) {
+                        // a read error occured...
+                    }
+                    break;
+                }
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    //closesocket(ClientSocket);
+                    //WSACleanup();
+                    //break;
+                }
+            }
+            closeConnection(socket);
+        }
+        else {
+            fp = fopen("/local/index.html", "rb");
+            wp += sprintf(wp, "Content-Type: text/html\r\n\r\n");
+            char c = 0;
+            do {
+                c = fgetc(fp);
+                if (feof(fp)) {
+                    break;
+                }
+                *wp++ = c;
+            } while (1);
+            /*while (!feof(fp)) {
+                *wp++ = fgetc(fp);
+            }*/
+            fclose(fp);
+
+            //printf(buff);
+            //sendBuffer(buff, strlen(buff));
+            int iSendResult = send(socket, buff, strlen(buff), 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+                //closesocket(ClientSocket);
+                //WSACleanup();
+                //break;
+            }
+            closeConnection(socket);
+        }
+
     }
 #else
 	_timeout.detach();

@@ -25,7 +25,7 @@ public:
 
 private:
     enum ConstantsT {
-        DEFAULT_BUFLEN = 2048
+        DEFAULT_BUFLEN = 4096
     };
 
 	TcpSocketServer();
