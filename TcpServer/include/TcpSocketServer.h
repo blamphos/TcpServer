@@ -31,6 +31,7 @@ private:
 	TcpSocketServer();
 	void handleConnection(SOCKET socket);
 	int serverThreadImp();
+	size_t getGmtDateTime(char* buff, int len);
 	Callback<void()> onDataReceived;
 
 	SOCKET _listen_socket;

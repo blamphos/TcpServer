@@ -1,4 +1,5 @@
 #include <thread>
+#include <time.h>
 #include "TcpSocketServer.h"
 
 TcpSocketServer::TcpSocketServer() :
@@ -7,6 +8,9 @@ TcpSocketServer::TcpSocketServer() :
     _is_running(false)
 {
 	//memset(_buffer, '\0', DEFAULT_BUFLEN);
+	char t[80];
+	getGmtDateTime(t, 80);
+	puts(t);
 }
 
 void TcpSocketServer::attach(Callback<void()> cb)
@@ -203,14 +207,16 @@ void TcpSocketServer::handleConnection(SOCKET socket)
         }
         else if (strstr(buffer, "GET /background.png") != NULL) {
             wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
-            wp += sprintf(wp, "Connection: Keep-Alive\r\n");
+            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
             wp += sprintf(wp, "Content-Length: 110226\r\n");
             wp += sprintf(wp, "Content-Type: image/png\r\n");
-            wp += sprintf(wp, "Date: Sun, 23 Feb 2020 14:13:22 GMT\r\n");
-            wp += sprintf(wp, "ETag: \"123\"\r\n");
-            wp += sprintf(wp, "Last-Modified: Sun, 23 Feb 2020 14:10:37 GMT\r\n");
+            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
+            wp += sprintf(wp, "Date: ");
+            wp += getGmtDateTime(wp, 80);
+            wp += sprintf(wp, "\r\nETag: \"123\"\r\n");
+            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
             wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-
+            printf(buff);
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {
@@ -355,6 +361,19 @@ int TcpSocketServer::serverThreadImp()
     printf("TCP server stopped.\n");
 
     return 0;
+}
+
+size_t TcpSocketServer::getGmtDateTime(char* buff, int len)
+{
+    time_t rawtime;
+    struct tm *info;
+
+    time(&rawtime);
+    /* Get GMT time */
+    info = gmtime(&rawtime);
+
+    // Date: Wed, 21 Oct 2015 07:28:00 GMT
+    return strftime(buff, len, "%a, %d %b %Y %H:%M:%S GMT", info);
 }
 
 TcpSocketServer* TcpSocketServer::instance()
