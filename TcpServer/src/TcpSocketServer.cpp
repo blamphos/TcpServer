@@ -206,6 +206,24 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             closeConnection(socket);
         }
         else if (strstr(buffer, "GET /background.png") != NULL) {
+            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
+                wp = buff + n;
+                //wp += sprintf(wp, "Date: ");
+                //wp += getGmtDateTime(wp, 80);
+                wp += sprintf(wp, "ETag: \"1\"\r\n");
+                wp += sprintf(wp, "Cache-Control: public\r\n");
+                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
+                buflen = wp - buff;
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                }
+                printf(buff);
+                closeConnection(socket);
+                return;
+            }
+
             wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
             //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
             wp += sprintf(wp, "Content-Length: 110226\r\n");
@@ -213,7 +231,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
             wp += sprintf(wp, "Date: ");
             wp += getGmtDateTime(wp, 80);
-            wp += sprintf(wp, "\r\nETag: \"123\"\r\n");
+            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
             //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
             wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
             printf(buff);
@@ -224,6 +242,116 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             }
 
             fp = fopen("/local/background.png", "rb");
+            while (1) {
+                buflen = fread(buff, 1, sizeof(buff), fp);
+                if (buflen < 1) {
+                    if (!feof(fp)) {
+                        // a read error occured...
+                    }
+                    break;
+                }
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    //closesocket(ClientSocket);
+                    //WSACleanup();
+                    //break;
+                }
+            }
+            closeConnection(socket);
+        }
+        else if (strstr(buffer, "GET /speaker.png") != NULL) {
+            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
+                wp = buff + n;
+                //wp += sprintf(wp, "Date: ");
+                //wp += getGmtDateTime(wp, 80);
+                wp += sprintf(wp, "ETag: \"1\"\r\n");
+                wp += sprintf(wp, "Cache-Control: public\r\n");
+                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
+                buflen = wp - buff;
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                }
+                printf(buff);
+                closeConnection(socket);
+                return;
+            }
+
+            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
+            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
+            wp += sprintf(wp, "Content-Length: 557\r\n");
+            wp += sprintf(wp, "Content-Type: image/png\r\n");
+            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
+            wp += sprintf(wp, "Date: ");
+            wp += getGmtDateTime(wp, 80);
+            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
+            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
+            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
+            printf(buff);
+            buflen = wp - buff;
+            int iSendResult = send(socket, buff, buflen, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+            }
+
+            fp = fopen("/local/speaker.png", "rb");
+            while (1) {
+                buflen = fread(buff, 1, sizeof(buff), fp);
+                if (buflen < 1) {
+                    if (!feof(fp)) {
+                        // a read error occured...
+                    }
+                    break;
+                }
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    //closesocket(ClientSocket);
+                    //WSACleanup();
+                    //break;
+                }
+            }
+            closeConnection(socket);
+        }
+        else if (strstr(buffer, "GET /settings.png") != NULL) {
+            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
+                wp = buff + n;
+                //wp += sprintf(wp, "Date: ");
+                //wp += getGmtDateTime(wp, 80);
+                wp += sprintf(wp, "ETag: \"1\"\r\n");
+                wp += sprintf(wp, "Cache-Control: public\r\n");
+                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
+                buflen = wp - buff;
+                int iSendResult = send(socket, buff, buflen, 0);
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                }
+                printf(buff);
+                closeConnection(socket);
+                return;
+            }
+
+            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
+            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
+            wp += sprintf(wp, "Content-Length: 1477\r\n");
+            wp += sprintf(wp, "Content-Type: image/png\r\n");
+            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
+            wp += sprintf(wp, "Date: ");
+            wp += getGmtDateTime(wp, 80);
+            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
+            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
+            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
+            printf(buff);
+            buflen = wp - buff;
+            int iSendResult = send(socket, buff, buflen, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+            }
+
+            fp = fopen("/local/settings.png", "rb");
             while (1) {
                 buflen = fread(buff, 1, sizeof(buff), fp);
                 if (buflen < 1) {
@@ -350,9 +478,9 @@ int TcpSocketServer::serverThreadImp()
         }
 
         if (_is_running) {
-            //std::thread t1(&TcpSocketServer::handleConnection, this, socket);
-            handleConnection(socket);
-            //t1.join();
+            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
+            //handleConnection(socket);
+            t1.detach();
         }
     }
     // No longer need server socket
