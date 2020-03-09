@@ -264,14 +264,15 @@
 	"Ticker.h"
 	"WorkerBase.h"
 
-1583468716 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpsocketserver.cpp
+1583731828 source:c:\data\sw_dev\tcpserver\tcpserver\src\tcpsocketserver.cpp
 	<thread>
 	<time.h>
 	"TcpSocketServer.h"
 
-1582659493 c:\data\sw_dev\tcpserver\tcpserver\include\tcpsocketserver.h
+1583731746 c:\data\sw_dev\tcpserver\tcpserver\include\tcpsocketserver.h
 	<ws2tcpip.h>
 	"mbed.h"
+	<mutex>
 
 1561444945 c:\data\tcpserver\tcpserver\include\tcpsocketserver.h
 	<ws2tcpip.h>
@@ -538,4 +539,11 @@
 1564569763 c:\data\tcpserver\tcpserver\include\tcplisten.h
 	"TCPState.h"
 	"EventQueue.h"
+
+1583731313 source:c:\data\sw_dev\tcpserver\tcpserver\src\httpresponse.cpp
+	<string.h>
+	"HttpResponse.h"
+
+1583731720 c:\data\sw_dev\tcpserver\tcpserver\include\httpresponse.h
+	<ws2tcpip.h>
 

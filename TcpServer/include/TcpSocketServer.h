@@ -8,6 +8,7 @@
 
 #include <ws2tcpip.h>
 #include "mbed.h"
+#include <mutex>
 
 #define DEFAULT_PORT	"80"
 
@@ -19,7 +20,7 @@ public:
     void readBuffer(char* buff, int* len);
     void start();
     void stop();
-    void closeConnection(int socket);
+    void closeConnection(SOCKET socket);
     void sendBuffer(const char* buff, int len);
 	static TcpSocketServer* instance();
 
@@ -33,6 +34,8 @@ private:
 	int serverThreadImp();
 	size_t getGmtDateTime(char* buff, int len);
 	Callback<void()> onDataReceived;
+	static void printBuffer(const char* format, ...);
+    static bool sendFile(const char* path, char* buff, int socket);
 
 	SOCKET _listen_socket;
     SOCKET _client_socket;
@@ -40,6 +43,7 @@ private:
 	bool _is_running;
 	bool _connection_handled;
 	Timeout _timeout;
+	static std::mutex _mutex;
 };
 
 #endif

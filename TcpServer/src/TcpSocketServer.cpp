@@ -2,6 +2,8 @@
 #include <time.h>
 #include "TcpSocketServer.h"
 
+std::mutex TcpSocketServer::_mutex;
+
 TcpSocketServer::TcpSocketServer() :
     _listen_socket(INVALID_SOCKET),
     _client_socket(INVALID_SOCKET),
@@ -48,7 +50,7 @@ void TcpSocketServer::sendBuffer(const char* buff, int len)
         //WSACleanup();
         //break;
     }
-#endif // 0
+#endif
 }
 
 void TcpSocketServer::start()
@@ -66,11 +68,11 @@ void TcpSocketServer::stop()
     printf("Server listen socket closed.\n");
 }
 
-void TcpSocketServer::closeConnection(int socket)
+void TcpSocketServer::closeConnection(SOCKET socket)
 {
     if (socket != INVALID_SOCKET) {
         // shutdown the connection since we're done
-        printf("Closing socket %d\n", socket);
+        printBuffer("Closing socket %d\n", socket);
         int iResult = shutdown(socket, SD_SEND);
         if (iResult == SOCKET_ERROR) {
             printf("shutdown failed with error: %d\n", WSAGetLastError());
@@ -83,6 +85,17 @@ void TcpSocketServer::closeConnection(int socket)
 	_connection_handled = true;
 }
 
+void TcpSocketServer::printBuffer(const char* format, ...)
+{
+    _mutex.lock();
+    va_list args;
+    va_start (args, format);
+    vprintf (format, args);
+    va_end (args);
+    //puts(buffer);
+    _mutex.unlock();
+}
+
 void TcpSocketServer::handleConnection(SOCKET socket)
 {
     char buffer[DEFAULT_BUFLEN];
@@ -91,13 +104,13 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 	int iResult;
 
     //_timeout.attach(callback(this, &TcpSocketServer::closeConnection), 1);
-    printf("socket: %d\n", socket);
+    printBuffer("socket: %d\n", socket);
 
 	// Receive until the peer shuts down the connection
 	do {
         memset(buffer, '\0', DEFAULT_BUFLEN);
 		iResult = recv(socket, buffer, DEFAULT_BUFLEN, 0);
-		printf("iResult: %d\n", iResult);
+		printBuffer("iResult: %d\n", iResult);
 		if (iResult > 0) {
 #if 0
             char* rp = _buffer;
@@ -112,7 +125,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
                 putchar(*rp++);
             }
 #endif
-			printf(buffer);
+			printBuffer(buffer);
 			/*for (unsigned int i = 0; i < strlen(_buffer); ++i) {
                 printf("%02X ", _buffer[i]);
                 //printf("%c", _buffer[i]);
@@ -120,7 +133,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 			break;
 		}
 		else if (iResult == 0) {
-            printf("No more stuff to receive..\n");
+            printBuffer("No more stuff to receive..\n");
 			//printf("Connection closing...\n");
 			//sprintf(_buffer, "0,ERROR\r\n");
 			closeConnection(socket);
@@ -128,7 +141,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 			break;
 		}
 		else {
-			printf("recv failed with error: %d\n", WSAGetLastError());
+			printBuffer("recv failed with error: %d\n", WSAGetLastError());
 			//sprintf(_buffer, "0,ERROR\r\n");
 			//closeConnection();
 			break;
@@ -154,7 +167,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
+                printBuffer("send failed with error: %d\n", WSAGetLastError());
             }
 
             fp = fopen("/local/script.js", "rb");
@@ -168,7 +181,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
                 }
                 int iSendResult = send(socket, buff, buflen, 0);
                 if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
+                    printBuffer("send failed with error: %d\n", WSAGetLastError());
                     //closesocket(ClientSocket);
                     //WSACleanup();
                     //break;
@@ -183,7 +196,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
+                printBuffer("send failed with error: %d\n", WSAGetLastError());
             }
 
             fp = fopen("/local/style.css", "rb");
@@ -219,7 +232,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed with error: %d\n", WSAGetLastError());
                 }
-                printf(buff);
+                printBuffer(buff);
                 closeConnection(socket);
                 return;
             }
@@ -234,7 +247,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
             //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
             wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printf(buff);
+            printBuffer(buff);
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {
@@ -252,7 +265,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
                 }
                 int iSendResult = send(socket, buff, buflen, 0);
                 if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
+                    printBuffer("send failed with error: %d\n", WSAGetLastError());
                     //closesocket(ClientSocket);
                     //WSACleanup();
                     //break;
@@ -281,7 +294,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 
             wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
             //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
-            wp += sprintf(wp, "Content-Length: 557\r\n");
+            //wp += sprintf(wp, "Content-Length: 557\r\n");
             wp += sprintf(wp, "Content-Type: image/png\r\n");
             //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
             wp += sprintf(wp, "Date: ");
@@ -289,7 +302,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
             //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
             wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printf(buff);
+            printBuffer(buff);
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {
@@ -344,7 +357,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
             //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
             wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printf(buff);
+            printBuffer(buff);
             buflen = wp - buff;
             int iSendResult = send(socket, buff, buflen, 0);
             if (iSendResult == SOCKET_ERROR) {

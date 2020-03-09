@@ -33,6 +33,7 @@
 		<Unit filename="include/EmbeddedMessages.h" />
 		<Unit filename="include/EventQueue.h" />
 		<Unit filename="include/Fifo.h" />
+		<Unit filename="include/HttpResponse.h" />
 		<Unit filename="include/HttpServer.h" />
 		<Unit filename="include/IO_mapping.h" />
 		<Unit filename="include/IrReceiver.h" />
@@ -59,6 +60,7 @@
 		<Unit filename="src/BusOut.cpp" />
 		<Unit filename="src/ESP8266.cpp" />
 		<Unit filename="src/EventQueue.cpp" />
+		<Unit filename="src/HttpResponse.cpp" />
 		<Unit filename="src/HttpServer.cpp" />
 		<Unit filename="src/Parameters.cpp" />
 		<Unit filename="src/RawSerial.cpp" />
