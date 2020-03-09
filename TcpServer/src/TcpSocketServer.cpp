@@ -1,6 +1,7 @@
 #include <thread>
 #include <time.h>
 #include "TcpSocketServer.h"
+#include "HttpResponse.h"
 
 std::mutex TcpSocketServer::_mutex;
 
@@ -160,6 +161,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
         size_t buflen = 0;
 
         if (strstr(buffer, "GET /script.js") != NULL) {
+
             wp += sprintf(wp, "Content-Type: text/javascript\r\n");
             wp += sprintf(wp, "Cache-Control: max-age=86400\r\n");
             wp += sprintf(wp, "ETag: \"1\"\r\n\r\n");
@@ -190,6 +192,11 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             closeConnection(socket);
         }
         else if (strstr(buffer, "GET /style.css") != NULL) {
+            HttpResponse response(socket);
+            response.addHeaders(HttpResponse::StatusCodeT::OK, "text/css", 86400, "1");
+            response.sendFile("/local/style.css");
+            return;
+
             wp += sprintf(wp, "Content-Type: text/css\r\n");
             wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
 

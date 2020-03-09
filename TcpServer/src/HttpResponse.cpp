@@ -1,7 +1,10 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <mutex>
 #include "HttpResponse.h"
+
+std::mutex HttpResponse::_mutex;
 
 HttpResponse::HttpResponse(SOCKET socket) : _socket(socket)
 {
@@ -10,7 +13,7 @@ HttpResponse::HttpResponse(SOCKET socket) : _socket(socket)
 
 HttpResponse::~HttpResponse()
 {
-
+    closeConnection();
 }
 
 void HttpResponse::addHeaders(StatusCodeT status, const char* contentType, int maxAge, const char* eTag)
@@ -25,7 +28,11 @@ void HttpResponse::addHeaders(StatusCodeT status, const char* contentType, int m
         }
         _wp += sprintf(_wp, "Date: ");
         _wp += getGmtDateTime(_wp);
-
+        if (eTag != NULL) {
+            _wp += sprintf(_wp, "\r\nETag: \"%s\"\r\n", eTag);
+        }
+        _wp += sprintf(_wp, "Cache-Control: public\r\n");
+        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n\r\n", maxAge);
         break;
     case StatusCodeT::NotModified:
         _wp += sprintf(_buffer, "HTTP/1.1 304 Not Modified\r\n");
@@ -33,15 +40,15 @@ void HttpResponse::addHeaders(StatusCodeT status, const char* contentType, int m
             _wp += sprintf(_wp, "ETag: \"%s\"\r\n", eTag);
         }
         _wp += sprintf(_wp, "Cache-Control: public\r\n");
-        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n\r\n", maxAge);
-
+        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n", maxAge);
         break;
     default:
         _wp += sprintf(_buffer, "HTTP/1.1 404 Not Found\r\n");
         break;
     }
 
-    //sendBuffer(_wp - _buffer);
+    printBuffer(_buffer);
+    sendBuffer(_wp - _buffer);
 }
 
 size_t HttpResponse::getGmtDateTime(char* buff)
@@ -57,7 +64,29 @@ size_t HttpResponse::getGmtDateTime(char* buff)
 
 bool HttpResponse::sendFile(const char* file)
 {
+    size_t buflen = 0;
     bool success = true;
+
+    FILE* fp = fopen(file, "rb");
+    if (fp == NULL) {
+        return false;
+    }
+
+    while (1) {
+        buflen = fread(_buffer, 1, DEFAULT_BUFLEN, fp);
+        if (buflen < 1) {
+            if (!feof(fp)) {
+                printBuffer("error while reading the file...");
+                success = false;
+            }
+            break;
+        }
+
+        if (!sendBuffer(buflen)) {
+            success = false;
+            break;
+        }
+    }
 
     return success;
 }
@@ -66,22 +95,33 @@ void HttpResponse::closeConnection()
 {
     if (_socket != INVALID_SOCKET) {
         // shutdown the connection since we're done
-        //printBuffer("Closing socket %d\n", socket);
+        printBuffer("Closing socket %d\n", socket);
         if (shutdown(_socket, SD_SEND) == SOCKET_ERROR) {
-            printf("shutdown failed with error: %d\n", WSAGetLastError());
+            printBuffer("shutdown failed with error: %d\n", WSAGetLastError());
         }
 
         closesocket(_socket);
-        _socket = INVALID_SOCKET;
     }
 }
 
-bool HttpResponse::sendBuffer(int len)
+void HttpResponse::printBuffer(const char* format, ...)
+{
+    _mutex.lock();
+
+    va_list args;
+    va_start (args, format);
+    vprintf (format, args);
+    va_end (args);
+
+    _mutex.unlock();
+}
+
+bool HttpResponse::sendBuffer(size_t len)
 {
     bool success = true;
 
     if (send(_socket, _buffer, len, 0) == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
+        printBuffer("send failed with error: %d\n", WSAGetLastError());
         success = false;
     }
 
