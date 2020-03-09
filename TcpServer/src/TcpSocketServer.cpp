@@ -73,7 +73,7 @@ void TcpSocketServer::closeConnection(SOCKET socket)
 {
     if (socket != INVALID_SOCKET) {
         // shutdown the connection since we're done
-        printBuffer("Closing socket %d\n", socket);
+        printBuffer("TcpSocketServer: Closing socket %d\n", socket);
         int iResult = shutdown(socket, SD_SEND);
         if (iResult == SOCKET_ERROR) {
             printf("shutdown failed with error: %d\n", WSAGetLastError());
@@ -153,271 +153,56 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 #if 1
     _timeout.detach();
     //if (iResult > 0) {
-    if (1) {
-        FILE* fp = NULL;
-        char buff[DEFAULT_BUFLEN] = {0};
-        int n = sprintf(buff, "HTTP/1.1 200 OK\r\n");
-        char* wp = buff + n;
-        size_t buflen = 0;
 
-        if (strstr(buffer, "GET /script.js") != NULL) {
+    HttpResponse response(socket);
 
-            wp += sprintf(wp, "Content-Type: text/javascript\r\n");
-            wp += sprintf(wp, "Cache-Control: max-age=86400\r\n");
-            wp += sprintf(wp, "ETag: \"1\"\r\n\r\n");
-            //printf(buff);
-            buflen = wp - buff;
-            int iSendResult = send(socket, buff, buflen, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printBuffer("send failed with error: %d\n", WSAGetLastError());
-            }
-
-            fp = fopen("/local/script.js", "rb");
-            while (1) {
-                buflen = fread(buff, 1, sizeof(buff), fp);
-                if (buflen < 1) {
-                    if (!feof(fp)) {
-                        // a read error occured...
-                    }
-                    break;
-                }
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printBuffer("send failed with error: %d\n", WSAGetLastError());
-                    //closesocket(ClientSocket);
-                    //WSACleanup();
-                    //break;
-                }
-            }
-            closeConnection(socket);
-        }
-        else if (strstr(buffer, "GET /style.css") != NULL) {
-            HttpResponse response(socket);
-            response.addHeaders(HttpResponse::StatusCodeT::OK, "text/css", 86400, "1");
-            response.sendFile("/local/style.css");
-            return;
-
-            wp += sprintf(wp, "Content-Type: text/css\r\n");
-            wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
-
-            buflen = wp - buff;
-            int iSendResult = send(socket, buff, buflen, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printBuffer("send failed with error: %d\n", WSAGetLastError());
-            }
-
-            fp = fopen("/local/style.css", "rb");
-            while (1) {
-                buflen = fread(buff, 1, sizeof(buff), fp);
-                if (buflen < 1) {
-                    if (!feof(fp)) {
-                        // a read error occured...
-                    }
-                    break;
-                }
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                    //closesocket(ClientSocket);
-                    //WSACleanup();
-                    //break;
-                }
-            }
-            closeConnection(socket);
-        }
-        else if (strstr(buffer, "GET /background.png") != NULL) {
-            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
-                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
-                wp = buff + n;
-                //wp += sprintf(wp, "Date: ");
-                //wp += getGmtDateTime(wp, 80);
-                wp += sprintf(wp, "ETag: \"1\"\r\n");
-                wp += sprintf(wp, "Cache-Control: public\r\n");
-                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
-                buflen = wp - buff;
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                }
-                printBuffer(buff);
-                closeConnection(socket);
-                return;
-            }
-
-            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
-            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
-            wp += sprintf(wp, "Content-Length: 110226\r\n");
-            wp += sprintf(wp, "Content-Type: image/png\r\n");
-            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
-            wp += sprintf(wp, "Date: ");
-            wp += getGmtDateTime(wp, 80);
-            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
-            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
-            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printBuffer(buff);
-            buflen = wp - buff;
-            int iSendResult = send(socket, buff, buflen, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-            }
-
-            fp = fopen("/local/background.png", "rb");
-            while (1) {
-                buflen = fread(buff, 1, sizeof(buff), fp);
-                if (buflen < 1) {
-                    if (!feof(fp)) {
-                        // a read error occured...
-                    }
-                    break;
-                }
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printBuffer("send failed with error: %d\n", WSAGetLastError());
-                    //closesocket(ClientSocket);
-                    //WSACleanup();
-                    //break;
-                }
-            }
-            closeConnection(socket);
-        }
-        else if (strstr(buffer, "GET /speaker.png") != NULL) {
-            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
-                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
-                wp = buff + n;
-                //wp += sprintf(wp, "Date: ");
-                //wp += getGmtDateTime(wp, 80);
-                wp += sprintf(wp, "ETag: \"1\"\r\n");
-                wp += sprintf(wp, "Cache-Control: public\r\n");
-                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
-                buflen = wp - buff;
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                }
-                printf(buff);
-                closeConnection(socket);
-                return;
-            }
-
-            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
-            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
-            //wp += sprintf(wp, "Content-Length: 557\r\n");
-            wp += sprintf(wp, "Content-Type: image/png\r\n");
-            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
-            wp += sprintf(wp, "Date: ");
-            wp += getGmtDateTime(wp, 80);
-            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
-            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
-            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printBuffer(buff);
-            buflen = wp - buff;
-            int iSendResult = send(socket, buff, buflen, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-            }
-
-            fp = fopen("/local/speaker.png", "rb");
-            while (1) {
-                buflen = fread(buff, 1, sizeof(buff), fp);
-                if (buflen < 1) {
-                    if (!feof(fp)) {
-                        // a read error occured...
-                    }
-                    break;
-                }
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                    //closesocket(ClientSocket);
-                    //WSACleanup();
-                    //break;
-                }
-            }
-            closeConnection(socket);
-        }
-        else if (strstr(buffer, "GET /settings.png") != NULL) {
-            if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
-                n = sprintf(buff, "HTTP/1.1 304 Not Modified\r\n");
-                wp = buff + n;
-                //wp += sprintf(wp, "Date: ");
-                //wp += getGmtDateTime(wp, 80);
-                wp += sprintf(wp, "ETag: \"1\"\r\n");
-                wp += sprintf(wp, "Cache-Control: public\r\n");
-                wp += sprintf(wp, "Cache-Control: max-age=86400\r\n\r\n");
-                buflen = wp - buff;
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                }
-                printf(buff);
-                closeConnection(socket);
-                return;
-            }
-
-            wp += sprintf(wp, "Accept-Ranges: bytes\r\n");
-            //wp += sprintf(wp, "Connection: Keep-Alive\r\n");
-            wp += sprintf(wp, "Content-Length: 1477\r\n");
-            wp += sprintf(wp, "Content-Type: image/png\r\n");
-            //wp += sprintf(wp, "Date: Mon, 24 Feb 2020 17:43:22 GMT\r\n");
-            wp += sprintf(wp, "Date: ");
-            wp += getGmtDateTime(wp, 80);
-            wp += sprintf(wp, "\r\nETag: \"1\"\r\n");
-            //wp += sprintf(wp, "Last-Modified: Mon, 24 Feb 2020 17:10:37 GMT\r\n");
-            wp += sprintf(wp, "Server: Gevol 3.0\r\n\r\n");
-            printBuffer(buff);
-            buflen = wp - buff;
-            int iSendResult = send(socket, buff, buflen, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-            }
-
-            fp = fopen("/local/settings.png", "rb");
-            while (1) {
-                buflen = fread(buff, 1, sizeof(buff), fp);
-                if (buflen < 1) {
-                    if (!feof(fp)) {
-                        // a read error occured...
-                    }
-                    break;
-                }
-                int iSendResult = send(socket, buff, buflen, 0);
-                if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
-                    //closesocket(ClientSocket);
-                    //WSACleanup();
-                    //break;
-                }
-            }
-            closeConnection(socket);
+    if (strstr(buffer, "GET /script.js") != NULL) {
+        response.sendResponseOk("text/javascript");
+        response.sendFile("script.js");
+    }
+    else if (strstr(buffer, "GET /style.css") != NULL) {
+        response.sendResponseOk("text/css");
+        response.sendFile("/local/style.css");
+    }
+    else if (strstr(buffer, "GET /background.png") != NULL) {
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
         }
         else {
-            fp = fopen("/local/index.html", "rb");
-            wp += sprintf(wp, "Content-Type: text/html\r\n\r\n");
-            char c = 0;
-            do {
-                c = fgetc(fp);
-                if (feof(fp)) {
-                    break;
-                }
-                *wp++ = c;
-            } while (1);
-            /*while (!feof(fp)) {
-                *wp++ = fgetc(fp);
-            }*/
-            fclose(fp);
-
-            //printf(buff);
-            //sendBuffer(buff, strlen(buff));
-            int iSendResult = send(socket, buff, strlen(buff), 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-                //closesocket(ClientSocket);
-                //WSACleanup();
-                //break;
-            }
-            closeConnection(socket);
+            response.sendResponseOk("image/png", "1");
+            response.sendFile("/local/background.png");
         }
-
+    }
+    else if (strstr(buffer, "GET /speaker.png") != NULL) {
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
+        }
+        else {
+            response.sendResponseOk("image/png", "1");
+            response.sendFile("/local/speaker.png");
+        }
+    }
+    else if (strstr(buffer, "GET /mute.png") != NULL) {
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
+        }
+        else {
+            response.sendResponseOk("image/png", "1");
+            response.sendFile("/local/mute.png");
+        }
+    }
+    else if (strstr(buffer, "GET /settings.png") != NULL) {
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
+        }
+        else {
+            response.sendResponseOk("image/png", "1");
+            response.sendFile("/local/settings.png");
+        }
+    }
+    else {
+        response.sendResponseOk("text/html");
+        response.sendFile("/local/index.html");
     }
 #else
 	_timeout.detach();

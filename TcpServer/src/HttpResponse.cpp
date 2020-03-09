@@ -6,7 +6,7 @@
 
 std::mutex HttpResponse::_mutex;
 
-HttpResponse::HttpResponse(SOCKET socket) : _socket(socket)
+HttpResponse::HttpResponse(SOCKET socket) : _socket(socket), _wp(_buffer)
 {
     memset(_buffer, '\0', DEFAULT_BUFLEN);
 }
@@ -16,37 +16,44 @@ HttpResponse::~HttpResponse()
     closeConnection();
 }
 
-void HttpResponse::addHeaders(StatusCodeT status, const char* contentType, int maxAge, const char* eTag)
+void HttpResponse::sendResponseOk(const char* contentType, const char* eTag)
 {
-    _wp = _buffer;
-
-    switch (status) {
-    case StatusCodeT::OK:
-        _wp += sprintf(_buffer, "HTTP/1.1 200 OK\r\n");
-        if (contentType != NULL) {
-            _wp += sprintf(_wp, "Content-Type: %s\r\n", contentType);
-        }
-        _wp += sprintf(_wp, "Date: ");
-        _wp += getGmtDateTime(_wp);
-        if (eTag != NULL) {
-            _wp += sprintf(_wp, "\r\nETag: \"%s\"\r\n", eTag);
-        }
-        _wp += sprintf(_wp, "Cache-Control: public\r\n");
-        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n\r\n", maxAge);
-        break;
-    case StatusCodeT::NotModified:
-        _wp += sprintf(_buffer, "HTTP/1.1 304 Not Modified\r\n");
-        if (eTag != NULL) {
-            _wp += sprintf(_wp, "ETag: \"%s\"\r\n", eTag);
-        }
-        _wp += sprintf(_wp, "Cache-Control: public\r\n");
-        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n", maxAge);
-        break;
-    default:
-        _wp += sprintf(_buffer, "HTTP/1.1 404 Not Found\r\n");
-        break;
+    _wp += sprintf(_buffer, "HTTP/1.1 200 OK\r\n");
+    if (contentType != NULL) {
+        _wp += sprintf(_wp, "Content-Type: %s\r\n", contentType);
     }
 
+    if (eTag != NULL) {
+        _wp += sprintf(_wp, "Date: ");
+        _wp += getGmtDateTime(_wp);
+        _wp += sprintf(_wp, "\r\n");
+        _wp += sprintf(_wp, "ETag: \"%s\"\r\n", eTag);
+        _wp += sprintf(_wp, "Cache-Control: public\r\n");
+        _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n", MAX_AGE);
+    }
+    _wp += sprintf(_wp, "\r\n");
+
+    printBuffer(_buffer);
+    sendBuffer(_wp - _buffer);
+}
+
+void HttpResponse::sendResponseNotModified(const char* eTag)
+{
+    _wp += sprintf(_buffer, "HTTP/1.1 304 Not Modified\r\n");
+    if (eTag != NULL) {
+        _wp += sprintf(_wp, "ETag: \"%s\"\r\n", eTag);
+    }
+    _wp += sprintf(_wp, "Cache-Control: public\r\n");
+    _wp += sprintf(_wp, "Cache-Control: max-age=%d\r\n", MAX_AGE);
+    _wp += sprintf(_wp, "\r\n");
+
+    printBuffer(_buffer);
+    sendBuffer(_wp - _buffer);
+}
+
+void HttpResponse::sendResponseNotFound()
+{
+    _wp += sprintf(_buffer, "HTTP/1.1 404 Not Found\r\n");
     printBuffer(_buffer);
     sendBuffer(_wp - _buffer);
 }
@@ -95,7 +102,7 @@ void HttpResponse::closeConnection()
 {
     if (_socket != INVALID_SOCKET) {
         // shutdown the connection since we're done
-        printBuffer("Closing socket %d\n", socket);
+        printBuffer("Closing socket %d\n", _socket);
         if (shutdown(_socket, SD_SEND) == SOCKET_ERROR) {
             printBuffer("shutdown failed with error: %d\n", WSAGetLastError());
         }

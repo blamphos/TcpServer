@@ -6,19 +6,17 @@
 class HttpResponse
 {
 public:
-    enum StatusCodeT {
-        OK,
-        NotModified,
-    };
-
     HttpResponse(SOCKET socket);
-    void addHeaders(StatusCodeT status, const char* contentType, int maxAge, const char* eTag);
+    void sendResponseOk(const char* contentType, const char* eTag = NULL);
+    void sendResponseNotModified(const char* eTag);
+    void sendResponseNotFound();
     bool sendFile(const char* file);
     virtual ~HttpResponse();
 
 private:
     enum ConstantsT {
-        DEFAULT_BUFLEN = 4096
+        DEFAULT_BUFLEN = 4096,
+        MAX_AGE = 86400,
     };
 
     void closeConnection();
