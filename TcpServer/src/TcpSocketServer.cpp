@@ -157,12 +157,22 @@ void TcpSocketServer::handleConnection(SOCKET socket)
     HttpResponse response(socket);
 
     if (strstr(buffer, "GET /script.js") != NULL) {
-        response.sendResponseOk("text/javascript");
-        response.sendFile("script.js");
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
+        }
+        else {
+            response.sendResponseOk("text/javascript", "1");
+            response.sendFile("/local/script.js");
+        }
     }
     else if (strstr(buffer, "GET /style.css") != NULL) {
-        response.sendResponseOk("text/css");
-        response.sendFile("/local/style.css");
+        if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
+            response.sendResponseNotModified("1");
+        }
+        else {
+            response.sendResponseOk("text/css", "1");
+            response.sendFile("/local/style.css");
+        }
     }
     else if (strstr(buffer, "GET /background.png") != NULL) {
         if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
