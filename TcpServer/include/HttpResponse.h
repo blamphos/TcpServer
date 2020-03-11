@@ -10,6 +10,7 @@ public:
     void sendResponseOk(const char* contentType, const char* eTag = NULL);
     void sendResponseNotModified(const char* eTag);
     void sendResponseNotFound();
+    void sendMainPage(int input, int volume);
     bool sendFile(const char* file);
     virtual ~HttpResponse();
 

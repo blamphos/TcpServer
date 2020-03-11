@@ -11,6 +11,8 @@ public:
     ~HttpServer();
     void handleRequest();
 	void handleMessage(message_t msg);
+	static void parseCharValue(char* buff, const char* tag, int* value);
+	static void setVolumeLevel(char* buff, int volume);
 
 private:
     enum HttpRequestTypeT {
@@ -20,8 +22,6 @@ private:
     };
 
     void sendResponse();
-	void parseCharValue(char* buff, const char* tag, int* value);
-	void setVolumeLevel(char* buff, int volume);
 	void setButtonState(char* buff, const char* tag, bool enabled);
 
 	TCPConnection* _tcp;

@@ -2,6 +2,7 @@
 #include <time.h>
 #include "TcpSocketServer.h"
 #include "HttpResponse.h"
+#include "HttpServer.h"
 
 std::mutex TcpSocketServer::_mutex;
 
@@ -156,7 +157,7 @@ void TcpSocketServer::handleConnection(SOCKET socket)
 
     HttpResponse response(socket);
 
-    if (strstr(buffer, "GET /script.js") != NULL) {
+    /*if (strstr(buffer, "GET /script.js") != NULL) {
         if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
             response.sendResponseNotModified("1");
         }
@@ -165,7 +166,8 @@ void TcpSocketServer::handleConnection(SOCKET socket)
             response.sendFile("/local/script.js");
         }
     }
-    else if (strstr(buffer, "GET /style.css") != NULL) {
+    else*/
+    if (strstr(buffer, "GET /style.css") != NULL) {
         if (strstr(buffer, "If-None-Match: \"1\"") != NULL) {
             response.sendResponseNotModified("1");
         }
@@ -211,8 +213,39 @@ void TcpSocketServer::handleConnection(SOCKET socket)
         }
     }
     else {
+        int volume = 26;
+        static int currentVolume = 26;
+        static int input = 3;
+        static bool muted = false;
+
+        if (strstr(buffer, "POST /") != NULL) {
+            bool validInput = false;
+
+            // Parse input data from POST request
+            HttpServer::parseCharValue(buffer, "pot=", &volume);
+            HttpServer::parseCharValue(buffer, "spdif=", &input);
+            switch (input) {
+            case 0: case 1: case 2: case 3:
+                validInput = true;
+                break;
+            default:
+                input = 3;
+                break;
+            }
+
+            if (volume == 0) {
+                muted = !muted;
+                if (!muted) {
+                    volume = currentVolume;
+                }
+            } else {
+                muted = false;
+                currentVolume = volume;
+            }
+        }
+
         response.sendResponseOk("text/html");
-        response.sendFile("/local/index.html");
+        response.sendMainPage(input, volume);
     }
 #else
 	_timeout.detach();
