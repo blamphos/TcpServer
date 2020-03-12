@@ -326,9 +326,9 @@ int TcpSocketServer::serverThreadImp()
         }
 
         if (_is_running) {
-            std::thread t1(&TcpSocketServer::handleConnection, this, socket);
-            //handleConnection(socket);
-            t1.detach();
+            handleConnection(socket);
+            //std::thread t1(&TcpSocketServer::handleConnection, this, socket);
+            //t1.detach();
         }
     }
     // No longer need server socket
