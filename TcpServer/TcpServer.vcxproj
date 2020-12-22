@@ -19,12 +19,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,7 +62,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EventQueue.cpp" />
+    <ClCompile Include="HttpResourceFile.cpp" />
+    <ClCompile Include="HttpResponse.cpp" />
+    <ClCompile Include="HttpServer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parameters.cpp" />
+    <ClCompile Include="Spdif_defs.cpp" />
+    <ClCompile Include="TcpSocketServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EmbeddedMessages.h" />
+    <ClInclude Include="EventQueue.h" />
+    <ClInclude Include="HttpResourceFile.h" />
+    <ClInclude Include="HttpResponse.h" />
+    <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="Parameters.h" />
+    <ClInclude Include="SafeQueue.h" />
+    <ClInclude Include="Spdif_defs.h" />
+    <ClInclude Include="StoppableTask.h" />
+    <ClInclude Include="TcpSocketServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
