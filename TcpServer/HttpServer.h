@@ -27,6 +27,7 @@ private:
         Post
     };
 
+	void threadFunc(SOCKET p_socket);
 	void handleConnection(SOCKET socket);
 	void closeSocket();
 	void parseCharValue(char* buff, const char* tag, int* value);

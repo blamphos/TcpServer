@@ -32,8 +32,138 @@ HttpServer::~HttpServer()
 	shutdown();
 }
 
+void HttpServer::threadFunc(SOCKET p_socket)
+{
+	int len = 0;
+	int iResult = 0;
+	char buffer[DEFAULT_BUFLEN];
+
+	memset(buffer, '\0', DEFAULT_BUFLEN);
+	char* wr = buffer;
+
+	HttpRequestTypeT requestType = NotDefined;
+	printf("accepted connection from socket %d\n", p_socket);
+	puts("----------------------------");
+
+	while (1) {
+		if ((DEFAULT_BUFLEN - len) <= 0) {
+			puts("buffer full");
+			break;
+		}
+
+		iResult = recv(p_socket, wr, DEFAULT_BUFLEN - len, 0);
+		if (iResult > 0) {
+			printf("recv: %d bytes from socket %d\n", iResult, p_socket);
+			len += iResult;
+			wr += iResult;
+			if ((wr - buffer) >= DEFAULT_BUFLEN) {
+				puts("buffer full, rounding over");
+				wr = buffer;
+			}
+
+			if (strstr(buffer, "\r\n\r\n") == NULL) {
+				continue;
+			}
+
+			if (strstr(buffer, "GET") != NULL) {
+				puts(buffer);
+				requestType = Get;
+				_socket = p_socket;
+				break;
+			}
+			else if (strstr(buffer, "POST") != NULL) {
+				puts(buffer);
+				requestType = Post;
+				_socket = p_socket;
+				break;
+			}
+		}
+		else if (iResult == 0) {
+			puts("no data available, client disconnects");
+			break;
+			//_response->sendResponseOk();
+			//closeSocket();
+			//return;
+		}
+		else {
+			puts("error recv");
+			//closeSocket();
+			//return;
+			break;
+		}
+	}
+
+	if (requestType == Post) {
+		int volume = -1;
+		int input = -1;
+		int validInput = 0;
+
+		// Parse input data from POST request
+//		parseCharValue(_buffer, "pot=", &volume);
+		parseCharValue(_buffer, "spdif=", &input);
+		switch (input) {
+		case 0: case 1: case 2: case 3:
+			validInput = 1;
+			break;
+		default:
+			input = 3;
+			break;
+		}
+
+		uint32_t data = input | (validInput << 2) | (volume << 3);
+		EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST, data);
+		int s = _sockets.dequeue();
+	}
+	else if (requestType == Get) {
+		if (strstr(buffer, "GET / HTTP") != NULL) {
+			//EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_GET);
+			//int s =_sockets.dequeue();
+			_response->sendResponseOk();
+			_response->sendFile(_resourceIndexHtml);
+			//_response->sendIndexPage(22, 3);
+		}
+
+		if (strstr(buffer, "GET /style.css") != NULL) {
+			_response->send(_resourceStyleCss);
+		}
+		else if (strstr(buffer, "GET /script.js") != NULL) {
+			_response->send(_resourceScriptJs);
+		}
+		else if (strstr(buffer, "GET /background.jpg") != NULL) {
+			_response->send(_resourceBackgroundJpg);
+		}
+		else if (strstr(buffer, "GET /speaker.png") != NULL) {
+			_response->send(_resourceSpeakerPng);
+		}
+		else if (strstr(buffer, "GET /mute.png") != NULL) {
+			_response->send(_resourceMutePng);
+		}
+		/*else if (strstr(_buffer, "GET /settings.png") != NULL) {
+			_response->send(_resourceSettingsPng);
+		}*/
+
+		//closeSocket();
+	}
+	else {
+		if (strstr(buffer, "shutdown") != NULL) {
+			//closeSocket();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+		puts("Unknown request");
+		puts(buffer);
+		//closeSocket();
+	}
+
+	printf("closing socket %d\n", p_socket);
+	closesocket(p_socket);
+}
+
 void HttpServer::handleConnection(SOCKET socket)
 {
+	std::thread t(&HttpServer::threadFunc, this, socket);
+	t.detach();
+	return;
+
 	int len = 0;
 	int iResult = 0;
 
