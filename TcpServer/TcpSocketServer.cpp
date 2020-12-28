@@ -158,8 +158,8 @@ void TcpSocketServer::run()
 			break;
 		}
 
-		//unsigned int timeout_ms = 250;
-		//setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout_ms, sizeof(unsigned int));
+		unsigned int timeout_ms = 50;
+		setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout_ms, sizeof(unsigned int));
 		handleConnection(clientSocket);
 	}
 	

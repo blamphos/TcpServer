@@ -12,7 +12,7 @@ class HttpServer : public TcpSocketServer {
 public:
     HttpServer();
     ~HttpServer();
-	void sendResponse(HttpResponseTypeT type, int level, int input);
+	void sendResponse(HttpResponseTypeT type, int level, int input, bool autofind, uint32_t spdifData);
 	bool sendBuffer(char* buffer, int len);
 
 private:
@@ -27,7 +27,6 @@ private:
         Post
     };
 
-	void threadFunc(SOCKET p_socket);
 	void handleConnection(SOCKET socket);
 	void closeSocket();
 	void parseCharValue(char* buff, const char* tag, int* value);

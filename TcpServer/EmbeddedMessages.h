@@ -28,7 +28,8 @@ enum ScreenStateIdT {
 
 enum HttpResponseTypeT {
 	HTTP_RESPONSE_GET,
-	HTTP_RESPONSE_POST
+	HTTP_RESPONSE_POST,
+	HTTP_RESPONSE_INFO_UPDATE,
 };
 
 typedef struct {

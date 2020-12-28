@@ -3,6 +3,8 @@
 #include "Parameters.h"
 #include "HttpServer.h"
 
+HttpServer* _http;
+
 int kbhit(void)
 {
 	if (GetKeyState('X') & 0x8000/*Check if high-order bit is set (1 << 15)*/)
@@ -17,7 +19,6 @@ void threadFunc()
 {
 	message_t msg;
 	bool running = true;
-	HttpServer* _http = new HttpServer();
 
 	while (running) {
 		EventQueue::instance()->wait(msg);
@@ -40,17 +41,21 @@ void threadFunc()
 			else {
 				//uint32_t data = VolumeControl::Update | (level << 2);
 				//EventQueue::instance()->post(EVENT_VOLUME_COMMAND, data);
-				EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_POST);
 				Parameters::instance()->current_level = level;
+				EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_POST);
 			}
 			break;
 		}
 		case EVENT_HTTP_SEND_RESPONSE:
 		{
+			int index = static_cast<int>(Parameters::instance()->current_input);
 			HttpResponseTypeT responseType = static_cast<HttpResponseTypeT>(msg.data);
+
 			_http->sendResponse(responseType,
 				Parameters::instance()->current_level,
-				Parameters::instance()->current_input);
+				Parameters::instance()->current_input,
+				Parameters::instance()->auto_find,
+				Parameters::instance()->getSpdifStatus(index));
 			break;
 		}
 		case EVENT_SYSTEM_SHUTDOWN:
@@ -61,8 +66,6 @@ void threadFunc()
 			break;
 		}
 	}
-
-	delete _http;
 }
 
 int __cdecl main(void)
@@ -74,6 +77,8 @@ int __cdecl main(void)
 	puts("GEVOL 3.0");
 	puts("Print any key to exit...");
 
+	_http = new HttpServer();
+
 	std::thread t(threadFunc);
 
 	printf("TCP server started!\n\n");
@@ -83,5 +88,6 @@ int __cdecl main(void)
 	EventQueue::instance()->post(EVENT_SYSTEM_SHUTDOWN);
 	t.join();
 
+	delete _http;
 	return 0;
 }

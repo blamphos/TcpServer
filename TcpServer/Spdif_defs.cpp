@@ -3,7 +3,25 @@
 const uint32_t SpdifStatus::SAMPLE_RATE_OFFSET = 4;
 const uint32_t SpdifStatus::PCM_INFO_OFFSET = 8;
 const uint32_t SpdifStatus::SDTO_DATA_OFFSET = 12;
-
+std::map<Spdif::InputTypeT, const char*> SpdifStatus::inputTitleMap = { 
+	{Spdif::Coax1, "COAX1"},
+	{Spdif::Coax2, "COAX2"},
+	{Spdif::Opt1, "OPT1"},
+};
+std::map<Spdif::SampleRateT, const char*> SpdifStatus::sampleRateTitleMap = {
+	{Spdif::SR_UNLOCK, "UNLOCK"},
+	{Spdif::SR_44100, "44.1kHz"},
+	{Spdif::SR_48000, "48kHz"},
+	{Spdif::SR_96000, "96kHz"},
+	{Spdif::SR_192000, "192kHz"},
+};
+std::map<Spdif::PcmInfoTypeT, const char*> SpdifStatus::pcmInfoeTitleMap = {
+	{Spdif::PCM_NO_INFO, ""},
+	{Spdif::PCM_NORMAL, "PCM"},
+	{Spdif::PCM_DD_AC3, "DD AC3"},
+	{Spdif::PCM_DTS, "DTS"},
+	{Spdif::PCM_NPCM, "NPCM"},
+};
 uint32_t SpdifStatus::create(spdif_message_t& msg)
 {
 	// EVENT_SPDIF_STATUS: message format

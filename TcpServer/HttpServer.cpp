@@ -2,6 +2,7 @@
 #include "HttpResponse.h"
 #include "HttpResourceFile.h"
 #include "EventQueue.h"
+#include "Spdif_defs.h"
 
 HttpServer::HttpServer() :
 	TcpSocketServer(DEFAULT_PORT),
@@ -32,138 +33,8 @@ HttpServer::~HttpServer()
 	shutdown();
 }
 
-void HttpServer::threadFunc(SOCKET p_socket)
-{
-	int len = 0;
-	int iResult = 0;
-	char buffer[DEFAULT_BUFLEN];
-
-	memset(buffer, '\0', DEFAULT_BUFLEN);
-	char* wr = buffer;
-
-	HttpRequestTypeT requestType = NotDefined;
-	printf("accepted connection from socket %d\n", p_socket);
-	puts("----------------------------");
-
-	while (1) {
-		if ((DEFAULT_BUFLEN - len) <= 0) {
-			puts("buffer full");
-			break;
-		}
-
-		iResult = recv(p_socket, wr, DEFAULT_BUFLEN - len, 0);
-		if (iResult > 0) {
-			printf("recv: %d bytes from socket %d\n", iResult, p_socket);
-			len += iResult;
-			wr += iResult;
-			if ((wr - buffer) >= DEFAULT_BUFLEN) {
-				puts("buffer full, rounding over");
-				wr = buffer;
-			}
-
-			if (strstr(buffer, "\r\n\r\n") == NULL) {
-				continue;
-			}
-
-			if (strstr(buffer, "GET") != NULL) {
-				puts(buffer);
-				requestType = Get;
-				_socket = p_socket;
-				break;
-			}
-			else if (strstr(buffer, "POST") != NULL) {
-				puts(buffer);
-				requestType = Post;
-				_socket = p_socket;
-				break;
-			}
-		}
-		else if (iResult == 0) {
-			puts("no data available, client disconnects");
-			break;
-			//_response->sendResponseOk();
-			//closeSocket();
-			//return;
-		}
-		else {
-			puts("error recv");
-			//closeSocket();
-			//return;
-			break;
-		}
-	}
-
-	if (requestType == Post) {
-		int volume = -1;
-		int input = -1;
-		int validInput = 0;
-
-		// Parse input data from POST request
-//		parseCharValue(_buffer, "pot=", &volume);
-		parseCharValue(_buffer, "spdif=", &input);
-		switch (input) {
-		case 0: case 1: case 2: case 3:
-			validInput = 1;
-			break;
-		default:
-			input = 3;
-			break;
-		}
-
-		uint32_t data = input | (validInput << 2) | (volume << 3);
-		EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST, data);
-		int s = _sockets.dequeue();
-	}
-	else if (requestType == Get) {
-		if (strstr(buffer, "GET / HTTP") != NULL) {
-			//EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_GET);
-			//int s =_sockets.dequeue();
-			_response->sendResponseOk();
-			_response->sendFile(_resourceIndexHtml);
-			//_response->sendIndexPage(22, 3);
-		}
-
-		if (strstr(buffer, "GET /style.css") != NULL) {
-			_response->send(_resourceStyleCss);
-		}
-		else if (strstr(buffer, "GET /script.js") != NULL) {
-			_response->send(_resourceScriptJs);
-		}
-		else if (strstr(buffer, "GET /background.jpg") != NULL) {
-			_response->send(_resourceBackgroundJpg);
-		}
-		else if (strstr(buffer, "GET /speaker.png") != NULL) {
-			_response->send(_resourceSpeakerPng);
-		}
-		else if (strstr(buffer, "GET /mute.png") != NULL) {
-			_response->send(_resourceMutePng);
-		}
-		/*else if (strstr(_buffer, "GET /settings.png") != NULL) {
-			_response->send(_resourceSettingsPng);
-		}*/
-
-		//closeSocket();
-	}
-	else {
-		if (strstr(buffer, "shutdown") != NULL) {
-			//closeSocket();
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		}
-		puts("Unknown request");
-		puts(buffer);
-		//closeSocket();
-	}
-
-	printf("closing socket %d\n", p_socket);
-	closesocket(p_socket);
-}
-
 void HttpServer::handleConnection(SOCKET socket)
 {
-	std::thread t(&HttpServer::threadFunc, this, socket);
-	t.detach();
-	return;
-
 	int len = 0;
 	int iResult = 0;
 
@@ -211,10 +82,9 @@ void HttpServer::handleConnection(SOCKET socket)
 		}
 		else if (iResult == 0) {
 			puts("no data available, client disconnects");
-			break;
-			//_response->sendResponseOk();
-			//closeSocket();
-			//return;
+			//break;
+			closeSocket();
+			return;
 		}
 		else {
 			puts("error recv");
@@ -224,32 +94,38 @@ void HttpServer::handleConnection(SOCKET socket)
 	}
 	
 	if (_requestType == Post) {
-		int volume = -1;
-		int input = -1;
-		int validInput = 0;
-		
-		// Parse input data from POST request
-//		parseCharValue(_buffer, "pot=", &volume);
-		parseCharValue(_buffer, "spdif=", &input);
-		switch (input) {
-		case 0: case 1: case 2: case 3:
-			validInput = 1;
-			break;
-		default:
-			input = 3;
-			break;
+		if (strstr(_buffer, "update") != NULL) {
+			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 		}
-		
-		uint32_t data = input | (validInput << 2) | (volume << 3);
-		EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST, data);
+		else {
+			int volume = -1;
+			int input = -1;
+			int validInput = 0;
+
+			// Parse input data from POST request
+			parseCharValue(_buffer, "pot=", &volume);
+			parseCharValue(_buffer, "spdif=", &input);
+			switch (input) {
+			case 0: case 1: case 2: case 3:
+				validInput = 1;
+				break;
+			default:
+				input = 3;
+				break;
+			}
+
+			uint32_t data = input | (validInput << 2) | (volume << 3);
+			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST, data);
+		}
+
 		int s = _sockets.dequeue();
 	}
 	else if (_requestType == Get) {
 		if (strstr(_buffer, "GET / HTTP") != NULL) {
-			//EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_GET);
-			//int s =_sockets.dequeue();
-			_response->sendResponseOk();
-			_response->sendFile(_resourceIndexHtml);
+			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_GET);
+			int s =_sockets.dequeue();
+			//_response->sendResponseOk();
+			//_response->sendFile(_resourceIndexHtml);
 			//_response->sendIndexPage(22, 3);
 		}
 		
@@ -285,7 +161,7 @@ void HttpServer::handleConnection(SOCKET socket)
 	}
 }
 
-void HttpServer::sendResponse(HttpResponseTypeT type, int level, int input)
+void HttpServer::sendResponse(HttpResponseTypeT type, int level, int input, bool autofind, uint32_t spdifData)
 {
 	if (_socket == INVALID_SOCKET) {
 		puts("sendResponse: invalid socket");
@@ -293,12 +169,12 @@ void HttpServer::sendResponse(HttpResponseTypeT type, int level, int input)
 	}
 
 	int socket = _socket;
-	printf("level: %d, input: %d\n", level, input);
-	_response->sendResponseOk();
+	printf("--> level: %d, input: %d\n", level, input);
 
 	if (type == HttpResponseTypeT::HTTP_RESPONSE_GET) {
 		//_response->sendIndexPage(level, input);
 		//_response->send(_resourceIndexHtml);
+		_response->sendResponseOk();
 		_response->sendFile(_resourceIndexHtml);
 	}
 	else if (type == HttpResponseTypeT::HTTP_RESPONSE_POST) {
@@ -306,6 +182,20 @@ void HttpServer::sendResponse(HttpResponseTypeT type, int level, int input)
 
 		char buffer[32] = { '\0' };
 		sprintf(buffer, "%d;%d", level, input);
+		sendBuffer(buffer, strlen(buffer));
+	}
+	else if (type == HttpResponseTypeT::HTTP_RESPONSE_INFO_UPDATE) {
+		_response->sendResponseOk();
+
+		SpdifStatus::spdif_message_t _spdif_status = SpdifStatus::dispatch(spdifData);
+
+		char buffer[64] = { '\0' };
+		sprintf(buffer, "%d;%s;%d;%s %s", 
+			level, 
+			SpdifStatus::inputTitleMap[_spdif_status.input],
+			autofind? 1 : 0,
+			SpdifStatus::sampleRateTitleMap[_spdif_status.sample_rate],
+			SpdifStatus::pcmInfoeTitleMap[_spdif_status.pcm_info]);
 		sendBuffer(buffer, strlen(buffer));
 	}
 

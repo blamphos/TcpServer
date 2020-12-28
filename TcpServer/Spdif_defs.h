@@ -3,6 +3,7 @@
 
 //#include "mbed.h"
 #include <stdint.h>
+#include <map>
 
 namespace Spdif {
 const int INPUT_COUNT = 3;
@@ -42,6 +43,9 @@ public:
 
 	static uint32_t create(spdif_message_t& msg);
 	static spdif_message_t dispatch(uint32_t data);
+	static std::map<Spdif::InputTypeT, const char*> inputTitleMap;
+	static std::map<Spdif::SampleRateT, const char*> sampleRateTitleMap;
+	static std::map<Spdif::PcmInfoTypeT, const char*> pcmInfoeTitleMap;
 
 private:
 	static const uint32_t SAMPLE_RATE_OFFSET;
