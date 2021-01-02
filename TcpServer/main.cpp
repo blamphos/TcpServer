@@ -36,6 +36,7 @@ void threadFunc()
 				else {
 					//EventQueue::instance()->post(EVENT_CHANGE_INPUT_REQ, input);
 					Parameters::instance()->current_input = input;
+					EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 				}
 			}
 			else {
@@ -78,6 +79,22 @@ int __cdecl main(void)
 	puts("Print any key to exit...");
 
 	_http = new HttpServer();
+
+	SpdifStatus::spdif_message_t msg;
+	msg.input = Spdif::Coax1;
+	msg.pcm_info = Spdif::PCM_NORMAL;
+	msg.sample_rate = Spdif::SR_44100;	
+	Parameters::instance()->setSpdifStatus(SpdifStatus::create(msg));
+
+	msg.input = Spdif::Coax2;
+	msg.pcm_info = Spdif::PCM_NORMAL;
+	msg.sample_rate = Spdif::SR_192000;
+	Parameters::instance()->setSpdifStatus(SpdifStatus::create(msg));
+
+	msg.input = Spdif::Opt1;
+	msg.pcm_info = Spdif::PCM_DD_AC3;
+	msg.sample_rate = Spdif::SR_48000;
+	Parameters::instance()->setSpdifStatus(SpdifStatus::create(msg));
 
 	std::thread t(threadFunc);
 

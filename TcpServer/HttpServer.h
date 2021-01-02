@@ -35,11 +35,15 @@ private:
 	HttpResponse* _response;
 	HttpRequestTypeT _requestType;
 	HttpResourceFile* _resourceIndexHtml;
-	HttpResourceFile* _resourceScriptJs;
+	//HttpResourceFile* _resourceScriptJs;
 	HttpResourceFile* _resourceStyleCss;
+	HttpResourceFile* _resourceRsMinStyleCss;
+	HttpResourceFile* _resourceRsMinScriptJs;
+	HttpResourceFile* _resourceJQueryMinScriptJs;
 	HttpResourceFile* _resourceBackgroundJpg;
-	HttpResourceFile* _resourceSpeakerPng;
-	HttpResourceFile* _resourceMutePng;
+	HttpResourceFile* _resourceFaviconPng;
+	//HttpResourceFile* _resourceSpeakerPng;
+	//HttpResourceFile* _resourceMutePng;
 	//HttpResourceFile* _resourceSettingsPng;
 	SOCKET _socket;
 	SafeQueue<int> _sockets;

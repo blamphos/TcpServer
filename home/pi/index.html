@@ -1,50 +1,170 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
-	<link rel="icon" href="data:,">
+	<link rel="icon" type="image/png" href="favicon.png">
 	<link rel="stylesheet" href="style.css">
+	<script src="jquery-3.3.1.min.js"></script>	
+    <link href="roundslider.min.css" rel="stylesheet" />
+    <script src="roundslider.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-	<title>GEVOL 3.0</title>
+	<title>GEVOL 3.0</title>	
 </head>
-<body>
-<div class="mobile-container">
-	<div class="nav-control">
-		<button class="nav-button" onclick="openNav()">☰</button>		
-	</div>	
-	<div id="mySidepanel" class="sidepanel">
-	  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-	  <a href="priority.html">Input settings</a>
-	  <a href="#">About</a>
-	</div>	
-	<div class="input-buttons">	
-		<div>
-			<button id="coax1" class="btn1 btn2" onclick="onInputChanged(0)" value="0">COAX1</button>
-			<button id="coax2" class="btn1 btn2" onclick="onInputChanged(1)" value="1">COAX2</button>
-			<button id="opt1" class="btn1 btn2" onclick="onInputChanged(2)" value="2">OPT1</button>
+  <body>
+  <div class="mobile-container">
+  		<div class="menu-container">
+			<a href="input_settings.html" class="nav-button">☰</a>		
 		</div>
-	</div>	
-	<div class="info-container">
-		<label class="header-label">INPUT</label>
-		<label class="header-label" style="left:135px">VOLUME</label>
-		<br>
-		<label id="info" class="info-label">COAX1</label>
-		<label id="auto" class="auto-label">AUTO</label>		
-		<br>
-		<label id="format" class="format-label">44100 Hz PCM</label>
-		<div class="volume-container">
-			<label id="level">--</label>
+		<div class="pie-slider">
+			<div id="slider"></div>
+			<button class="circle volume-mute" onclick="onMuteButtonClick()">MUTE</button>						
 		</div>
+		<div class="volume-buttons">
+			<button class="circle volume-minus" onclick="onVolumeButtonClick(-1)">&#8722</button>
+			<button class="circle volume-plus" onclick="onVolumeButtonClick(1)">&#x2b</button>		
+		</div>
+		<div class="info-container-bg">
+			<div class="info-container">
+				<label class="header-label">INPUT</label>
+				<label class="header-label" style="left:135px">VOLUME</label>
+				<br>
+				<label id="info" class="info-label">COAX1</label>
+				<label id="auto" class="auto-label">AUTO</label>		
+				<br>
+				<label id="format" class="format-label">44100 Hz PCM</label>
+				<div class="volume-container">
+					<label id="level">26</label>
+				</div>
+			</div>
+		<div>		
+		<div class="input-buttons">	
+			<div>
+				<button class="btn1" onclick="onInputChanged(0)">COAX1</button>
+				<button class="btn1" onclick="onInputChanged(1)">COAX2</button>
+				<button class="btn1" onclick="onInputChanged(2)">OPT1</button>
+				<button class="btn1" onclick="onInputChanged(-1)">AUTO</button>
+			</div>
+		</div>
+		<label id="debug"></label>
 	</div>
-	<div class="info-container">
-		<button id="btn" class="circle volume-minus" onclick="onVolumeUpdate(-1)">&#8722</button>
-		<div class="mute-container">
-			<img id="audio" src="speaker.png" alt="sp" class="audio1"/>
-			<img id="mute" src="mute.png" alt="mute" class="audio2"/>
-		</div>	
-		<button class="circle volume-plus" onclick="onVolumeUpdate(1)">&#x2b</button>
-	</div>
-	<input class="input-range" type="input" id="myRange" value="26" min="0" max="99">
-</div>
-	<script src="script.js"></script>
-</body>
+    <script>
+		var level = 26;
+		var prevClick = new Date();
+		
+		var infoLabel = document.getElementById("info");
+		var autoLabel = document.getElementById("auto");
+		var formatLabel = document.getElementById("format");
+		
+		$("#slider").roundSlider({ 
+			radius: 90,
+			circleShape: "pie",
+			sliderType: "min-range",
+			width: 3,
+			min: 0,
+			max: 99,
+			showTooltip: false,
+			value: level,
+			startAngle: -45,
+			handleSize: "+18",
+			animation: false,
+			svgMode: true,
+			rangeColor: "#CCC",
+			pathColor: "#333",
+			change: onVolumeChanged
+		});	
+
+		$("#slider").roundSlider({			
+			beforeValueChange: function(e) {				
+				value = e.value;
+				if (value > (level + 20)) {
+					return false;
+				}				
+				level = value;
+				return true;
+			}			
+		});		
+		
+		$("#slider").roundSlider({
+			valueChange: function (e) {
+				document.getElementById("level").innerHTML = ('0'+level).slice(-2);
+			}
+		});
+						
+		function onMuteButtonClick() {
+			level = 0;
+			$("#slider").roundSlider("setValue", level, 1);
+			onVolumeChanged();
+		}
+				
+		window.onload = function(e){ 
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(";");
+					if (arr.length == 4) {
+						level = parseInt(arr[0]);
+						$("#slider").roundSlider("setValue", level, 1);
+						infoLabel.innerHTML = arr[1];
+						autoLabel.style.visibility = (arr[2] == "1") ? "visible" : "hidden";
+						formatLabel.innerHTML = arr[3];
+					}
+				}
+			};
+			xhttp.open("POST", "update", true);
+			xhttp.send();	
+		}
+
+		function onVolumeChanged() {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(";");
+					if (arr.length == 2) {
+						level = parseInt(arr[0]);
+						$("#slider").roundSlider("setValue", level, 1);
+					}
+				}
+			};
+			xhttp.open("POST", "pot=" + level, true);
+			xhttp.send();
+		}
+
+		function onInputChanged(input) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(";");
+					if (arr.length == 4) {
+						level = parseInt(arr[0]);
+						$("#slider").roundSlider("setValue", level, 1);
+						infoLabel.innerHTML = arr[1];
+						autoLabel.style.visibility = (arr[2] == "1") ? "visible" : "hidden";
+						formatLabel.innerHTML = arr[3];
+					}
+				}
+			};
+			xhttp.open("POST", "spdif=" + input, true);
+			xhttp.send();
+		}
+		
+		function onVolumeButtonClick(direction) {
+			var now = new Date();
+			var change = (now - prevClick < 500) ? 3 : 1;
+			prevClick = now;
+				  
+			for (var i = 0; i < change; i++) {
+			  direction > 0 ? level++ : level--;
+			}
+
+			if (level < 0) {
+			  level = 0;
+			}
+			else if (level > 99) {
+			  level = 99;
+			}
+
+			$("#slider").roundSlider("setValue", level, 1);
+			onVolumeChanged();
+		}		
+	</script>
+  </body>
 </html>
