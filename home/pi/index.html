@@ -12,20 +12,12 @@
   <body>
   <div class="mobile-container">
   		<div class="menu-container">
-			<a href="input_settings.html" class="nav-button">☰</a>		
-		</div>
-		<div class="pie-slider">
-			<div id="slider"></div>
-			<button class="circle volume-mute" onclick="onMuteButtonClick()">MUTE</button>						
-		</div>
-		<div class="volume-buttons">
-			<button class="circle volume-minus" onclick="onVolumeButtonClick(-1)">&#8722</button>
-			<button class="circle volume-plus" onclick="onVolumeButtonClick(1)">&#x2b</button>		
+			<a href="input.html" class="nav-button">☰</a>		
 		</div>
 		<div class="info-container-bg">
 			<div class="info-container">
 				<label class="header-label">INPUT</label>
-				<label class="header-label" style="left:135px">VOLUME</label>
+				<label class="header-label" style="left:155px">VOLUME</label>
 				<br>
 				<label id="info" class="info-label">COAX1</label>
 				<label id="auto" class="auto-label">AUTO</label>		
@@ -36,12 +28,20 @@
 				</div>
 			</div>
 		<div>		
+		<div class="pie-slider-container">
+			<div id="slider"></div>
+			<button class="circle volume-mute" onclick="onMuteButtonClick()">MUTE</button>						
+		</div>
+		<div class="volume-buttons">
+			<button class="circle volume-minus" onclick="onVolumeButtonClick(-1)">&#8722</button>
+			<button class="circle volume-plus" onclick="onVolumeButtonClick(1)">&#x2b</button>		
+		</div>		
 		<div class="input-buttons">	
 			<div>
-				<button class="btn1" onclick="onInputChanged(0)">COAX1</button>
-				<button class="btn1" onclick="onInputChanged(1)">COAX2</button>
-				<button class="btn1" onclick="onInputChanged(2)">OPT1</button>
-				<button class="btn1" onclick="onInputChanged(-1)">AUTO</button>
+				<button class="input-btn" onclick="onInputChanged(0)">COAX1</button>
+				<button class="input-btn" onclick="onInputChanged(1)">COAX2</button>
+				<button class="input-btn" onclick="onInputChanged(2)">OPT1</button>
+				<button class="input-btn" onclick="onInputChanged(-1)">AUTO</button>
 			</div>
 		</div>
 		<label id="debug"></label>
@@ -52,10 +52,10 @@
 		
 		var infoLabel = document.getElementById("info");
 		var autoLabel = document.getElementById("auto");
-		var formatLabel = document.getElementById("format");
+		var formatLabel = document.getElementById("format");		
 		
 		$("#slider").roundSlider({ 
-			radius: 90,
+			radius: 94,
 			circleShape: "pie",
 			sliderType: "min-range",
 			width: 3,

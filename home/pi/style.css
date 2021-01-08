@@ -11,19 +11,17 @@ body {
   background-position: center top;  
   background-position-y: 10px;  
   height: 430px;
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 .menu-container {
   display: inline-flex;
-  opacity: 0.9;	
 }
 		
 .nav-button {
   font-size: 26px;
   cursor: pointer;
-  background-color: Transparent;
-  color: white;
+  color: #fff;
   text-decoration: none;
   position: relative;
   top: 22px;
@@ -34,11 +32,10 @@ body {
   opacity: 0.7;
 }
 		
-.pie-slider {
+.pie-slider-container {
   position: relative;
-  top: 59px;
-  left: 51px;
-  opacity: 1.0;
+  top: -28px;
+  left: 40px;
 }
 
 .rs-control .rs-handle {
@@ -47,23 +44,24 @@ body {
 		
 .volume-buttons {
   position: relative; 
-  top: 0px;
-  opacity: 0.8;
+  top: -90px;
 }
 
 .circle {
-  background-color: #000;s
+  background-color: Transparent;
   box-shadow: 0px 0px 2px 2px #000;	
   padding: 0px;  
   outline: none;
   color: #C9CACD;
   font-size: 18px;
   font-family: "Times New Roman";
-  cursor: pointer;	
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center; 
-  justify-content: center;	  
+  justify-content: center; 
 }
 
 .circle:hover {
@@ -79,25 +77,25 @@ body {
   background-color: Transparent;
   font-family: "Arial";
   font-size: 11px;
-  width: 40px;
-  height: 40px;  
+  width: 46px;
+  height: 46px;  
   position: relative;
-  top: -111px;
-  left: 71px;
+  top: -120px;
+  left: 70px;
 }
 
 .volume-minus {
-  background-color: #111;
+  background-color: #222;
   font-size: 40px;
   width: 46px;
   height: 46px;  
   position: relative;
   top: -15px;
-  left: 90px;
+  left: 80px;
 }
 
 .volume-plus {
-  background-color: #111;
+  background-color: #222;
   font-size: 40px;
   width: 46px;
   height: 46px;
@@ -107,25 +105,23 @@ body {
 }
 		
 .info-container-bg {
-  position:relative;
+  position: relative;
   width: 260px;
   height: 70px;
-  top: -5px;
-  left: 10px;		  
-  background-color: #111;
-  opacity: 0.9;
+  top: 45px;
+  left: 10px;
 }
 
 .info-container {
-  position:relative;
-  left: 10px;		  
+  position:relative; 
+  opacity: 0.7;  
 }
 
 .volume-container {
   position:relative;
   width: 50px;
   top: -44px;
-  left: 178px;
+  left: 198px;
   font-size: 38px;
   color: cyan;  
   text-align: right;
@@ -156,10 +152,6 @@ body {
   color: cyan;
 }
 
-.info-label:hover {
-  opacity: 0.7;
-}
-
 .format-label {
   position:relative;
   top: 2px;
@@ -173,13 +165,13 @@ body {
   width: 260px;
   height: 50px;
   background-color: Transparent;
-  top: -25px;
+  top: -90px;
   left: 2px;
   margin: auto;
 }
 
-.btn1 {
-  background-color: #111;
+.input-btn {
+  background-color: #222;
   box-shadow: 0px 0px 1px 1px #000;
   color: #C9CACD;
   width: 61px;
@@ -190,11 +182,89 @@ body {
   outline: none;
 }
 
-.btn1:hover {
+.input-btn:hover {
   opacity: 0.7;
 }
 
-.btn1:active {
+.input-btn:active {
   background-color: #000;
   box-shadow: 0px 0px 5px 5px #00CED1;
+}
+
+.edit {
+  width: 80px;
+  height: 30px;
+  margin-left: 10px;  
+}
+
+.input-main-container {
+  height: 100%;
+  background-color: #222;
+  color : #fff;
+}
+
+.setting-header-container {
+  padding: 5px 0px 5px 0px;
+  border-bottom: 1px solid #333;  
+}
+
+.setting-container {
+  padding: 10px 20px 10px 20px;
+  border-bottom: 1px solid #333;  
+}
+
+.basic-label {
+  font-size: 14px;
+  width: 60px;
+  position: relative;
+  display: inline-block;
+  top: -1px;
+  left: 5px;
+  padding: 5px;
+  font-weight: 600;
+}
+
+.setting-name {
+  font-size: 14px;
+}
+
+.arrow {
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+}
+
+.left {
+  padding: 4px;
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+  margin-left: 15px;
+}
+
+.arrow:hover {
+  opacity: 0.5;
+}
+
+.right {
+  padding: 4px;
+  transform: rotate(-45);
+  -webkit-transform: rotate(-45deg);
+}
+
+.priority-container {
+  display: inline-block; 
+}
+
+.unsorted-list {
+  list-style-type: none;
+  position: relative;
+  left: -45px;   
+  width: 250px
+}
+
+.list-item {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid #333;    
+  padding: 3px;
+  margin: 4px;
 }

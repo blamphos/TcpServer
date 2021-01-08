@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="icon" type="image/png" href="favicon.png">
+	<link rel="stylesheet" href="style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>GEVOL 3.0</title>
+</head>
+<body>
+<div class="mobile-container">
+	<div class="input-main-container">
+		<div class="setting-header-container">
+			<a href="javascript:history.back()" class="arrow left"></a>
+			<label class="basic-label" style="width:auto">Input settings</label>
+		</div>		
+		<div class="setting-container">		
+			<label class="setting-name">Input switching priority:</label>		
+			<div class="priority-container">
+				<ul class="unsorted-list" id="inputs">
+					<li class="list-item" input type='hidden' value=0>
+						<button class="circle minus">&#8722</button> 
+						<label class="basic-label">COAX1</label>
+						<button class="circle plus">&#x2b</button>
+						<button class="input-btn edit">Edit name</button>
+					</li>
+					<li class="list-item" input type='hidden' value=1>
+						<button class="circle minus">&#8722</button> 
+						<label class="basic-label">OPT</label>
+						<button class="circle plus">&#x2b;</button>
+						<button class="input-btn edit">Edit name</button>
+					</li>
+					<li class="list-item" input type='hidden' value=2>
+						<button class="circle minus">&#8722</button> 
+						<label class="basic-label">COAX2</label>
+						<button class="circle plus">&#x2b;</button>
+						<button class="input-btn edit">Edit name</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<br>
+		<label id="lblDebug"></label>
+	</div>
+</div>	
+	<script>
+		window.onload = function () {
+			var upLink = document.querySelectorAll(".plus");
+
+			for (var i = 0; i < upLink.length; i++) {
+				upLink[i].addEventListener('click', function () {
+					var wrapper = this.parentElement;
+					if (wrapper.previousElementSibling)
+						wrapper.parentNode.insertBefore(wrapper, wrapper.previousElementSibling);
+						
+					apply();
+				});
+			}
+
+			var downLink = document.querySelectorAll(".minus");
+
+			for (var i = 0; i < downLink.length; i++) {
+				downLink[i].addEventListener('click', function () {
+					var wrapper = this.parentElement;
+					if (wrapper.nextElementSibling)
+						wrapper.parentNode.insertBefore(wrapper.nextElementSibling, wrapper);
+						
+					apply();
+				});
+			}			
+		}
+		
+		function apply() {		
+			var values = [];
+			var items = document.getElementById("inputs").getElementsByTagName("li");
+
+			for (var i = 0; i < items.length; ++i) {
+			  values.push(items[i].value);
+			}	
+			document.getElementById('lblDebug').innerHTML = values.toString();
+		}		
+	</script>
+</body>
+</html>

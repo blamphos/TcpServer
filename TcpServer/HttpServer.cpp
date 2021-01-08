@@ -12,30 +12,24 @@ HttpServer::HttpServer() :
 {
 	_resourceIndexHtml = new HttpResourceFile("../home/pi/index.html", HttpResourceFile::TEXT_HTML);
 	_resourceBackgroundJpg = new HttpResourceFile("../home/pi/background.jpg", HttpResourceFile::IMAGE_JPG);
-	//_resourceScriptJs = new HttpResourceFile("../home/pi/script.js", HttpResourceFile::TEXT_JAVASCRIPT);
 	_resourceStyleCss = new HttpResourceFile("../home/pi/style.css", HttpResourceFile::TEXT_CSS);
 	_resourceRsMinStyleCss = new HttpResourceFile("../home/pi/roundslider.min.css", HttpResourceFile::TEXT_CSS);
 	_resourceRsMinScriptJs = new HttpResourceFile("../home/pi/roundslider.min.js", HttpResourceFile::TEXT_JAVASCRIPT);
 	_resourceJQueryMinScriptJs = new HttpResourceFile("../home/pi/jquery-3.3.1.min.js", HttpResourceFile::TEXT_JAVASCRIPT);
 	_resourceFaviconPng = new HttpResourceFile("../home/pi/favicon.png", HttpResourceFile::IMAGE_PNG);
-	//_resourceSpeakerPng = new HttpResourceFile("../home/pi/speaker.png", HttpResourceFile::IMAGE_PNG);
-	//_resourceMutePng = new HttpResourceFile("../home/pi/mute.png", HttpResourceFile::IMAGE_PNG);
-	//_resourceSettingsPng = new HttpResourceFile("../home/pi/settings.png", HttpResourceFile::IMAGE_PNG);
+	_resourceInputHtml = new HttpResourceFile("../home/pi/input.html", HttpResourceFile::TEXT_HTML);
 }
 
 HttpServer::~HttpServer()
 {
 	delete _response;
 	delete _resourceIndexHtml;
-	//delete _resourceScriptJs;
 	delete _resourceStyleCss;
 	delete _resourceRsMinStyleCss;
 	delete _resourceRsMinScriptJs;
 	delete _resourceJQueryMinScriptJs;
 	delete _resourceBackgroundJpg;
-	//delete _resourceSpeakerPng;
-	//delete _resourceMutePng;
-	//delete _resourceSettingsPng;
+	delete _resourceInputHtml;
 
 	shutdown();
 }
@@ -154,18 +148,9 @@ void HttpServer::handleConnection(SOCKET socket)
 		else if (strstr(_buffer, "GET /favicon.png") != NULL) {
 			_response->send(_resourceFaviconPng);
 		}
-		/*else if (strstr(_buffer, "GET /script.js") != NULL) {
-			_response->send(_resourceScriptJs);
-		}*/
-		/*else if (strstr(_buffer, "GET /speaker.png") != NULL) {
-			_response->send(_resourceSpeakerPng);
+		else if (strstr(_buffer, "GET /input.html") != NULL) {
+			_response->send(_resourceInputHtml);
 		}
-		else if (strstr(_buffer, "GET /mute.png") != NULL) {
-			_response->send(_resourceMutePng);
-		}*/
-		/*else if (strstr(_buffer, "GET /settings.png") != NULL) {
-			_response->send(_resourceSettingsPng);
-		}*/
 
 		closeSocket();
 	}
