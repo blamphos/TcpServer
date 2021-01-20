@@ -24,11 +24,12 @@ HttpServer::~HttpServer()
 {
 	delete _response;
 	delete _resourceIndexHtml;
+	delete _resourceBackgroundJpg;
 	delete _resourceStyleCss;
 	delete _resourceRsMinStyleCss;
 	delete _resourceRsMinScriptJs;
 	delete _resourceJQueryMinScriptJs;
-	delete _resourceBackgroundJpg;
+	delete _resourceFaviconPng;
 	delete _resourceInputHtml;
 
 	shutdown();
@@ -104,8 +105,8 @@ void HttpServer::handleConnection(SOCKET socket)
 			int validInput = 0;
 
 			// Parse input data from POST request
-			parseCharValue(_buffer, "pot=", &volume);
-			parseCharValue(_buffer, "spdif=", &input);
+			parseIntValue(_buffer, "pot=", &volume);
+			parseIntValue(_buffer, "spdif=", &input);
 			switch (input) {
 			case 0: case 1: case 2: case 3:
 				validInput = 1;
@@ -230,7 +231,7 @@ void HttpServer::closeSocket()
 	_socket = INVALID_SOCKET;
 }
 
-void HttpServer::parseCharValue(char* buff, const char* tag, int* value)
+void HttpServer::parseIntValue(char* buff, const char* tag, int* value)
 {
 	const int CHAR_BUFF_LEN = 3;
 

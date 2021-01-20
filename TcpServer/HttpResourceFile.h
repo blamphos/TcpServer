@@ -10,7 +10,7 @@ public:
         TEXT_CSS,
         TEXT_JAVASCRIPT,
         IMAGE_PNG,
-        IMAGE_JPG
+        IMAGE_JPG,
     };
 
     HttpResourceFile(const char* fileName, ContentTypeT type);

@@ -29,7 +29,7 @@ private:
 
 	void handleConnection(SOCKET socket);
 	void closeSocket();
-	void parseCharValue(char* buff, const char* tag, int* value);
+	void parseIntValue(char* buff, const char* tag, int* value);
 
 	char _buffer[DEFAULT_BUFLEN];
 	HttpResponse* _response;
