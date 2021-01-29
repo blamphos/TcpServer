@@ -3,7 +3,7 @@
 Parameters::Parameters() :
 		auto_find(true),
 		current_level(0),
-		current_input(Spdif::Auto)
+		current_input(Spdif::Coax1)
 {
 	for (int i = 0; i < Spdif::INPUT_COUNT; ++i) {
 		_spdif_status[i] = 0;
@@ -15,13 +15,11 @@ bool Parameters::isMuted()
 	return current_level == 0;
 }
 
-uint32_t Parameters::getSpdifStatus(int index)
+uint32_t Parameters::getSpdifStatus(Spdif::InputTypeT input)
 {
-	if (index < Spdif::INPUT_COUNT) {
-		return _spdif_status[index];
-	}
+	int index = static_cast<int>(input);
 
-	return 0;
+	return _spdif_status[index];
 }
 
 void Parameters::setSpdifStatus(uint32_t data)

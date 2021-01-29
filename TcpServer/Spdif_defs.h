@@ -12,7 +12,6 @@ enum InputTypeT {
 	Coax1 = 0,
 	Coax2,
 	Opt1,
-	Auto
 };
 
 enum SampleRateT {
@@ -41,16 +40,22 @@ public:
 		uint8_t sdto_data;
 	} spdif_message_t;
 
+	static bool isValidInput(int index, Spdif::InputTypeT* input);
 	static uint32_t create(spdif_message_t& msg);
 	static spdif_message_t dispatch(uint32_t data);
+	static void getInputInfo(uint32_t data, char* inputTitle, char* sampleRate, char* pcmInfo);
+
+private:
+	enum SpdifMessageOffsetT {
+		INPUT_BITS_MASK = 0x3,
+		SAMPLE_RATE_OFFSET = 4,
+		PCM_INFO_OFFSET = 8,
+		SDTO_DATA_OFFSET = 12,
+	};
+
 	static std::map<Spdif::InputTypeT, const char*> inputTitleMap;
 	static std::map<Spdif::SampleRateT, const char*> sampleRateTitleMap;
 	static std::map<Spdif::PcmInfoTypeT, const char*> pcmInfoeTitleMap;
-
-private:
-	static const uint32_t SAMPLE_RATE_OFFSET;
-	static const uint32_t PCM_INFO_OFFSET;
-	static const uint32_t SDTO_DATA_OFFSET;
 };
 
 #endif

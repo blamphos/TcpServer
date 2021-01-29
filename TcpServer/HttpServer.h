@@ -12,8 +12,8 @@ class HttpServer : public TcpSocketServer {
 public:
     HttpServer();
     ~HttpServer();
-	void sendResponse(HttpResponseTypeT type, int level, int input, bool autofind, uint32_t spdifData);
-	bool sendBuffer(char* buffer, int len);
+	void sendResponse(HttpResponseTypeT type, const char* buffer);
+	bool sendBuffer(const char* buffer, int len);
 
 private:
 	enum ConstantsT {

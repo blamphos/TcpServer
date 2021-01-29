@@ -6,7 +6,7 @@
 class Parameters {
 public:
 	bool isMuted();
-	uint32_t getSpdifStatus(int index);
+	uint32_t getSpdifStatus(Spdif::InputTypeT input);
 	void setSpdifStatus(uint32_t data);
 	static Parameters* instance();
 

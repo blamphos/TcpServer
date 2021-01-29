@@ -12,7 +12,6 @@ public:
     void sendResponseOk();
     void sendResponseOk(HttpResourceFile* resource);
     void sendResponseNotFound();
-    void sendIndexPage(int volume, int input);
     bool sendFile(HttpResourceFile* resource);
     virtual ~HttpResponse();
 

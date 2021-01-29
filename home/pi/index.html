@@ -117,14 +117,11 @@
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
-					var arr = this.responseText.split(";");
-					if (arr.length == 2) {
-						level = parseInt(arr[0]);
-						$("#slider").roundSlider("setValue", level, 1);
-					}
+					level = parseInt(this.responseText);
+					$("#slider").roundSlider("setValue", level, 1);
 				}
 			};
-			xhttp.open("POST", "pot=" + level, true);
+			xhttp.open("POST", "volume=" + level, true);
 			xhttp.send();
 		}
 
@@ -142,7 +139,7 @@
 					}
 				}
 			};
-			xhttp.open("POST", "spdif=" + input, true);
+			xhttp.open("POST", "input=" + input, true);
 			xhttp.send();
 		}
 		
