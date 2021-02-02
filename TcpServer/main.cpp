@@ -34,30 +34,10 @@ void threadFunc()
 			else {
 				EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 			}
-			/*Spdif::InputTypeT input = static_cast<Spdif::InputTypeT>(msg.data & 0x3);
-			bool valid = msg.data & 0x4;
-			printf("level: %d, input: %d (valid: %d)\n", level, input, valid);
-			if (valid) {
-				if (input == Parameters::instance()->current_input) {
-					EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_POST);
-				}
-				else {
-					//EventQueue::instance()->post(EVENT_CHANGE_INPUT_REQ, input);
-					Parameters::instance()->current_input = input;
-					EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
-				}
-			}
-			else {
-				//uint32_t data = VolumeControl::Update | (level << 2);
-				//EventQueue::instance()->post(EVENT_VOLUME_COMMAND, data);
-				Parameters::instance()->current_level = level;
-				EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_POST);
-			}*/
 			break;
 		}
 		case EVENT_HTTP_REQUEST_POST_SET_INPUT:
 		{
-			//HttpResponseTypeT responseType = HttpResponseTypeT::HTTP_RESPONSE_INFO_UPDATE;
 			Spdif::InputTypeT input = Parameters::instance()->current_input;
 
 			if (SpdifStatus::isValidInput(static_cast<int>(msg.data), &input))
@@ -101,11 +81,6 @@ void threadFunc()
 					pcmTitle);
 			}
 			_http->sendResponse(responseType, buffer);
-			/*_http->sendResponse(responseType,
-				Parameters::instance()->current_level,
-				Parameters::instance()->current_input,
-				Parameters::instance()->auto_find,
-				Parameters::instance()->getSpdifStatus(index));*/
 			break;
 		}
 		case EVENT_SYSTEM_SHUTDOWN:

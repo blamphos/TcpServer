@@ -169,30 +169,15 @@ void HttpServer::sendResponse(HttpResponseTypeT type, const char* buffer)
 	}
 
 	int socket = _socket;
+	_response->sendResponseOk();
 
 	if (type == HttpResponseTypeT::HTTP_RESPONSE_GET) {
-		_response->sendResponseOk();
 		_response->sendFile(_resourceIndexHtml);
 	}
 	else if (type == HttpResponseTypeT::HTTP_RESPONSE_POST) {
-		_response->sendResponseOk();
-
-		//char buffer[32] = { '\0' };
-		//sprintf(buffer, "%d;%d", level, input);
 		sendBuffer(buffer, strlen(buffer));
 	}
 	else if (type == HttpResponseTypeT::HTTP_RESPONSE_INFO_UPDATE) {
-		_response->sendResponseOk();
-
-		/*SpdifStatus::spdif_message_t _spdif_status = SpdifStatus::dispatch(spdifData);
-
-		char buffer[64] = { '\0' };
-		sprintf(buffer, "%d;%s;%d;%s %s", 
-			level, 
-			SpdifStatus::inputTitleMap[_spdif_status.input],
-			autofind? 1 : 0,
-			SpdifStatus::sampleRateTitleMap[_spdif_status.sample_rate],
-			SpdifStatus::pcmInfoeTitleMap[_spdif_status.pcm_info]);*/
 		sendBuffer(buffer, strlen(buffer));
 	}
 
