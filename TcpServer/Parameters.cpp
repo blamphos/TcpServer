@@ -277,6 +277,34 @@ void Parameters::setSpdifStatus(uint32_t data)
 	}
 }
 
+int Parameters::getStartLevel()
+{
+	return _startLevel;
+}
+
+std::vector<Spdif::InputTypeT> Parameters::getSwitchingOrder()
+{
+	return _switchPriorityOrder;
+}
+
+bool Parameters::setSwitchingOrder(std::vector<Spdif::InputTypeT> list)
+{
+	std::vector<Spdif::InputTypeT>::iterator it = std::unique(list.begin(), list.end());
+	if (it != list.end()) {
+		std::cerr << "Duplicate inputs in SwitchPriorityOrder, no change.\n";
+		return false;
+	}
+
+	if (list.size() != Spdif::INPUT_COUNT) {
+		std::cerr << "Input count mismatch in SwitchPriorityOrder, no change.\n";
+		return false;
+	}
+
+	_switchPriorityOrder.clear();
+	_switchPriorityOrder = list;
+	return true;
+}
+
 Parameters* Parameters::instance()
 {
 	static Parameters inst;

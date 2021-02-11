@@ -15,7 +15,7 @@ public:
 		VolumeDown
 	};
 
-	VolumeControl();
+	VolumeControl(int initLevel);
 	void handleCommand(uint32_t data);
 	static bool isValidLevel(int level);
 	void mute();

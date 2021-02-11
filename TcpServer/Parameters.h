@@ -11,6 +11,9 @@ public:
 	bool isMuted();
 	uint32_t getSpdifStatus(Spdif::InputTypeT input);
 	void setSpdifStatus(uint32_t data);
+	int getStartLevel();
+	std::vector<Spdif::InputTypeT> getSwitchingOrder();
+	bool setSwitchingOrder(std::vector<Spdif::InputTypeT> list);
 	static Parameters* instance();
 
 	bool auto_find;

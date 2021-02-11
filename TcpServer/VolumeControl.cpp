@@ -3,7 +3,7 @@
 #include "Parameters.h"
 //#include "SoftSPI.h"
 
-VolumeControl::VolumeControl() :
+VolumeControl::VolumeControl(int initLevel) :
 		/*_cs(CE0),*/ _muted(false)
 {
 	//_cs = 1;
@@ -25,8 +25,11 @@ VolumeControl::VolumeControl() :
 		}
 		_gainMap[level] = gain & 0xFF;
 	}
-
-	//updateLevel(INIT_LEVEL_VALUE);
+	
+	if (initLevel > 30) {
+		initLevel = 30;
+	}
+	updateLevel(initLevel);
 
 	//_guard_timer.reset();
 	//_guard_timer.start();

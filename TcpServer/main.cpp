@@ -100,7 +100,7 @@ int __cdecl main(void)
 	puts("GEVOL 3.0");
 	puts("Print any key to exit...");
 	bool b = Parameters::instance()->auto_find;
-	VolumeControl volume;
+	VolumeControl volume(Parameters::instance()->getStartLevel());
 	getchar();
 	return 0;
 
