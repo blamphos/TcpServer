@@ -1,7 +1,10 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include <vector> 
 #include "Spdif_defs.h"
+#include "SpdifInput.h"
+#include "ST7735S_defs.h"
 
 class Parameters {
 public:
@@ -15,9 +18,30 @@ public:
 	Spdif::InputTypeT current_input;
 
 private:
-	Parameters();
+	enum ConstantsT {
+		DEFAULT_START_LEVEL = 26,
+	};
 
+	Parameters();
+	~Parameters();
+	void addInput(Spdif::InputTypeT input);
+	bool readConfigFile();
+	bool writeConfigFile();
+	void logParameters();
+
+	void setDefaultDisplayType();
+	void setDefaultStartLevel();
+	void setDefaultInputName(Spdif::InputTypeT input);
+	void setDefaultAutoSwitch();
+	void setDefaultSwitchingOrder();
+	std::string getSwitchPriorityOrderListStr();
+
+	std::string _configFile;
+	int _startLevel;
+	DisplayModuleT _displayType;
+	std::map<Spdif::InputTypeT, SpdifInput*> _inputs;
 	uint32_t _spdif_status[Spdif::INPUT_COUNT];
+	std::vector<Spdif::InputTypeT> _switchPriorityOrder;
 };
 
 #endif

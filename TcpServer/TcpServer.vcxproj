@@ -66,10 +66,12 @@
     <ClCompile Include="HttpResourceFile.cpp" />
     <ClCompile Include="HttpResponse.cpp" />
     <ClCompile Include="HttpServer.cpp" />
+    <ClCompile Include="SpdifInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parameters.cpp" />
     <ClCompile Include="Spdif_defs.cpp" />
     <ClCompile Include="TcpSocketServer.cpp" />
+    <ClCompile Include="VolumeControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EmbeddedMessages.h" />
@@ -77,11 +79,14 @@
     <ClInclude Include="HttpResourceFile.h" />
     <ClInclude Include="HttpResponse.h" />
     <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="SpdifInput.h" />
     <ClInclude Include="Parameters.h" />
     <ClInclude Include="SafeQueue.h" />
     <ClInclude Include="Spdif_defs.h" />
+    <ClInclude Include="ST7735S_defs.h" />
     <ClInclude Include="StoppableTask.h" />
     <ClInclude Include="TcpSocketServer.h" />
+    <ClInclude Include="VolumeControl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

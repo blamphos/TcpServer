@@ -39,37 +39,52 @@
     <ClCompile Include="Spdif_defs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SpdifInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="StoppableTask.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpSocketServer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpResourceFile.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpResponse.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpServer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SafeQueue.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmbeddedMessages.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="SpdifInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="EventQueue.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpResourceFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpServer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Parameters.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SafeQueue.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Spdif_defs.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StoppableTask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpSocketServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ST7735S_defs.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #include "EventQueue.h"
 #include "HttpServer.h"
 #include "Parameters.h"
+#include "VolumeControl.h"
+#include <iostream>
 
 HttpServer* _http;
 
@@ -64,7 +66,7 @@ void threadFunc()
 			HttpResponseTypeT responseType = static_cast<HttpResponseTypeT>(msg.data);
 
 			if (responseType == HTTP_RESPONSE_POST) {
-				sprintf(buffer, "%d", Parameters::instance()->current_level);
+				sprintf_s(buffer, "%d", Parameters::instance()->current_level);
 			}
 			else if (responseType == HTTP_RESPONSE_INFO_UPDATE) {
 				char inputTitle[10] = { 0 };
@@ -73,7 +75,7 @@ void threadFunc()
 				uint32_t data = Parameters::instance()->getSpdifStatus(Parameters::instance()->current_input);
 
 				SpdifStatus::getInputInfo(data, inputTitle, sampleRateTitle, pcmTitle);
-				sprintf(buffer, "%d;%s;%d;%s %s",
+				sprintf_s(buffer, "%d;%s;%d;%s %s",
 					Parameters::instance()->current_level,
 					inputTitle,
 					Parameters::instance()->auto_find ? 1 : 0,
@@ -97,6 +99,10 @@ int __cdecl main(void)
 {
 	puts("GEVOL 3.0");
 	puts("Print any key to exit...");
+	bool b = Parameters::instance()->auto_find;
+	VolumeControl volume;
+	getchar();
+	return 0;
 
 	_http = new HttpServer();
 
