@@ -17,9 +17,9 @@ public:
 
 	VolumeControl(int initLevel);
 	void handleCommand(uint32_t data);
-	static bool isValidLevel(int level);
 	void mute();
 	void unmute();
+	static bool isValidLevel(int level);
 
 private:
 	enum ConstantsT {
