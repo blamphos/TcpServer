@@ -69,7 +69,7 @@
     <ClCompile Include="SpdifInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parameters.cpp" />
-    <ClCompile Include="Spdif_defs.cpp" />
+    <ClCompile Include="SpdifUtils.cpp" />
     <ClCompile Include="TcpSocketServer.cpp" />
     <ClCompile Include="VolumeControl.cpp" />
   </ItemGroup>
@@ -82,7 +82,7 @@
     <ClInclude Include="SpdifInput.h" />
     <ClInclude Include="Parameters.h" />
     <ClInclude Include="SafeQueue.h" />
-    <ClInclude Include="Spdif_defs.h" />
+    <ClInclude Include="SpdifUtils.h" />
     <ClInclude Include="ST7735S_defs.h" />
     <ClInclude Include="StoppableTask.h" />
     <ClInclude Include="TcpSocketServer.h" />

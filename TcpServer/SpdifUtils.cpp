@@ -1,6 +1,6 @@
 #include <sstream>
-#include "Spdif_defs.h"
 #include <algorithm>
+#include "SpdifUtils.h"
 
 std::map<Spdif::InputTypeT, const char*> SpdifHelper::inputTitleMap = { 
 	{Spdif::Coax1, "COAX1"},

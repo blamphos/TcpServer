@@ -2,15 +2,15 @@
 #define PARAMETERS_H
 
 #include <vector> 
-#include "Spdif_defs.h"
+#include "SpdifUtils.h"
 #include "SpdifInput.h"
 #include "ST7735S_defs.h"
 
 class Parameters {
 public:
 	bool isMuted();
-	uint32_t getSpdifHelper(Spdif::InputTypeT input);
-	void setSpdifHelper(uint32_t data);
+	uint32_t getSpdifStatus(Spdif::InputTypeT input);
+	void setSpdifStatus(uint32_t data);
 	int getStartLevel();
 	std::vector<Spdif::InputTypeT> getSwitchOrderList();
 	bool setSwitchOrderList(std::vector<Spdif::InputTypeT> list);

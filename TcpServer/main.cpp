@@ -8,10 +8,6 @@
 
 HttpServer* _http;
 
-std::string cmdUStr = "84B4B0B434303000FF8484B4B0B084343484B030FF00FF00FF00FF00FF8484B4B0B084343484B030FF00FF00FF00FF8484B4B0B084343484B030FF00FF00FF00FF00FF8484B4B0B084343484B030FF00FF00FF00FF00FF8484B4B0B084343484B030FF00FF00FF00FF00FF8484B4B0B084343484B030FF00FF00FF00FF00FF84";
-std::string cmdDStr = "84B4B0B084343484B030FF00FF00FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF00FF8484B4B0B0B034B430B030FF00FF00FF00FF8484B4";
-std::string cmdMStr = "B0B0B034B430B030FF00FF00FF00A0C00F00803F190F74C00F58FE641F15C001A91F81F30300A8F8000080B40700000000580100FF8484B4B0B084B03484B030FF00FF00FF8484B4B0B084B03484B030FF00FF00FF8484B4B0B084B03484B030FF00FF00FF8484B4B0B084B03484B030FF00FF00FF8484B4B0B084B03484B030";
-
 int kbhit(void)
 {
 	if (GetKeyState('X') & 0x8000/*Check if high-order bit is set (1 << 15)*/)
@@ -97,7 +93,7 @@ void threadFunc()
 				char inputTitle[10] = { 0 };
 				char sampleRateTitle[10] = { 0 };
 				char pcmTitle[10] = { 0 };
-				uint32_t data = Parameters::instance()->getSpdifHelper(Parameters::instance()->current_input);
+				uint32_t data = Parameters::instance()->getSpdifStatus(Parameters::instance()->current_input);
 
 				SpdifHelper::getInputInfo(data, inputTitle, sampleRateTitle, pcmTitle);
 				sprintf_s(buffer, "%d;%s;%d;%s %s",
@@ -137,17 +133,17 @@ int __cdecl main(void)
 	msg.input = Spdif::Coax1;
 	msg.pcm_info = Spdif::PCM_NORMAL;
 	msg.sample_rate = Spdif::SR_44100;	
-	Parameters::instance()->setSpdifHelper(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
 
 	msg.input = Spdif::Coax2;
 	msg.pcm_info = Spdif::PCM_NORMAL;
 	msg.sample_rate = Spdif::SR_192000;
-	Parameters::instance()->setSpdifHelper(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
 
 	msg.input = Spdif::Opt1;
 	msg.pcm_info = Spdif::PCM_DD_AC3;
 	msg.sample_rate = Spdif::SR_48000;
-	Parameters::instance()->setSpdifHelper(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
 
 	Parameters::instance()->current_level = 26;
 	Parameters::instance()->current_input = Spdif::Coax1;

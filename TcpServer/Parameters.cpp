@@ -240,12 +240,12 @@ bool Parameters::isMuted()
 	return current_level == 0;
 }
 
-uint32_t Parameters::getSpdifHelper(Spdif::InputTypeT input)
+uint32_t Parameters::getSpdifStatus(Spdif::InputTypeT input)
 {
 	return _inputs[input]->getStatus();
 }
 
-void Parameters::setSpdifHelper(uint32_t data)
+void Parameters::setSpdifStatus(uint32_t data)
 {
 	Spdif::InputTypeT input = current_input;
 	if (SpdifHelper::isValidInput(data & 0x3, &input)) {

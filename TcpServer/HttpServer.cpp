@@ -2,7 +2,7 @@
 #include "HttpResponse.h"
 #include "HttpResourceFile.h"
 #include "EventQueue.h"
-#include "Spdif_defs.h"
+#include "SpdifUtils.h"
 
 HttpServer::HttpServer() :
 	TcpSocketServer(DEFAULT_PORT),
@@ -139,7 +139,7 @@ void HttpServer::handleConnection(SOCKET socket)
 			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST_SET_SWITCH_ORDER, data);
 		}
 		else  {
-			puts("WTF");
+			puts("Unknown POST request");
 			//puts(_buffer);
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 		}

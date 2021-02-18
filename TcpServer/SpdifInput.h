@@ -2,7 +2,7 @@
 #define SPDIFINPUT_H
 
 #include <string>
-#include "Spdif_defs.h"
+#include "SpdifUtils.h"
 
 class SpdifInput {
 public:

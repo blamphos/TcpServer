@@ -1,5 +1,5 @@
-#ifndef SPDIF_DEFS_H
-#define SPDIF_DEFS_H
+#ifndef SPDIF_UTILS_H
+#define SPDIF_UTILS_H
 
 //#include "mbed.h"
 #include <stdint.h>
