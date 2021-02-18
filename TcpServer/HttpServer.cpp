@@ -96,8 +96,11 @@ void HttpServer::handleConnection(SOCKET socket)
 	}
 	
 	if (_requestType == Post) {
-		if (strstr(_buffer, "update") != NULL) {
+		if (strstr(_buffer, "updateInfo") != NULL) {
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
+		}
+		else if (strstr(_buffer, "updateSwitch") != NULL) {
+			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_SWITCH_UPDATE);
 		}
 		else if (strstr(_buffer, "volume=") != NULL) {
 			int volume = -1;
@@ -113,8 +116,31 @@ void HttpServer::handleConnection(SOCKET socket)
 			uint32_t data = static_cast<int16_t>(input) & 0xFFFF;
 			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST_SET_INPUT, data);
 		}
+		else if (strstr(_buffer, "switchOrder=") != NULL) {
+			std::vector<Spdif::InputTypeT> switchPriorityOrder;
+
+			char* c = strstr(_buffer, "switchOrder=");
+			if (c != NULL) {
+				std::string str(c);
+				size_t delimiterPos = str.find("=");
+				std::string value = str.substr(delimiterPos + 1);
+				switchPriorityOrder = SpdifHelper::parseSwitchPriorityOrder(value);
+			}
+
+			int shift = 2;
+			uint32_t data = switchPriorityOrder.size() & 0x3;
+			std::vector<Spdif::InputTypeT>::const_iterator iter = switchPriorityOrder.begin();
+			std::vector<Spdif::InputTypeT>::const_iterator iterEnd = switchPriorityOrder.end();
+			while (iter != iterEnd) {
+				data |= ((*iter) & 03) << shift;
+				shift += 2;
+				++iter;
+			}
+			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST_SET_SWITCH_ORDER, data);
+		}
 		else  {
 			puts("WTF");
+			//puts(_buffer);
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 		}
 
@@ -178,6 +204,9 @@ void HttpServer::sendResponse(HttpResponseTypeT type, const char* buffer)
 		sendBuffer(buffer, strlen(buffer));
 	}
 	else if (type == HttpResponseTypeT::HTTP_RESPONSE_INFO_UPDATE) {
+		sendBuffer(buffer, strlen(buffer));
+	}
+	else if (type == HttpResponseTypeT::HTTP_RESPONSE_SWITCH_UPDATE) {
 		sendBuffer(buffer, strlen(buffer));
 	}
 

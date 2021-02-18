@@ -9,11 +9,12 @@
 class Parameters {
 public:
 	bool isMuted();
-	uint32_t getSpdifStatus(Spdif::InputTypeT input);
-	void setSpdifStatus(uint32_t data);
+	uint32_t getSpdifHelper(Spdif::InputTypeT input);
+	void setSpdifHelper(uint32_t data);
 	int getStartLevel();
-	std::vector<Spdif::InputTypeT> getSwitchingOrder();
-	bool setSwitchingOrder(std::vector<Spdif::InputTypeT> list);
+	std::vector<Spdif::InputTypeT> getSwitchOrderList();
+	bool setSwitchOrderList(std::vector<Spdif::InputTypeT> list);
+	std::string getSwitchOrderListStr();
 	static Parameters* instance();
 
 	bool auto_find;
@@ -37,7 +38,6 @@ private:
 	void setDefaultInputName(Spdif::InputTypeT input);
 	void setDefaultAutoSwitch();
 	void setDefaultSwitchingOrder();
-	std::string getSwitchPriorityOrderListStr();
 
 	std::string _configFile;
 	int _startLevel;

@@ -3,6 +3,8 @@
 
 //#include "mbed.h"
 #include <stdint.h>
+#include <string>
+#include <vector>
 #include <map>
 
 namespace Spdif {
@@ -31,7 +33,7 @@ enum PcmInfoTypeT {
 };
 }
 
-class SpdifStatus {
+class SpdifHelper {
 public:
 	typedef struct {
 		Spdif::InputTypeT input;
@@ -44,6 +46,7 @@ public:
 	static uint32_t create(spdif_message_t& msg);
 	static spdif_message_t dispatch(uint32_t data);
 	static void getInputInfo(uint32_t data, char* inputTitle, char* sampleRate, char* pcmInfo);
+	static std::vector<Spdif::InputTypeT> parseSwitchPriorityOrder(std::string str);
 
 private:
 	enum SpdifMessageOffsetT {

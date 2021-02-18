@@ -21,25 +21,22 @@
 						<button class="circle minus">&#8722</button> 
 						<label class="basic-label">COAX1</label>
 						<button class="circle plus">&#x2b</button>
-						<button class="input-btn edit">Edit name</button>
-					</li>
-					<li class="list-item" input type='hidden' value=1>
-						<button class="circle minus">&#8722</button> 
-						<label class="basic-label">OPT</label>
-						<button class="circle plus">&#x2b;</button>
-						<button class="input-btn edit">Edit name</button>
 					</li>
 					<li class="list-item" input type='hidden' value=2>
 						<button class="circle minus">&#8722</button> 
+						<label class="basic-label">OPT</label>
+						<button class="circle plus">&#x2b;</button>
+					</li>
+					<li class="list-item" input type='hidden' value=1>
+						<button class="circle minus">&#8722</button> 
 						<label class="basic-label">COAX2</label>
 						<button class="circle plus">&#x2b;</button>
-						<button class="input-btn edit">Edit name</button>
 					</li>
 				</ul>
 			</div>
 		</div>
 		<br>
-		<label id="lblDebug"></label>
+		<label id="lblInfo"></label>
 	</div>
 </div>	
 	<script>
@@ -66,7 +63,27 @@
 						
 					apply();
 				});
-			}			
+			}		
+
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(",");
+					if (arr.length == 3) {
+						var items = document.getElementById("inputs").getElementsByTagName("li");
+									
+						for (var i = 0; i < arr.length; ++i) {
+							for (var x = 0; x < items.length; x++) {
+								if (items[x].value == arr[i]) {
+									document.getElementById("inputs").appendChild(items[x]);
+								}
+							}
+						}
+					}
+				}
+			};
+			xhttp.open("POST", "updateSwitch", true);
+			xhttp.send();				
 		}
 		
 		function apply() {		
@@ -75,8 +92,27 @@
 
 			for (var i = 0; i < items.length; ++i) {
 			  values.push(items[i].value);
-			}	
-			document.getElementById('lblDebug').innerHTML = values.toString();
+			}
+			
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(",");
+					if (arr.length == 3) {
+						var items = document.getElementById("inputs").getElementsByTagName("li");
+									
+						for (var i = 0; i < arr.length; ++i) {
+							for (var x = 0; x < items.length; x++) {
+								if (items[x].value == arr[i]) {
+									document.getElementById("inputs").appendChild(items[x]);
+								}
+							}
+						}
+					}
+				}
+			};
+			xhttp.open("POST", "switchOrder=" + values.toString(), true);
+			xhttp.send();			
 		}		
 	</script>
 </body>

@@ -126,31 +126,7 @@ bool Parameters::readConfigFile()
 			}
 		}
 		else if (key == "SwitchPriorityOrder") {
-			_switchPriorityOrder.clear();
-			std::stringstream ss(value);
-
-			for (int i; ss >> i;) {
-				Spdif::InputTypeT input;
-				if (SpdifStatus::isValidInput(i - 1, &input)) {
-					_switchPriorityOrder.push_back(input);
-				}
-				else {
-					success = false;
-					std::cerr << "Invalid SwitchPriorityOrder, using default.\n";
-					break;
-				}
-
-				if (ss.peek() == ',') {
-					ss.ignore();
-				}
-			}
-
-			std::vector<Spdif::InputTypeT>::iterator it = std::unique(_switchPriorityOrder.begin(), _switchPriorityOrder.end());
-			if (it != _switchPriorityOrder.end()) {
-				success = false;
-				setDefaultSwitchingOrder();
-				std::cerr << "Duplicate inputs in SwitchPriorityOrder, using default.\n";
-			}
+			_switchPriorityOrder = SpdifHelper::parseSwitchPriorityOrder(value);
 
 			if (_switchPriorityOrder.size() != Spdif::INPUT_COUNT) {
 				success = false;
@@ -188,7 +164,7 @@ bool Parameters::writeConfigFile()
 	cFile << "Input2=" << _inputs[Spdif::InputTypeT::Coax2]->getName() << std::endl;
 	cFile << "Input3=" << _inputs[Spdif::InputTypeT::Opt1 ]->getName() << std::endl;
 	cFile << "AutoSwitch=" << (auto_find ? "1" : "0") << std::endl;
-	cFile << "SwitchPriorityOrder=" << getSwitchPriorityOrderListStr() << std::endl;
+	cFile << "SwitchPriorityOrder=" << getSwitchOrderListStr() << std::endl;
 	cFile.close();
 
 	return true;
@@ -242,14 +218,14 @@ void Parameters::setDefaultSwitchingOrder()
 	_switchPriorityOrder.push_back(Spdif::InputTypeT::Coax2);
 }
 
-std::string Parameters::getSwitchPriorityOrderListStr()
+std::string Parameters::getSwitchOrderListStr()
 {
 	std::stringstream ss;
 
 	std::vector<Spdif::InputTypeT>::const_iterator iter = _switchPriorityOrder.begin();
 	std::vector<Spdif::InputTypeT>::const_iterator iterEnd = _switchPriorityOrder.end();
 	while (iter != iterEnd) {
-		ss << static_cast<int>(*iter + 1);
+		ss << static_cast<int>(*iter);
 		if (iter < (iterEnd - 1)) {
 			ss << ",";
 		}
@@ -264,15 +240,15 @@ bool Parameters::isMuted()
 	return current_level == 0;
 }
 
-uint32_t Parameters::getSpdifStatus(Spdif::InputTypeT input)
+uint32_t Parameters::getSpdifHelper(Spdif::InputTypeT input)
 {
 	return _inputs[input]->getStatus();
 }
 
-void Parameters::setSpdifStatus(uint32_t data)
+void Parameters::setSpdifHelper(uint32_t data)
 {
 	Spdif::InputTypeT input = current_input;
-	if (SpdifStatus::isValidInput(data & 0x3, &input)) {
+	if (SpdifHelper::isValidInput(data & 0x3, &input)) {
 		_inputs[input]->setStatus(data);
 	}
 }
@@ -282,13 +258,17 @@ int Parameters::getStartLevel()
 	return _startLevel;
 }
 
-std::vector<Spdif::InputTypeT> Parameters::getSwitchingOrder()
+std::vector<Spdif::InputTypeT> Parameters::getSwitchOrderList()
 {
 	return _switchPriorityOrder;
 }
 
-bool Parameters::setSwitchingOrder(std::vector<Spdif::InputTypeT> list)
+bool Parameters::setSwitchOrderList(std::vector<Spdif::InputTypeT> list)
 {
+	if (list == _switchPriorityOrder) {
+		return true;
+	}
+
 	std::vector<Spdif::InputTypeT>::iterator it = std::unique(list.begin(), list.end());
 	if (it != list.end()) {
 		std::cerr << "Duplicate inputs in SwitchPriorityOrder, no change.\n";
@@ -302,7 +282,8 @@ bool Parameters::setSwitchingOrder(std::vector<Spdif::InputTypeT> list)
 
 	_switchPriorityOrder.clear();
 	_switchPriorityOrder = list;
-	return true;
+
+	return writeConfigFile();
 }
 
 Parameters* Parameters::instance()
