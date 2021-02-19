@@ -6,7 +6,7 @@
 
 class SpdifInput {
 public:
-	SpdifInput(Spdif::InputTypeT type);
+	SpdifInput(Spdif::InputT type);
 	bool setName(std::string name);
 	void setDefaultName();
 	std::string getName();
@@ -14,7 +14,7 @@ public:
 	uint32_t getStatus();
 
 private:
-	Spdif::InputTypeT _type;
+	Spdif::InputT _type;
 	int _startLevel;
 	std::string _name;
 	uint32_t _status;

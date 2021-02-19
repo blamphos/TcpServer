@@ -1,6 +1,6 @@
 #include "SpdifInput.h"
 
-SpdifInput::SpdifInput(Spdif::InputTypeT type) :
+SpdifInput::SpdifInput(Spdif::InputT type) :
 	_type(type), _startLevel(0), _status(0x0)
 {
 	setDefaultName();

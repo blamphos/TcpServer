@@ -20,9 +20,9 @@ Parameters::Parameters() :
 	{
 		setDefaultDisplayType();
 		setDefaultStartLevel();
-		setDefaultInputName(Spdif::InputTypeT::Coax1);
-		setDefaultInputName(Spdif::InputTypeT::Coax2);
-		setDefaultInputName(Spdif::InputTypeT::Opt1);
+		setDefaultInputName(Spdif::InputT::Coax1);
+		setDefaultInputName(Spdif::InputT::Coax2);
+		setDefaultInputName(Spdif::InputT::Opt1);
 		setDefaultAutoSwitch();
 		setDefaultSwitchingOrder();
 		writeConfigFile();
@@ -33,8 +33,8 @@ Parameters::Parameters() :
 
 Parameters::~Parameters()
 {
-	std::map<Spdif::InputTypeT, SpdifInput*>::const_iterator iter = _inputs.begin();
-	std::map<Spdif::InputTypeT, SpdifInput*>::const_iterator iterEnd = _inputs.end();
+	std::map<Spdif::InputT, SpdifInput*>::const_iterator iter = _inputs.begin();
+	std::map<Spdif::InputT, SpdifInput*>::const_iterator iterEnd = _inputs.end();
 	while (iter != iterEnd) {
 		delete (*iter).second;
 		++iter;
@@ -42,7 +42,7 @@ Parameters::~Parameters()
 	_inputs.clear();
 }
 
-void Parameters::addInput(Spdif::InputTypeT input)
+void Parameters::addInput(Spdif::InputT input)
 {
 	SpdifInput* newInput = new SpdifInput(input);
 	_inputs[input] = newInput;
@@ -160,9 +160,9 @@ bool Parameters::writeConfigFile()
 		cFile << "DisplayType=2" << std::endl;
 	}
 	cFile << "StartLevel=" << _startLevel << std::endl;
-	cFile << "Input1=" << _inputs[Spdif::InputTypeT::Coax1]->getName() << std::endl;
-	cFile << "Input2=" << _inputs[Spdif::InputTypeT::Coax2]->getName() << std::endl;
-	cFile << "Input3=" << _inputs[Spdif::InputTypeT::Opt1 ]->getName() << std::endl;
+	cFile << "Input1=" << _inputs[Spdif::InputT::Coax1]->getName() << std::endl;
+	cFile << "Input2=" << _inputs[Spdif::InputT::Coax2]->getName() << std::endl;
+	cFile << "Input3=" << _inputs[Spdif::InputT::Opt1 ]->getName() << std::endl;
 	cFile << "AutoSwitch=" << (auto_find ? "1" : "0") << std::endl;
 	cFile << "SwitchPriorityOrder=" << getSwitchOrderListStr() << std::endl;
 	cFile.close();
@@ -179,8 +179,8 @@ void Parameters::logParameters()
 	std::cout << "Input3: " << _inputs[Spdif::Opt1]->getName() << std::endl;
 	std::cout << "AutoSwitch: " << auto_find << std::endl;
 	std::cout << "SwitchPriorityOrder: ";
-	std::vector<Spdif::InputTypeT>::const_iterator iter = _switchPriorityOrder.begin();
-	std::vector<Spdif::InputTypeT>::const_iterator iterEnd = _switchPriorityOrder.end();
+	std::vector<Spdif::InputT>::const_iterator iter = _switchPriorityOrder.begin();
+	std::vector<Spdif::InputT>::const_iterator iterEnd = _switchPriorityOrder.end();
 	while (iter != iterEnd) {
 		std::cout << _inputs[(*iter)]->getName() << " ";
 		++iter;
@@ -200,7 +200,7 @@ void Parameters::setDefaultStartLevel()
 	_startLevel = DEFAULT_START_LEVEL;
 }
 
-void Parameters::setDefaultInputName(Spdif::InputTypeT input)
+void Parameters::setDefaultInputName(Spdif::InputT input)
 {
 	_inputs[input]->setDefaultName();
 }
@@ -213,17 +213,17 @@ void Parameters::setDefaultAutoSwitch()
 void Parameters::setDefaultSwitchingOrder()
 {
 	_switchPriorityOrder.clear();
-	_switchPriorityOrder.push_back(Spdif::InputTypeT::Coax1);
-	_switchPriorityOrder.push_back(Spdif::InputTypeT::Opt1);
-	_switchPriorityOrder.push_back(Spdif::InputTypeT::Coax2);
+	_switchPriorityOrder.push_back(Spdif::InputT::Coax1);
+	_switchPriorityOrder.push_back(Spdif::InputT::Opt1);
+	_switchPriorityOrder.push_back(Spdif::InputT::Coax2);
 }
 
 std::string Parameters::getSwitchOrderListStr()
 {
 	std::stringstream ss;
 
-	std::vector<Spdif::InputTypeT>::const_iterator iter = _switchPriorityOrder.begin();
-	std::vector<Spdif::InputTypeT>::const_iterator iterEnd = _switchPriorityOrder.end();
+	std::vector<Spdif::InputT>::const_iterator iter = _switchPriorityOrder.begin();
+	std::vector<Spdif::InputT>::const_iterator iterEnd = _switchPriorityOrder.end();
 	while (iter != iterEnd) {
 		ss << static_cast<int>(*iter);
 		if (iter < (iterEnd - 1)) {
@@ -240,14 +240,14 @@ bool Parameters::isMuted()
 	return current_level == 0;
 }
 
-uint32_t Parameters::getSpdifStatus(Spdif::InputTypeT input)
+uint32_t Parameters::getSpdifStatus(Spdif::InputT input)
 {
 	return _inputs[input]->getStatus();
 }
 
 void Parameters::setSpdifStatus(uint32_t data)
 {
-	Spdif::InputTypeT input = current_input;
+	Spdif::InputT input = current_input;
 	if (SpdifHelper::isValidInput(data & 0x3, &input)) {
 		_inputs[input]->setStatus(data);
 	}
@@ -258,18 +258,18 @@ int Parameters::getStartLevel()
 	return _startLevel;
 }
 
-std::vector<Spdif::InputTypeT> Parameters::getSwitchOrderList()
+std::vector<Spdif::InputT> Parameters::getSwitchOrderList()
 {
 	return _switchPriorityOrder;
 }
 
-bool Parameters::setSwitchOrderList(std::vector<Spdif::InputTypeT> list)
+bool Parameters::setSwitchOrderList(std::vector<Spdif::InputT> list)
 {
 	if (list == _switchPriorityOrder) {
 		return true;
 	}
 
-	std::vector<Spdif::InputTypeT>::iterator it = std::unique(list.begin(), list.end());
+	std::vector<Spdif::InputT>::iterator it = std::unique(list.begin(), list.end());
 	if (it != list.end()) {
 		std::cerr << "Duplicate inputs in SwitchPriorityOrder, no change.\n";
 		return false;

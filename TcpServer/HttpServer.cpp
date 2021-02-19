@@ -117,7 +117,7 @@ void HttpServer::handleConnection(SOCKET socket)
 			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST_SET_INPUT, data);
 		}
 		else if (strstr(_buffer, "switchOrder=") != NULL) {
-			std::vector<Spdif::InputTypeT> switchPriorityOrder;
+			std::vector<Spdif::InputT> switchPriorityOrder;
 
 			char* c = strstr(_buffer, "switchOrder=");
 			if (c != NULL) {
@@ -129,8 +129,8 @@ void HttpServer::handleConnection(SOCKET socket)
 
 			int shift = 2;
 			uint32_t data = switchPriorityOrder.size() & 0x3;
-			std::vector<Spdif::InputTypeT>::const_iterator iter = switchPriorityOrder.begin();
-			std::vector<Spdif::InputTypeT>::const_iterator iterEnd = switchPriorityOrder.end();
+			std::vector<Spdif::InputT>::const_iterator iter = switchPriorityOrder.begin();
+			std::vector<Spdif::InputT>::const_iterator iterEnd = switchPriorityOrder.end();
 			while (iter != iterEnd) {
 				data |= ((*iter) & 03) << shift;
 				shift += 2;

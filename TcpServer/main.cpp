@@ -42,7 +42,7 @@ void threadFunc()
 		}
 		case EVENT_HTTP_REQUEST_POST_SET_INPUT:
 		{
-			Spdif::InputTypeT input = Parameters::instance()->current_input;
+			Spdif::InputT input = Parameters::instance()->current_input;
 
 			if (SpdifHelper::isValidInput(static_cast<int>(msg.data), &input))
 			{
@@ -75,7 +75,7 @@ void threadFunc()
 				}
 			}
 
-			std::vector<Spdif::InputTypeT> switchPriorityOrder = SpdifHelper::parseSwitchPriorityOrder(ss.str());
+			std::vector<Spdif::InputT> switchPriorityOrder = SpdifHelper::parseSwitchPriorityOrder(ss.str());
 			Parameters::instance()->setSwitchOrderList(switchPriorityOrder);
 
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_SWITCH_UPDATE);
@@ -129,21 +129,21 @@ int __cdecl main(void)
 
 	_http = new HttpServer();
 
-	SpdifHelper::spdif_message_t msg;
+	Spdif::StatusS msg;
 	msg.input = Spdif::Coax1;
 	msg.pcm_info = Spdif::PCM_NORMAL;
 	msg.sample_rate = Spdif::SR_44100;	
-	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::serializeStatusMsg(msg));
 
 	msg.input = Spdif::Coax2;
 	msg.pcm_info = Spdif::PCM_NORMAL;
 	msg.sample_rate = Spdif::SR_192000;
-	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::serializeStatusMsg(msg));
 
 	msg.input = Spdif::Opt1;
 	msg.pcm_info = Spdif::PCM_DD_AC3;
 	msg.sample_rate = Spdif::SR_48000;
-	Parameters::instance()->setSpdifStatus(SpdifHelper::create(msg));
+	Parameters::instance()->setSpdifStatus(SpdifHelper::serializeStatusMsg(msg));
 
 	Parameters::instance()->current_level = 26;
 	Parameters::instance()->current_input = Spdif::Coax1;
