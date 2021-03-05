@@ -74,6 +74,7 @@
     <ClCompile Include="VolumeControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Callback.h" />
     <ClInclude Include="EmbeddedMessages.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="HttpResourceFile.h" />
