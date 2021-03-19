@@ -7,6 +7,7 @@
 #include "Parameters.h"
 #include "VolumeControl.h"
 #include "Callback.h"
+#include "IrAnalyxerUtils.h"
 
 HttpServer* _http;
 
@@ -408,8 +409,74 @@ void traverseString(std::string& p_str)
 	puts("");
 }
 
+void analyzeIr()
+{
+	static std::map<IrCommandT, std::vector<uint32_t>> recordedIrCodeMap;
+
+	IrCommandT _irCommand = IR_VOLUME_UP;
+	std::vector<uint32_t> upCodes = {0x018484B4, 0x8484B4B0, 0x84B4B0B0, 0xB4B0B084, 0xB0B08434, 0xB0843434, 0x84343484, 0x343484B0, 0x3484B030};
+	std::vector<uint32_t> downCodes = {0x018484B4, 0x8484B4B0, 0x84B4B0B0, 0xB4B0B0B0, 0xB0B0B034, 0xB0B034B4, 0xB034B430, 0x34B430B0, 0xB430B030};
+	std::vector<uint32_t> muteCodes = {0x018484B4, 0x8484B4B0, 0x84B4B0B0, 0xB4B0B084, 0xB0B084B0, 0xB084B034, 0x84B03484, 0xB03484B0, 0x3484B030};
+	/*std::vector<int> bytes = IrAnalyzerUtils::analyze(buff, BUFF_SIZE);
+	commands.push_back(bytes);
+	IrAnalyzerUtils::logBytes(bytes);
+
+	IrAnalyzerUtils::trimStart(commands);
+	IrAnalyzerUtils::logMatrix(commands);
+
+	std::vector<uint32_t> codes;
+	IrAnalyzerUtils::getCodes(commands.front(), codes);*/
+	
+	recordedIrCodeMap[IR_VOLUME_UP] = upCodes;
+	recordedIrCodeMap[IR_VOLUME_DOWN] = downCodes;
+	recordedIrCodeMap[IR_VOLUME_MUTE] = muteCodes;
+	IrAnalyzerUtils::logIrCodeMap(recordedIrCodeMap);
+
+	std::map<IrCommandT, std::vector<uint32_t>> uniqueIrCodesMap;
+	IrAnalyzerUtils::getUniqueIrCodesMap(uniqueIrCodesMap, recordedIrCodeMap);
+	IrAnalyzerUtils::logIrCodeMap(uniqueIrCodesMap);
+
+	uint32_t irCode = IrAnalyzerUtils::getScoredCode(uniqueIrCodesMap[_irCommand]);
+	if (irCode != 0x0) {
+		//std::vector<uint32_t> currentCodes = Parameters::instance()->getIrRemoteCodes();
+		//currentCodes[_irCommand] = irCode;
+		printf("Code: %08X\n", irCode);
+		//Parameters::instance()->setIrRemoteCodesList(currentCodes);
+	}
+	else {
+		perror("IR learning failed");
+	}
+
+}
+
 int __cdecl main(void)
 {
+	analyzeIr();
+
+	//std::vector<uint32_t> irCodes = {0x018484B4, 0x8484B4B0, 0x84B4B0B0, 0xB4B0B084, 0xB0B08434, 0xB0843484, 0x84348484, 0x348484B0, 0x8484B004};
+	std::vector<uint32_t> irCodes = { 0x0030B0B4, 0x30B0B430, 0xB0B430B4, 0xB430B484, 0x30B48484, 0xB48484B4, 0x8484B484, 0x84B48430, 0xB4843030, 0x84303000 };
+
+	uint32_t irCode = IrAnalyzerUtils::getScoredCode(irCodes);
+	printf("The winner is: 0x%08X\n", irCode);
+
+	/*
+	std::map<int, uint32_t> orderedCodes;
+	std::map<uint32_t, int>::const_iterator mapIter = irCodeCorrelationMap.cbegin();
+	while (mapIter != irCodeCorrelationMap.cend()) {
+		orderedCodes[mapIter->second] = mapIter->first;
+		printf("0x%08X: %d\n", mapIter->first, mapIter->second);
+		++mapIter;
+	}
+
+	if (!orderedCodes.empty()) {
+		std::map<int, uint32_t>::const_reverse_iterator mapRevIter = orderedCodes.crbegin();
+		while (mapRevIter != orderedCodes.crend()) {
+			printf("The winner is: 0x%08X\n", mapRevIter->second);
+			break;
+		}
+	}	*/
+	getchar();
+
 	/*std::string ssid = "Kuhaverkko\r\n";
 	traverseString(ssid);
 

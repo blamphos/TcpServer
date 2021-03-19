@@ -89,5 +89,8 @@
     <ClInclude Include="Callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IrAnalyxerUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

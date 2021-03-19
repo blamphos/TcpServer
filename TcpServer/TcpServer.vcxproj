@@ -80,6 +80,7 @@
     <ClInclude Include="HttpResourceFile.h" />
     <ClInclude Include="HttpResponse.h" />
     <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="IrAnalyxerUtils.h" />
     <ClInclude Include="SpdifInput.h" />
     <ClInclude Include="Parameters.h" />
     <ClInclude Include="SafeQueue.h" />
