@@ -130,7 +130,7 @@ public:
 		return irCode;
 	}*/
 
-	static uint32_t getScoredCode(std::vector<uint32_t> p_irCodes)
+	static uint32_t getIrBinCode(std::vector<uint32_t> p_irCodes)
 	{
 		int max = 0;
 		uint32_t irCode = 0x0;

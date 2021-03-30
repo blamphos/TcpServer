@@ -45,6 +45,18 @@
     <ClCompile Include="SpdifUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Font56.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font16.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EmbeddedMessages.h">
@@ -90,6 +102,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IrAnalyxerUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font56.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font16.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

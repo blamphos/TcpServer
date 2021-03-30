@@ -7,9 +7,11 @@ enum DisplayModuleT {
 };
 
 enum FontTypeT {
-	ST7735S_FONT2	= 2,
-	ST7735S_FONT3	= 3,
-	ST7735S_FONT4	= 4
+	ST7735S_FONT16 = 2,
+	ST7735S_FONT32 = 3,
+	ST7735S_FONT64 = 4,
+	ST7735S_FONT72 = 5,
+	ST7735S_FONT56 = 6,
 };
 
 enum OrientationTypeT {

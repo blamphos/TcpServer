@@ -63,6 +63,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EventQueue.cpp" />
+    <ClCompile Include="Font16.c" />
+    <ClCompile Include="Font32.c" />
+    <ClCompile Include="Font56.c" />
+    <ClCompile Include="Font64.c" />
     <ClCompile Include="HttpResourceFile.cpp" />
     <ClCompile Include="HttpResponse.cpp" />
     <ClCompile Include="HttpServer.cpp" />
@@ -77,6 +81,10 @@
     <ClInclude Include="Callback.h" />
     <ClInclude Include="EmbeddedMessages.h" />
     <ClInclude Include="EventQueue.h" />
+    <ClInclude Include="Font16.h" />
+    <ClInclude Include="Font32.h" />
+    <ClInclude Include="Font56.h" />
+    <ClInclude Include="Font64.h" />
     <ClInclude Include="HttpResourceFile.h" />
     <ClInclude Include="HttpResponse.h" />
     <ClInclude Include="HttpServer.h" />
