@@ -203,6 +203,8 @@ int _text_size = 1;
 int _text_color = ST7735S_WHITE;
 int _text_bgcolor = ST7735S_BLACK;
 
+const float DEG2RAD = 0.0174532925;
+
 // Swap any type
 template <typename T> static inline void
 tftswap(T& a, T& b) { T t = a; a = b; b = t; }
@@ -785,8 +787,6 @@ void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, in
 void fillArc(int16_t x, int16_t y, int16_t start_angle, int16_t seg_count, 
 	int16_t rx, int16_t ry, int16_t w, uint16_t color)
 {
-	const float DEG2RAD = 0.0174532925;
-
 	int seg = 6; // Segments are 3 degrees wide = 120 segments for 360 degrees
 	int inc = 6; // Draw segments every 3 degrees, increase to 6 for segmented ring
 
@@ -839,30 +839,129 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 	//_cs->write(1);
 }
 
+/***************************************************************************************
+** Function name:           fillCircleHelper
+** Description:             Support function for filled circle drawing
+***************************************************************************************/
+// Used to do circles and roundrects
+void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color)
+{
+	int16_t f = 1 - r;
+	int16_t ddF_x = 1;
+	int16_t ddF_y = -r - r;
+	int16_t x = 0;
+
+	delta++;
+	while (x < r) {
+		if (f >= 0) {
+			r--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		if (cornername & 0x1) {
+			drawFastVLine(x0 + x, y0 - r, r + r + delta, color);
+			drawFastVLine(x0 + r, y0 - x, x + x + delta, color);
+		}
+		if (cornername & 0x2) {
+			drawFastVLine(x0 - x, y0 - r, r + r + delta, color);
+			drawFastVLine(x0 - r, y0 - x, x + x + delta, color);
+		}
+	}
+}
+
+/***************************************************************************************
+** Function name:           fillCircle
+** Description:             draw a filled circle
+***************************************************************************************/
+void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+{
+	drawFastVLine(x0, y0 - r, r + r + 1, color);
+	fillCircleHelper(x0, y0, r, 3, 0, color);
+}
+
 class RingSegmentItem {
 public:
 	RingSegmentItem(int p_index, int p_segs) : 
-		_startAngle(0), _min(0), _max(), _dimmed(true)
+		_startAngle(0), _min(0), _max(), _dimmed(true), _size(4)
 	{
-		_startAngle = p_index * 15 - 3 - 90;
+		_startAngle = p_index * 15 - 90;
 		_min = p_index * (100 / p_segs);
 		_max = (p_index + 1) * (100 / p_segs) - 1;
 
-		fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
+		int radius = 60;
+		_x = 81 + radius * cos((_startAngle - 90) * DEG2RAD);
+		//_x = 81 + x0 * cos2(_startAngle - 90);
+		_y = 72 + radius * sin((_startAngle - 90) * DEG2RAD);
+		//_y = 72 + x0 * sin2(_startAngle - 90);
+		
+		//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
+		fillCircle(_x, _y, _size, ST7735S_DARKGREY);
+	}
+
+	float pow(float v, int p)
+	{
+		for (int i = 1; i < p; i++) {
+			v *= v;
+		}
+
+		return v;
+	}
+	
+	int fact(int v)
+	{
+		int f = 1;
+		for (int i = 1; i <= v; i++) {
+			f *= i;
+		}
+		return f;
+	}
+
+	float sin2(float deg)
+	{
+		const float PI = 3.141592653589;
+
+		float x = deg / 180.0 * PI;
+		float s1 = pow(x, 3) / fact(3);
+		float s2 = pow(x, 5) / fact(5);
+		float s3 = pow(x, 7) / fact(7);
+		float s4 = pow(x, 9) / fact(9);
+		float s5 = pow(x, 11) / fact(11);
+
+		return x - s1 + s2 - s3 + s4 - s5;
+	}
+
+	float cos2(int deg)
+	{
+		const float PI = 3.141592653589;
+
+		float x = static_cast<float>(deg) / 180.0 * PI;
+		float s1 = pow(x, 2) / fact(2);
+		float s2 = pow(x, 4) / fact(4);
+		float s3 = pow(x, 6) / fact(6);
+		float s4 = pow(x, 8) / fact(8);
+		float s5 = pow(x, 10) / fact(10);
+
+		return 1 - s1 + s2 - s3 + s4 - s5;
 	}
 
 	void update(int value)
 	{
 		if (_dimmed) {
-			if ((value > _min) && (value <= _max)) {
-				fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_WHITE);
+			if (value > _max) {
+				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_WHITE);
+				fillCircle(_x, _y, _size, ST7735S_WHITE);
 				_dimmed = false;
 			}
 		}
 		else {
 			if (value <= _min) {
-				fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
+				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
 				_dimmed = true;
+				fillCircle(_x, _y, _size, ST7735S_DARKGREY);
 			}
 		}
 	}
@@ -872,37 +971,18 @@ private:
 	int _min;
 	int _max;
 	bool _dimmed;
+	int _x;
+	int _y;
+	int _size;
 };
 
-int draw()
+void draw()
 {
-	//Get a console handle
 	HWND myconsole = GetConsoleWindow();
-	//Get a handle to device context
-	//HDC mydc = GetDC(myconsole);
 	dc = GetDC(myconsole);
-	int pixel = 0;
 
-	//Choose any color
-	//colorREF color = RGB(255, 255, 255);
 	fillRect(0, 0, 162, 132, ST7735S_BLACK);
-	
 	drawRect(0, 0, 162, 132, ST7735S_WHITE);
-	/*
-	drawCircle(81, 60, 50, ST7735S_WHITE);
-	drawCircle(81, 60, 49, ST7735S_WHITE);
-	drawCircle(81, 60, 48, ST7735S_WHITE);
-	*/
-
-	/*for (int i = 0; i < 5; i++) {
-		//drawCircleHelper(81, 60, 50 - i, 0x3, ST7735S_WHITE);
-		drawCircle(81, 60, 50-i, ST7735S_WHITE);
-	}*/
-
-	/*fillArc(81, 64, 354, 4, 54, 54, 10, ST7735S_WHITE);
-	fillArc(81, 64, 84, 4, 54, 54, 10, ST7735S_WHITE);
-	fillArc(81, 64, 174, 4, 54, 54, 10, ST7735S_WHITE);
-	fillArc(81, 64, 264, 4, 54, 54, 10, ST7735S_WHITE);*/
 
 	int xPos = 6;
 	xPos += drawString("COAX2", xPos, 88, ST7735S_FONT32);
@@ -914,18 +994,27 @@ int draw()
 	xPos += drawString("192kHz ", xPos, 112, ST7735S_FONT16);
 	drawString("PCM", xPos, 112, ST7735S_FONT16);
 
-	//const float tr = 100 / 13;
-	
 	std::vector<RingSegmentItem> ringItems;
-
 	for (int i = 0; i < 13; i++) {
 		RingSegmentItem item(i, 13);
 		ringItems.push_back(item);
-		//fillArc(81, 72, item.deg, 1, 64, 64, 10, ST7735S_DARKGREY);
+	}
+
+	// Ring indicator demo
+	std::vector<int> levels = { 99, 27, 0, 27, 48, 33, 88, 56, 2, 45, 99 };
+	std::vector<int>::const_iterator levelIter = levels.cbegin();
+	while (levelIter != levels.cend()) {
+		std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
+		while (iter != ringItems.end()) {
+			(*iter).update(*levelIter);
+			++iter;
+		}
+		Sleep(500);
+		++levelIter;
 	}
 
 	xPos = 48;
-	int yPos = 34;
+	int yPos = 36;
 	int prevX1 = -1;
 	int prevX2 = -1;
 
@@ -937,7 +1026,7 @@ int draw()
 		}
 		int x2 = i % 10;
 		if (x2 != prevX2) {
-			drawChar(48 + x2, xPos + 32 + 2, yPos, ST7735S_FONT56);
+			drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56);
 			prevX2 = x2;
 		}
 		//break;
@@ -947,16 +1036,10 @@ int draw()
 			(*iter).update(i);
 			++iter;
 		}
-		/*int index = static_cast<int>(floor(i / tr));
-
-		if (!ringItemMap[index].highlight) {
-			fillArc(81, 72, ringItemMap[index].deg, 1, 64, 64, 10, ST7735S_WHITE);
-			ringItemMap[index].highlight = true;
-		}*/
 
 		Sleep(150);
 	}
-
+	
 	for (int i = 99; i >= 0; i -= 1) {
 		int x1 = i / 10;
 		if (x1 != prevX1) {
@@ -965,7 +1048,7 @@ int draw()
 		}
 		int x2 = i % 10;
 		if (x2 != prevX2) {
-			drawChar(48 + x2, xPos + 32 + 2, yPos, ST7735S_FONT56);
+			drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56);
 			prevX2 = x2;
 		}
 
@@ -978,31 +1061,7 @@ int draw()
 		Sleep(150);
 	}
 
-	//fillArc(81, 64, 0, 1, 54, 54, 10, ST7735S_WHITE);
-	//fillArc2(81, 64, 235, 82, 54, 54, 10, ST7735S_WHITE);
-
-	/*int segs = 24;
-	int inc = 360 / 24;
-	int startAngle = 240;
-	int stopAngle = 120;
-	for (int i = 0; i < 360; i += inc) {
-		if (i > stopAngle && i < startAngle) {
-			continue;
-		}
-		fillArc(81, 64, i, 3, 54, 54, 10, ST7735S_WHITE);
-	}*/
-
-	/*
-	//Draw pixels
-	for (double i = 0; i < PI * 4; i += 0.05)
-	{
-		SetPixel(mydc, pixel, (int)(50 + 25 * cos(i)), color);
-		pixel += 1;
-	}*/
-
 	ReleaseDC(myconsole, dc);
-	//cin.ignore();
-	return 0;
 }
 
 int __cdecl main(void)
