@@ -907,145 +907,85 @@ void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 	fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
+class ISegmentItem {
+public:
+	ISegmentItem() :
+		_min(0), _x(0), _y(0)
+	{
+
+	}
+
+	virtual void update(int value) = 0;
+
+protected:
+	int _min;
+	int _x;
+	int _y;
+};
+
 class RingSegmentItem {
 public:
 	RingSegmentItem(int p_index, int p_segs) : 
-		_startAngle(0), _min(0), _max(), _dimmed(true), _size(4)
+		_startAngle(0), _min(0), _size(4)
 	{
 		_startAngle = p_index * 15 - 90;
 		_min = p_index * (100 / p_segs);
-		_max = (p_index + 1) * (100 / p_segs) - 1;
 
 		int radius = 60;
 		_x = 81 + radius * cos((_startAngle - 90) * DEG2RAD);
-		//_x = 81 + x0 * cos2(_startAngle - 90);
 		_y = 72 + radius * sin((_startAngle - 90) * DEG2RAD);
-		//_y = 72 + x0 * sin2(_startAngle - 90);
 		
-		//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
 		fillCircle(_x, _y, _size, ST7735S_DARKGREY);
 	}
 
-	float pow(float v, int p)
+	void update(int p_level)
 	{
-		for (int i = 1; i < p; i++) {
-			v *= v;
-		}
-
-		return v;
-	}
-	
-	int fact(int v)
-	{
-		int f = 1;
-		for (int i = 1; i <= v; i++) {
-			f *= i;
-		}
-		return f;
-	}
-
-	float sin2(float deg)
-	{
-		const float PI = 3.141592653589;
-
-		float x = deg / 180.0 * PI;
-		float s1 = pow(x, 3) / fact(3);
-		float s2 = pow(x, 5) / fact(5);
-		float s3 = pow(x, 7) / fact(7);
-		float s4 = pow(x, 9) / fact(9);
-		float s5 = pow(x, 11) / fact(11);
-
-		return x - s1 + s2 - s3 + s4 - s5;
-	}
-
-	float cos2(int deg)
-	{
-		const float PI = 3.141592653589;
-
-		float x = static_cast<float>(deg) / 180.0 * PI;
-		float s1 = pow(x, 2) / fact(2);
-		float s2 = pow(x, 4) / fact(4);
-		float s3 = pow(x, 6) / fact(6);
-		float s4 = pow(x, 8) / fact(8);
-		float s5 = pow(x, 10) / fact(10);
-
-		return 1 - s1 + s2 - s3 + s4 - s5;
-	}
-
-	void update(int value)
-	{
-		if (_dimmed) {
-			if (value > _max) {
-				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_WHITE);
-				fillCircle(_x, _y, _size, ST7735S_WHITE);
-				_dimmed = false;
-			}
+		if (p_level >= _min) {
+			fillCircle(_x, _y, _size, ST7735S_WHITE);
 		}
 		else {
-			if (value <= _min) {
-				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
-				_dimmed = true;
-				fillCircle(_x, _y, _size, ST7735S_DARKGREY);
-			}
+			fillCircle(_x, _y, _size, ST7735S_DARKGREY);
 		}
 	}
 	
 private:
 	int _startAngle;
 	int _min;
-	int _max;
-	bool _dimmed;
 	int _x;
 	int _y;
 	int _size;
 };
 
-class BarItem {
+class BarItem : public ISegmentItem {
 public:
-	BarItem(int p_index, int p_bars) :
-		_min(0), _max(), _dimmed(true), _h(0)
+	BarItem(int p_index, int p_bars)
 	{
 		const int HEIGHT = 40;
 
 		_min = p_index * (100 / p_bars);
-		_max = (p_index + 1) * (100 / p_bars) - 1;
+
+		int max = (p_index + 1) * (100 / p_bars) - 1;
+		_h = (HEIGHT * max / 100);
 
 		_x = 10 + 6 * p_index;
-		_h = (HEIGHT * _max / 100);
 		_y = 86 - _h;
 		fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
-		//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
-		//fillCircle(_x, _y, _size, ST7735S_DARKGREY);
 	}
 
-	void update(int value)
+	void update(int p_level)
 	{
-		if (_dimmed) {
-			if (value > _max) {
-				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_WHITE);
-				//fillCircle(_x, _y, _size, ST7735S_WHITE);
-				fillRect(_x, _y, 3, _h, ST7735S_WHITE);
-				_dimmed = false;
-			}
+		if (p_level >= _min) {
+			fillRect(_x, _y, 3, _h, ST7735S_WHITE);
 		}
 		else {
-			if (value <= _min) {
-				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
-				_dimmed = true;
-				//fillCircle(_x, _y, _size, ST7735S_DARKGREY);
-				fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
-			}
+			fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
 		}
 	}
 
 private:
-	int _min;
-	int _max;
-	bool _dimmed;
-	int _x;
-	int _y;
 	int _h;
 };
+
 
 const char lanIconBitmap24x20[80] = {
 	0x00, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFE, 0x00, 0x7F, 0xFF, 0xFE, 0x00,
@@ -1202,9 +1142,10 @@ void draw()
 		}
 
 		xPos = 8;
-		xPos += drawStringGFX("192 kHz ", xPos, 20, Open_Sans_Light_12);
-		xPos += drawStringGFX("PCM ", xPos, 20, Open_Sans_Light_12);
+		xPos += drawStringGFX("192 kHz ", xPos, 20, Open_Sans_Light_16);
+		xPos += drawStringGFX("PCM ", xPos, 20, Open_Sans_Light_16);
 	}
+
 	std::vector<BarItem> barItems;
 	for (int i = 0; i < 10; i++) {
 		BarItem item(i, 10);
