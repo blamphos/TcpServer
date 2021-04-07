@@ -12,8 +12,21 @@
 #include <windows.h>
 #include "Font16.h"
 #include "Font32.h"
-#include "Font56.h"
 #include "Font64.h"
+#include "Font56_OpenSansRegular.h"
+#include "Font64_OpenSansRegular.h"
+#include "Roboto_Mono_16_GFX.h"
+#include "Roboto_Mono_32_GFX.h"
+#include "Roboto_Mono_64_GFX.h"
+#include "RobotoMonoMedium_12_GFX.h"
+#include "RobotoMonoMedium_16_GFX.h"
+#include "Orbitron_64_GFX.h"
+#include "OpenSans_16_GFX.h"
+#include "OpenSans_24_GFX.h"
+#include "OpenSans_32_GFX.h"
+#include "OpenSans_64_GFX.h"
+#include "OpenSansLight_12_GFX.h"
+#include "OpenSansLight_16_GFX.h"
 
 HttpServer* _http;
 
@@ -221,8 +234,10 @@ void drawPixel(int16_t x, int16_t y, uint16_t color)
 		break;
 	case ST7735S_CYAN:
 		c = COLOR_CYAN;
+		break;
 	case ST7735S_DARKGREY:
 		c = COLOR_DARKGREY;
+		break;
 	default:
 		break;
 	}
@@ -271,6 +286,7 @@ int drawChar(int p_char, int p_x, int p_y, int p_font)
 	int height = 0;
 	const char* flash_address = 0;
 	char gap = 0;
+	int startPixel = 0;
 
 	if (p_font == ST7735S_FONT16) {
 		flash_address = chrtbl_f16[p_char];
@@ -290,11 +306,19 @@ int drawChar(int p_char, int p_x, int p_y, int p_font)
 		height = F64_CHAR_HEIGHT;
 		gap = 0;
 	}
-	else if (p_font == ST7735S_FONT56) {
-		flash_address = chrtbl_f56[p_char];
-		width = widtbl_f56[p_char];
-		height = F56_CHAR_HEIGHT;
+	else if (p_font == ST7735S_FONT56_OSR) {
+		flash_address = chrtbl_f56_osr[p_char];
+		width = widtbl_f56_osr[p_char];
+		height = F56_OSR_CHAR_HEIGHT;
 		gap = 0;
+		startPixel = 72;
+	}
+	else if (p_font == ST7735S_FONT64_OSR) {
+		flash_address = chrtbl_f64_osr[p_char];
+		width = widtbl_f64_osr[p_char];
+		height = F64_OSR_CHAR_HEIGHT;
+		gap = 0;
+		startPixel = 74;
 	}
 	/*else if (p_font == ST7735S_FONT72) {
 		flash_address = chrtbl_f72[p_char];
@@ -311,12 +335,12 @@ int drawChar(int p_char, int p_x, int p_y, int p_font)
 	int pY = p_y;
 	char line = 0;
 
-	if (p_font == ST7735S_FONT56) {
+	if ((p_font == ST7735S_FONT56_OSR) || (p_font == ST7735S_FONT64_OSR)) {
 		w = 0;
 		int len = width * height / 8 + 1;
 		drawFastHLine(p_x, pY, width + gap, _text_bgcolor);
 
-		for (int i = 72; i < len; i++) {
+		for (int i = startPixel; i < len; i++) {
 			line = *(flash_address + i);
 			for (int x = 0; x < 8; x++) {
 				pX = p_x + w;
@@ -813,7 +837,7 @@ void fillArc(int16_t x, int16_t y, int16_t start_angle, int16_t seg_count,
 	}
 }
 
-void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+void fillRect(int16_t p_x, int16_t p_y, int16_t p_w, int16_t p_h, uint16_t p_color)
 {
 	// Rudimentary clipping (drawChar w/big text requires this)
 	/*if ((x >= _width) || (y >= _height)) {
@@ -831,9 +855,9 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 	//_cs->write(0);
 	//setAddrWindow(x, y, x + w - 1, y + h - 1);
 
-	for (y = h; y > 0; y--) {
-		for (x = w; x > 0; x--) {
-			drawPixel(x, y, color);
+	for (int y = 0; y < p_h; y++) {
+		for (int x = 0; x < p_w; x++) {
+			drawPixel(p_x + x, p_y + y, p_color);
 		}
 	}
 	//_cs->write(1);
@@ -976,6 +1000,159 @@ private:
 	int _size;
 };
 
+class BarItem {
+public:
+	BarItem(int p_index, int p_bars) :
+		_min(0), _max(), _dimmed(true), _h(0)
+	{
+		const int HEIGHT = 40;
+
+		_min = p_index * (100 / p_bars);
+		_max = (p_index + 1) * (100 / p_bars) - 1;
+
+		_x = 10 + 6 * p_index;
+		_h = (HEIGHT * _max / 100);
+		_y = 86 - _h;
+		fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
+		//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
+		//fillCircle(_x, _y, _size, ST7735S_DARKGREY);
+	}
+
+	void update(int value)
+	{
+		if (_dimmed) {
+			if (value > _max) {
+				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_WHITE);
+				//fillCircle(_x, _y, _size, ST7735S_WHITE);
+				fillRect(_x, _y, 3, _h, ST7735S_WHITE);
+				_dimmed = false;
+			}
+		}
+		else {
+			if (value <= _min) {
+				//fillArc(81, 72, _startAngle, 1, 64, 64, 10, ST7735S_DARKGREY);
+				_dimmed = true;
+				//fillCircle(_x, _y, _size, ST7735S_DARKGREY);
+				fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
+			}
+		}
+	}
+
+private:
+	int _min;
+	int _max;
+	bool _dimmed;
+	int _x;
+	int _y;
+	int _h;
+};
+
+const char lanIconBitmap24x20[80] = {
+	0x00, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFE, 0x00, 0x7F, 0xFF, 0xFE, 0x00,
+	0x60, 0x00, 0x06, 0x00, 0x60, 0x00, 0x06, 0x00, 0x67, 0xFF, 0xE6, 0x00,
+	0x64, 0xDB, 0x26, 0x00, 0x64, 0x9B, 0x26, 0x00, 0x66, 0xDB, 0x66, 0x00,
+	0x67, 0xFF, 0xE6, 0x00, 0x67, 0xFF, 0xE6, 0x00, 0x67, 0xFF, 0xE6, 0x00,
+	0x61, 0xFF, 0x86, 0x00, 0x60, 0x7E, 0x06, 0x00, 0x60, 0x3C, 0x06, 0x00,
+	0x60, 0x3C, 0x06, 0x00, 0x60, 0x00, 0x06, 0x00, 0x7F, 0xFF, 0xFE, 0x00,
+	0x7F, 0xFF, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+const char wifiIconBitmap24x24[96] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xFE, 0x00, 0x00,
+	0x07, 0xFF, 0xC0, 0x00, 0x0F, 0xC7, 0xE0, 0x00, 0x1E, 0x00, 0xF0, 0x00,
+	0x38, 0x30, 0x78, 0x00, 0x31, 0xFE, 0x38, 0x00, 0x03, 0xFF, 0x00, 0x00,
+	0x07, 0xC7, 0x80, 0x00, 0x07, 0x03, 0xC0, 0x00, 0x02, 0x01, 0x80, 0x00,
+	0x00, 0x38, 0x00, 0x00, 0x00, 0x7C, 0x00, 0x00, 0x00, 0x7C, 0x00, 0x00,
+	0x00, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+void drawBitmap(const char* p_bitmap, int p_x, int p_y, int p_width, int p_height)
+{
+	char line = 0;
+	int pX = 0;
+	int pY = p_y;
+	int w = (p_width + 7) / 8;
+
+	for (int i = 0; i < p_height; i++) {
+		drawFastHLine(p_x, pY, p_width, _text_bgcolor);
+		for (int k = 0; k < w; k++) {
+			line = *(p_bitmap + (4 * i) + k);
+			if (line != 0) {
+				pX = p_x + k * 8;
+				for (int x = 0; x < 8; x++) {
+					if ((line << x) & 0x80) {
+						drawPixel(pX + x, pY, _text_color);
+					}
+				}
+			}
+		}
+		pY++;
+	}
+}
+
+int drawCharGFX(char p_char, uint16_t p_x, uint16_t p_y, GFXfont p_font)
+{
+	int index = p_char - 32;
+
+	if ((p_char < p_font.first) || (p_char > p_font.last)) {
+		/*int maxWidth = 0;
+		for (int i = p_font.first; i < p_font.last; i++) {
+			int w = p_font.glyph[i - 32].width;
+			if (w > maxWidth) {
+				maxWidth = w;
+			}
+			//printf("%d, ", p_font.glyph[i - 32].width);
+		}
+		fillRect(p_x, p_y, maxWidth, p_font.yAdvance, ST7735S_BLACK);
+		return 0;*/
+		index = 0;
+	}
+
+	GFXglyph glyph = p_font.glyph[index];
+
+	int pX = 0;
+	int pY = p_y + glyph.yOffset;
+	int w = 0;
+	int len = ((glyph.width * glyph.height) + 7) / 8;
+	uint8_t line = 0;
+
+	//drawFastHLine(p_x, pY, glyph.width + glyph.xOffset, _text_bgcolor);
+
+	for (int i = 0; i < len; i++) {
+		line = (p_font.bitmap[glyph.bitmapOffset + i]);
+		for (int x = 0; x < 8; x++) {
+			pX = p_x + glyph.xOffset + w;
+			if ((line << x) & 0x80) {
+				drawPixel(pX, pY, _text_color);
+			}
+
+			if (++w == glyph.width) {
+				w = 0;
+				pY++;
+				//drawFastHLine(p_x, pY, glyph.width + glyph.xOffset, _text_bgcolor);
+			}
+		}
+	}
+
+	return glyph.xAdvance;
+}
+
+int drawStringGFX(const char* p_str, uint16_t p_oX, uint16_t p_oY, GFXfont p_font)
+{
+	int sumX = 0;
+
+	//_cs->write(0);
+	while (*p_str) {
+		int xPlus = drawCharGFX(*p_str++, p_oX, p_oY, p_font);
+		sumX += xPlus;
+		p_oX += xPlus; /* Move cursor right       */
+	}
+	//_cs->write(1);
+	return sumX;
+}
+
 void draw()
 {
 	HWND myconsole = GetConsoleWindow();
@@ -984,17 +1161,57 @@ void draw()
 	fillRect(0, 0, 162, 132, ST7735S_BLACK);
 	drawRect(0, 0, 162, 132, ST7735S_WHITE);
 
-	int xPos = 6;
-	xPos += drawString("COAX2", xPos, 88, ST7735S_FONT32);
-	if (Parameters::instance()->auto_find) {
-		drawString("AUTO", 120, 94, ST7735S_FONT16);
-	}
-	
-	xPos = 6;
-	xPos += drawString("192kHz ", xPos, 112, ST7735S_FONT16);
-	drawString("PCM", xPos, 112, ST7735S_FONT16);
+	if (false) {
+		int vx = 6;
+		int vy = 134;
+		//drawStringGFX("COAX2", vx, vy, Roboto_Mono_32);
+		drawStringGFX("192kHz PCM 0123456789", 170, 10, Roboto_Mono_16);
+		drawStringGFX("192kHz PCM 0123456789", 170, 30, Roboto_Mono_32);
+		drawStringGFX("0123456789", 170, 70, Roboto_Mono_64);
 
-	std::vector<RingSegmentItem> ringItems;
+		//drawStringGFX("192KHZ PCM 0123456789", 400, 140, Open_Sans_Regular_16);
+		drawStringGFX("192 kHz PCM 0123456789", 400, 140, Open_Sans_Light_16);
+		drawStringGFX("COAX2 0123456789", 400, 160, Open_Sans_Regular_24);
+		drawStringGFX("COAX2 0123456789", 400, 190, Open_Sans_Regular_32);
+		drawStringGFX("COAX2 0123456789", 400, 220, Open_Sans_Regular_64);
+		drawStringGFX("0123456789", 400, 290, Orbitron_Medium_64);
+	}
+	//drawBitmap(lanIconBitmap24x20, 110, 6, 24, 20);
+	drawBitmap(wifiIconBitmap24x24, 130, 3, 24, 20);
+
+	if (false) {
+		int xPos = 8;
+		xPos += drawString("COAX2", xPos, 102, ST7735S_FONT32);
+		if (Parameters::instance()->auto_find) {
+			drawString("AUTO", 116, 108, ST7735S_FONT16);
+		}
+
+		xPos = 8;
+		xPos += drawString("192kHz ", xPos, 6, ST7735S_FONT16);
+		xPos += drawString("PCM ", xPos, 6, ST7735S_FONT16);
+	}
+	else {
+		int xPos = 8;
+		_text_color = ST7735S_CYAN;
+		//xPos += drawString("COAX2", xPos, 102, ST7735S_FONT32);
+		//drawStringGFX("COAX2", xPos, 126, Roboto_Mono_32);
+		drawStringGFX("COAX2", xPos, 122, Open_Sans_Regular_24);
+		if (Parameters::instance()->auto_find) {
+			drawStringGFX("AUTO", 116, 122, Open_Sans_Light_12);
+			//drawRect(116, 102, 40, 20, ST7735S_CYAN);
+		}
+
+		xPos = 8;
+		xPos += drawStringGFX("192 kHz ", xPos, 20, Open_Sans_Light_12);
+		xPos += drawStringGFX("PCM ", xPos, 20, Open_Sans_Light_12);
+	}
+	std::vector<BarItem> barItems;
+	for (int i = 0; i < 10; i++) {
+		BarItem item(i, 10);
+		barItems.push_back(item);
+	}
+
+	/*std::vector<RingSegmentItem> ringItems;
 	for (int i = 0; i < 13; i++) {
 		RingSegmentItem item(i, 13);
 		ringItems.push_back(item);
@@ -1011,54 +1228,117 @@ void draw()
 		}
 		Sleep(500);
 		++levelIter;
-	}
+	}*/
 
-	xPos = 48;
-	int yPos = 36;
+	int xPos = 48;
+	int yPos = 34;
 	int prevX1 = -1;
 	int prevX2 = -1;
 
-	for (int i = 0; i < 100; i += 1) {
-		int x1 = i / 10;
-		if (x1 != prevX1) {
-			drawChar(48 + x1, xPos, yPos, ST7735S_FONT56);
-			prevX1 = x1;
-		}
-		int x2 = i % 10;
-		if (x2 != prevX2) {
-			drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56);
-			prevX2 = x2;
-		}
-		//break;
+	if (false) {
+		// Clock demo
+		int lastH1 = -1;
+		int lastH2 = -1;
+		int lastM1 = -1;
+		int lastM2 = -1;
 
-		std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
-		while (iter != ringItems.end()) {
-			(*iter).update(i);
-			++iter;
-		}
+		drawChar(48 + 10, 70, 0, ST7735S_FONT64_OSR); // ':'
 
-		Sleep(150);
+		for (int h = 0; h < 24; h++) {
+			int h1 = h / 10;
+			if (h1 != lastH1) {
+				drawChar(48 + h1, 2, 5, ST7735S_FONT64_OSR);
+				lastH1 = h1;
+			}
+			int h2 = h % 10;
+			if (h2 != lastH2) {
+				drawChar(48 + h2, 36, 5, ST7735S_FONT64_OSR);
+				lastH2 = h2;
+			}
+			for (int m = 0; m < 60; m++) {
+				int m1 = m / 10;
+				if (m1 != lastM1) {
+					drawChar(48 + m1, 86, 5, ST7735S_FONT64_OSR);
+					lastM1 = m1;
+				}
+				int m2 = m % 10;
+				if (m2 != lastM2) {
+					drawChar(48 + m2, 122, 5, ST7735S_FONT64_OSR);
+					lastM2 = m2;
+				}
+				Sleep(100);
+			}
+		}
+	}
+
+	if (false) {
+		for (int i = 0; i < 100; i += 1) {
+			int x1 = i / 10;
+			if (x1 != prevX1) {
+				//drawChar(48 + x1, xPos, yPos, ST7735S_FONT56_OSR);
+				drawChar(48 + x1, xPos, 10, ST7735S_FONT64_OSR);
+				prevX1 = x1;
+			}
+			int x2 = i % 10;
+			if (x2 != prevX2) {
+				//drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56_OSR);
+				drawChar(48 + x2, xPos + 37, 10, ST7735S_FONT64_OSR);
+				prevX2 = x2;
+			}
+			break;
+
+			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
+			while (iter != ringItems.end()) {
+				(*iter).update(i);
+				++iter;
+			}*/
+
+			Sleep(150);
+		}
 	}
 	
-	for (int i = 99; i >= 0; i -= 1) {
-		int x1 = i / 10;
-		if (x1 != prevX1) {
-			drawChar(48 + x1, xPos, yPos, ST7735S_FONT56);
-			prevX1 = x1;
-		}
-		int x2 = i % 10;
-		if (x2 != prevX2) {
-			drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56);
-			prevX2 = x2;
-		}
+	if (true) {
+		_text_color = ST7735S_WHITE;
+		xPos = 76;
+		yPos = 86;
+		for (int i = 99; i >= 0; i -= 1) {
+			int x1 = i / 10;
+			if (x1 != prevX1) {
+				//drawChar(48 + x1, xPos, yPos, ST7735S_FONT64_OSR);
+				
+				fillRect(xPos, yPos-47, 36, 48, ST7735S_BLACK);
+				drawCharGFX(48 + x1, xPos, yPos, Open_Sans_Regular_64);
 
-		std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
-		while (iter != ringItems.end()) {
-			(*iter).update(i);
-			++iter;
-		}
+				//fillRect(xPos-24, yPos - 47, 52, 48, ST7735S_BLACK);
+				//drawCharGFX(48 + x1, xPos-24, yPos, Orbitron_Medium_64);
+				prevX1 = x1;
+			}
+			int x2 = i % 10;
+			if (x2 != prevX2) {
+				//drawChar(48 + x2, xPos + 37, yPos, ST7735S_FONT64_OSR);
 
-		Sleep(150);
+				fillRect(xPos + 40, yPos-47, 36, 48, ST7735S_BLACK);
+				drawCharGFX(48 + x2, xPos + 40, yPos, Open_Sans_Regular_64);
+
+				//fillRect(xPos + 30, yPos-47, 52, 48, ST7735S_BLACK);
+				//drawCharGFX(48 + x2, xPos + 30, yPos, Orbitron_Medium_64);
+				prevX2 = x2;
+			}
+			//break;
+
+			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
+			while (iter != ringItems.end()) {
+				(*iter).update(i);
+				++iter;
+			}*/
+			std::vector<BarItem>::iterator iter = barItems.begin();
+			while (iter != barItems.end()) {
+				(*iter).update(i);
+				++iter;
+			}
+
+			Sleep(100);
+		}
 	}
 
 	ReleaseDC(myconsole, dc);

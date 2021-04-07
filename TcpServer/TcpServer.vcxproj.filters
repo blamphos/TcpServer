@@ -45,9 +45,6 @@
     <ClCompile Include="SpdifUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Font56.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Font16.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -55,6 +52,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Font64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font56_OpenSansRegular.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font64_OpenSansRegular.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,9 +107,6 @@
     <ClInclude Include="IrAnalyxerUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Font56.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Font16.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -114,6 +114,51 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Font64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font56_OpenSansRegular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font64_OpenSansRegular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Roboto_Mono_16_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gfxfont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Roboto_Mono_32_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Orbitron_64_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Roboto_Mono_64_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSans_32_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSans_16_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSans_24_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSans_64_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSansLight_16_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSansLight_12_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RobotoMonoMedium_16_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RobotoMonoMedium_12_GFX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
