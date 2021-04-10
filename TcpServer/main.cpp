@@ -960,25 +960,26 @@ class BarItem : public ISegmentItem {
 public:
 	BarItem(int p_index, int p_bars)
 	{
-		const int HEIGHT = 40;
+		const int HEIGHT = 5;
 
 		_min = p_index * (100 / p_bars);
 
 		int max = (p_index + 1) * (100 / p_bars) - 1;
-		_h = (HEIGHT * max / 100);
+		_h = HEIGHT;
 
-		_x = 10 + 6 * p_index;
-		_y = 86 - _h;
-		fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
+		_x = 8 + 14 * p_index;
+		_y = 98;
+		//drawRect(_x, _y, 12, _h, ST7735S_DARKGREY);
 	}
 
 	void update(int p_level)
 	{
-		if (p_level >= _min) {
-			fillRect(_x, _y, 3, _h, ST7735S_WHITE);
+		if (p_level && p_level >= _min) {
+			fillRect(_x, _y, 12, _h, ST7735S_WHITE);
 		}
 		else {
-			fillRect(_x, _y, 3, _h, ST7735S_DARKGREY);
+			fillRect(_x, _y, 12, _h, ST7735S_BLACK);
+			drawRect(_x, _y, 12, _h, ST7735S_DARKGREY);
 		}
 	}
 
@@ -986,6 +987,47 @@ private:
 	int _h;
 };
 
+class BarItem2 : public ISegmentItem {
+public:
+	BarItem2(int p_index, int p_bars)
+	{
+		const int HEIGHT = 3;
+		const int WIDTH = 6;
+
+		_min = p_index * (100 / p_bars);
+
+		int max = (p_index + 1) * (100 / p_bars) - 1;
+		_h = HEIGHT;
+		_w = WIDTH;
+
+		_x = 14 + _w * p_index;
+		_y = 90;
+		_dimmed = true;
+	}
+
+	void update(int p_level)
+	{
+		if (p_level && p_level >= _min) {
+			if (_dimmed) {
+				fillRect(_x, _y, _w, _h, ST7735S_WHITE);
+				//drawRect(_x, _y, 14, _h, ST7735S_DARKGREY);
+				_dimmed = false;
+			}
+		}
+		else {
+			if (!_dimmed) {
+				fillRect(_x, _y, _w, _h, ST7735S_DARKGREY);
+				//drawRect(_x, _y, _w, _h, ST7735S_DARKGREY);
+				_dimmed = true;
+			}
+		}
+	}
+
+private:
+	int _h;
+	int _w;
+	bool _dimmed;
+};
 
 const char lanIconBitmap24x20[80] = {
 	0x00, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFE, 0x00, 0x7F, 0xFF, 0xFE, 0x00,
@@ -1093,6 +1135,124 @@ int drawStringGFX(const char* p_str, uint16_t p_oX, uint16_t p_oY, GFXfont p_fon
 	return sumX;
 }
 
+class Label {
+public:
+	Label(int p_x, int p_y, uint16_t p_color, uint16_t p_backColor, GFXfont p_font) :
+		_x(p_x), _y(p_y), _width(0), _height(0), _color(p_color), _backColor(p_backColor), _font(p_font), _prevChar(0)
+	{
+		// Scan glyphs to set the (max) height
+		for (int i = 0; i < (_font.last - _font.first); i++) {
+			if (_font.glyph[i].height > _height) {
+				_height = _font.glyph[i].height;
+			}
+
+			switch (static_cast<char>(i + 32))
+			{
+			case '0': case '1': case '2': case '3': case '4': 
+			case '5': case '6': case '7': case '8': case '9':
+				if (_font.glyph[i].xAdvance > _width) {
+					_width = _font.glyph[i].xAdvance;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void setText(const char* p_str)
+	{
+		//SetTextColor(_color, _backColor);
+
+		if (_width > 0) {
+			fillRect(_x, _y - _height, _width, _height, _backColor);
+		}
+
+		_width = drawStringGFX(p_str, _x, _y, _font);
+	}
+
+	void setChar(int p_char)
+	{
+		if (p_char == _prevChar) {
+			return;
+		}
+		_prevChar = p_char;
+
+		if (_width > 0) {
+			fillRect(_x, _y - _height, _width, _height, _backColor);
+		}
+
+		char c = static_cast<char>(p_char);
+		int xOffset = (_width - _font.glyph[p_char - 32].xAdvance) / 2;
+		drawCharGFX(c, _x + xOffset, _y, _font);
+	}
+
+private:
+	int _x;
+	int _y;
+	int _width;
+	int _height;
+	uint16_t _color;
+	uint16_t _backColor;
+	GFXfont _font;
+	int _prevChar;
+};
+
+class SlidingBar
+{
+public:
+	SlidingBar(int p_x0, int p_y0, int p_width, int p_height) : 
+		_x0(p_x0), _y0(p_y0), _width(p_width), _height(p_height), _lastLevel(0)
+	{
+		/*
+		int xOffset = 26;
+		int w = 162 - (xOffset * 2);
+		int yOffset = 14;
+		int onWidth = w * i / 99;
+		int offWidth = w * (99 - i) / 99;
+		fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
+		fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
+		//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
+		drawRect(xOffset, yPos + yOffset, w, 4, ST7735S_DARKGREY);
+		//fillRect(30 + i, yPos + 10, 99 - i, 1, ST7735S_DARKGREY);
+		*/
+	}
+
+	void update(int p_level)
+	{
+		if (p_level == _lastLevel) {
+			return;
+		}
+
+		if (_lastLevel == 0) {
+			//fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
+			//fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
+			//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
+			drawRect(_x0, _y0, _width, _height, ST7735S_DARKGREY);
+		}
+
+		int barWidth = _width * p_level / 99;
+		int diff = p_level - _lastLevel;
+
+		if (diff >= 0) {
+			fillRect(_x0, _y0, barWidth, _height, ST7735S_WHITE);
+		}
+		else {
+			fillRect(_x0 + barWidth, _y0 + 1, _width - barWidth, _height - 2, ST7735S_BLACK);
+			drawRect(_x0 + barWidth, _y0, _width - barWidth, _height, ST7735S_DARKGREY);
+		}
+
+		_lastLevel = p_level;
+	}
+
+private:
+	int _x0;
+	int _y0;
+	int _width;
+	int _height;
+	int _lastLevel;
+};
+
 void draw()
 {
 	HWND myconsole = GetConsoleWindow();
@@ -1100,6 +1260,25 @@ void draw()
 
 	fillRect(0, 0, 162, 132, ST7735S_BLACK);
 	drawRect(0, 0, 162, 132, ST7735S_WHITE);
+
+	if (false) {
+		int r = 20;
+		for (int i = 0; i < 5; i++) {
+			fillArc(81, 61, 60, 10, r, r, 2, ST7735S_WHITE);
+			r += 5;
+		}
+		return;
+	}
+
+	if (false) {
+		int x = 8;
+		for (int i = 0; i < 10; i++) {
+			//fillArc(81, 61, 60, 10, r, r, 2, ST7735S_WHITE);
+			fillRect(x, 80, 12, 10, ST7735S_WHITE);
+			x += 14;
+		}
+		return;
+	}
 
 	if (false) {
 		int vx = 6;
@@ -1135,9 +1314,15 @@ void draw()
 		_text_color = ST7735S_CYAN;
 		//xPos += drawString("COAX2", xPos, 102, ST7735S_FONT32);
 		//drawStringGFX("COAX2", xPos, 126, Roboto_Mono_32);
-		drawStringGFX("COAX2", xPos, 122, Open_Sans_Regular_24);
+		//drawStringGFX("COAX2", xPos, 122, Open_Sans_Regular_24);
+		Label inputLabel(8, 122, ST7735S_CYAN, ST7735S_BLACK, Open_Sans_Regular_24);
+		inputLabel.setText("COAX2");
+
+
 		if (Parameters::instance()->auto_find) {
-			drawStringGFX("AUTO", 116, 122, Open_Sans_Light_12);
+			//drawStringGFX("AUTO", 116, 122, Open_Sans_Light_12);
+			Label autoLabel(116, 122, ST7735S_CYAN, ST7735S_BLACK, Open_Sans_Light_12);
+			autoLabel.setText("AUTO");
 			//drawRect(116, 102, 40, 20, ST7735S_CYAN);
 		}
 
@@ -1146,30 +1331,40 @@ void draw()
 		xPos += drawStringGFX("PCM ", xPos, 20, Open_Sans_Light_16);
 	}
 
-	std::vector<BarItem> barItems;
+	/*std::vector<BarItem> barItems;
 	for (int i = 0; i < 10; i++) {
 		BarItem item(i, 10);
 		barItems.push_back(item);
+	}*/
+	std::vector<BarItem2> barItems;
+	for (int i = 0; i < 20; i++) {
+		BarItem2 item(i, 20);
+		barItems.push_back(item);
 	}
+
+	SlidingBar sb(26, 90, 110, 4);
 
 	/*std::vector<RingSegmentItem> ringItems;
 	for (int i = 0; i < 13; i++) {
 		RingSegmentItem item(i, 13);
 		ringItems.push_back(item);
-	}
-
-	// Ring indicator demo
-	std::vector<int> levels = { 99, 27, 0, 27, 48, 33, 88, 56, 2, 45, 99 };
-	std::vector<int>::const_iterator levelIter = levels.cbegin();
-	while (levelIter != levels.cend()) {
-		std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
-		while (iter != ringItems.end()) {
-			(*iter).update(*levelIter);
-			++iter;
-		}
-		Sleep(500);
-		++levelIter;
 	}*/
+
+	if (false) {
+		// Ring indicator demo
+		std::vector<int> levels = { 99, 27, 0, 27, 48, 33, 88, 56, 2, 45, 99 };
+		std::vector<int>::const_iterator levelIter = levels.cbegin();
+		while (levelIter != levels.cend()) {
+			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
+			while (iter != ringItems.end()) {
+				(*iter).update(*levelIter);
+				++iter;
+			}*/
+			sb.update(*levelIter);
+			Sleep(500);
+			++levelIter;
+		}
+	}
 
 	int xPos = 48;
 	int yPos = 34;
@@ -1238,18 +1433,25 @@ void draw()
 		}
 	}
 	
+	Label digit1(28, 86, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_64);
+	Label digit2(82, 86, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_64);
+
 	if (true) {
 		_text_color = ST7735S_WHITE;
 		xPos = 76;
-		yPos = 86;
+		yPos = 78;
 		for (int i = 99; i >= 0; i -= 1) {
-			int x1 = i / 10;
+			digit1.setChar((i / 10) + 48);
+			digit2.setChar((i % 10) + 48);
+	
+			/*int x1 = i / 10;
 			if (x1 != prevX1) {
 				//drawChar(48 + x1, xPos, yPos, ST7735S_FONT64_OSR);
 				
-				fillRect(xPos, yPos-47, 36, 48, ST7735S_BLACK);
-				drawCharGFX(48 + x1, xPos, yPos, Open_Sans_Regular_64);
+				//fillRect(xPos, yPos-47, 36, 48, ST7735S_BLACK);
+				//drawCharGFX(48 + x1, xPos, yPos, Open_Sans_Regular_64);
 
+				digit1.setChar(x1 + 48);
 				//fillRect(xPos-24, yPos - 47, 52, 48, ST7735S_BLACK);
 				//drawCharGFX(48 + x1, xPos-24, yPos, Orbitron_Medium_64);
 				prevX1 = x1;
@@ -1258,23 +1460,43 @@ void draw()
 			if (x2 != prevX2) {
 				//drawChar(48 + x2, xPos + 37, yPos, ST7735S_FONT64_OSR);
 
-				fillRect(xPos + 40, yPos-47, 36, 48, ST7735S_BLACK);
-				drawCharGFX(48 + x2, xPos + 40, yPos, Open_Sans_Regular_64);
+				//fillRect(xPos + 40, yPos-47, 36, 48, ST7735S_BLACK);
+				//drawCharGFX(48 + x2, xPos + 40, yPos, Open_Sans_Regular_64);
 
+				digit2.setChar(x2 + 48);
 				//fillRect(xPos + 30, yPos-47, 52, 48, ST7735S_BLACK);
 				//drawCharGFX(48 + x2, xPos + 30, yPos, Orbitron_Medium_64);
 				prevX2 = x2;
-			}
+			}*/
 			//break;
-
+			
 			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
 			while (iter != ringItems.end()) {
 				(*iter).update(i);
 				++iter;
 			}*/
-			std::vector<BarItem>::iterator iter = barItems.begin();
+
+			/*int xOffset = 26;
+			int w = 162 - (xOffset * 2);
+			int yOffset = 14;
+			int onWidth = w * i / 99;
+			int offWidth = w * (99 - i) / 99;
+			fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
+			fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
+			//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
+			drawRect(xOffset, yPos + yOffset, w, 4, ST7735S_DARKGREY);
+			//fillRect(30 + i, yPos + 10, 99 - i, 1, ST7735S_DARKGREY);*/
+
+			/*std::vector<BarItem>::iterator iter = barItems.begin();
 			while (iter != barItems.end()) {
 				(*iter).update(i);
+				++iter;
+			}*/
+			sb.update(i);
+
+			std::vector<BarItem2>::iterator iter = barItems.begin();
+			while (iter != barItems.end()) {
+				//(*iter).update(i);
 				++iter;
 			}
 
