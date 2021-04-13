@@ -371,10 +371,15 @@ private:
 	int _lastLevel;
 };
 
-void draw()
+void clearScreen()
 {
 	_tft->fillRect(0, 0, 162, 132, ST7735S_BLACK);
 	_tft->drawRect(0, 0, 162, 132, ST7735S_WHITE);
+}
+
+void draw()
+{
+	clearScreen();
 
 	if (false) {
 		int r = 20;
@@ -411,16 +416,21 @@ void draw()
 		_tft->drawStringGFX("0123456789", 400, 290, Orbitron_Medium_64);
 	}
 
-	//drawBitmap(lanIconBitmap24x20, 110, 6, 24, 20);
-	//drawBitmap(wifiIconBitmap24x24, 130, 3, 24, 20);
+	if (false) {
+		_tft->drawBitmap(lanIconBitmap24x20, 110, 6, 24, 20);
+		_tft->drawBitmap(wifiIconBitmap24x24, 130, 3, 24, 20);
+	}
 
-	_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
-	_tft->drawStringGFX("SWITCH INPUT", 8, 24, Open_Sans_Light_16);
-	_tft->drawStringGFX("COAX1", 20, 48, Open_Sans_Light_16);
-	_tft->drawStringGFX("COAX2", 20, 72, Open_Sans_Light_16);
-	_tft->drawStringGFX("OPT1", 20, 96, Open_Sans_Light_16);
-	_tft->drawStringGFX("Exit (AUTO)", 20, 120, Open_Sans_Light_16);
-	getchar();
+	if (true) {
+		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
+		_tft->drawStringGFX("SWITCH INPUT", 8, 24, Open_Sans_Light_16);
+		_tft->drawStringGFX("COAX1", 20, 48, Open_Sans_Light_16);
+		_tft->drawStringGFX("COAX2", 20, 72, Open_Sans_Light_16);
+		_tft->drawStringGFX("OPT1", 20, 96, Open_Sans_Light_16);
+		_tft->drawStringGFX("Exit (AUTO)", 20, 120, Open_Sans_Light_16);
+		getchar();
+		clearScreen();
+	}
 
 	if (true) {
 		int xPos = 8;
@@ -530,7 +540,7 @@ void draw()
 		for (int i = 99; i >= 0; i -= 1) {
 			digit1.setChar((i / 10) + 48);
 			digit2.setChar((i % 10) + 48);
-	
+			break;
 			//sb.update(i);
 
 			std::vector<BarItem2>::iterator iter = barItems.begin();
@@ -550,6 +560,7 @@ int __cdecl main(void)
 	printf("\n\n\n\n\n\n\n\n\n\n");
 	draw();
 	getchar();
+	delete _tft;
 	return 0;
 
 	puts("GEVOL 3.0.0");
