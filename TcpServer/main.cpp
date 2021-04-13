@@ -170,7 +170,6 @@ public:
 	}
 	
 private:
-	ST7735S* _tft;
 	int _startAngle;
 	int _min;
 	int _x;
@@ -191,7 +190,6 @@ public:
 
 		_x = 8 + 14 * p_index;
 		_y = 98;
-		//_tft->drawRect(_x, _y, 12, _h, ST7735S_DARKGREY);
 	}
 
 	void update(int p_level)
@@ -206,7 +204,6 @@ public:
 	}
 
 private:
-	ST7735S* _tft;
 	int _h;
 };
 
@@ -233,14 +230,12 @@ public:
 		if (p_level && p_level >= _min) {
 			if (_dimmed) {
 				_tft->fillRect(_x, _y, _w, _h, ST7735S_WHITE);
-				//_tft->drawRect(_x, _y, 14, _h, ST7735S_DARKGREY);
 				_dimmed = false;
 			}
 		}
 		else {
 			if (!_dimmed) {
 				_tft->fillRect(_x, _y, _w, _h, ST7735S_DARKGREY);
-				//_tft->drawRect(_x, _y, _w, _h, ST7735S_DARKGREY);
 				_dimmed = true;
 			}
 		}
@@ -341,18 +336,7 @@ public:
 	SlidingBar(int p_x0, int p_y0, int p_width, int p_height) : 
 		_x0(p_x0), _y0(p_y0), _width(p_width), _height(p_height), _lastLevel(0)
 	{
-		/*
-		int xOffset = 26;
-		int w = 162 - (xOffset * 2);
-		int yOffset = 14;
-		int onWidth = w * i / 99;
-		int offWidth = w * (99 - i) / 99;
-		fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
-		fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
-		//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
-		drawRect(xOffset, yPos + yOffset, w, 4, ST7735S_DARKGREY);
-		//fillRect(30 + i, yPos + 10, 99 - i, 1, ST7735S_DARKGREY);
-		*/
+
 	}
 
 	void update(int p_level)
@@ -362,9 +346,6 @@ public:
 		}
 
 		if (_lastLevel == 0) {
-			//fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
-			//fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
-			//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
 			_tft->drawRect(_x0, _y0, _width, _height, ST7735S_DARKGREY);
 		}
 
@@ -429,8 +410,10 @@ void draw()
 		_tft->drawStringGFX("COAX2 0123456789", 400, 220, Open_Sans_Regular_64);
 		_tft->drawStringGFX("0123456789", 400, 290, Orbitron_Medium_64);
 	}
+
 	//drawBitmap(lanIconBitmap24x20, 110, 6, 24, 20);
 	//drawBitmap(wifiIconBitmap24x24, 130, 3, 24, 20);
+
 	_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
 	_tft->drawStringGFX("SWITCH INPUT", 8, 24, Open_Sans_Light_16);
 	_tft->drawStringGFX("COAX1", 20, 48, Open_Sans_Light_16);
@@ -438,18 +421,8 @@ void draw()
 	_tft->drawStringGFX("OPT1", 20, 96, Open_Sans_Light_16);
 	_tft->drawStringGFX("Exit (AUTO)", 20, 120, Open_Sans_Light_16);
 	getchar();
-	if (false) {
-		int xPos = 8;
-		xPos += _tft->drawString("COAX2", xPos, 102, ST7735S_FONT32);
-		if (Parameters::instance()->auto_find) {
-			_tft->drawString("AUTO", 116, 108, ST7735S_FONT16);
-		}
 
-		xPos = 8;
-		xPos += _tft->drawString("192kHz ", xPos, 6, ST7735S_FONT16);
-		xPos += _tft->drawString("PCM ", xPos, 6, ST7735S_FONT16);
-	}
-	else {
+	if (true) {
 		int xPos = 8;
 		//_text_color = ST7735S_CYAN;
 		//xPos += drawString("COAX2", xPos, 102, ST7735S_FONT32);
@@ -518,58 +491,32 @@ void draw()
 		int lastM1 = -1;
 		int lastM2 = -1;
 
-		_tft->drawChar(48 + 10, 70, 0, ST7735S_FONT64_OSR); // ':'
+		//_tft->drawChar(48 + 10, 70, 0, ST7735S_FONT64_OSR); // ':'
 
 		for (int h = 0; h < 24; h++) {
 			int h1 = h / 10;
 			if (h1 != lastH1) {
-				_tft->drawChar(48 + h1, 2, 5, ST7735S_FONT64_OSR);
+				//_tft->drawChar(48 + h1, 2, 5, ST7735S_FONT64_OSR);
 				lastH1 = h1;
 			}
 			int h2 = h % 10;
 			if (h2 != lastH2) {
-				_tft->drawChar(48 + h2, 36, 5, ST7735S_FONT64_OSR);
+				//_tft->drawChar(48 + h2, 36, 5, ST7735S_FONT64_OSR);
 				lastH2 = h2;
 			}
 			for (int m = 0; m < 60; m++) {
 				int m1 = m / 10;
 				if (m1 != lastM1) {
-					_tft->drawChar(48 + m1, 86, 5, ST7735S_FONT64_OSR);
+					//_tft->drawChar(48 + m1, 86, 5, ST7735S_FONT64_OSR);
 					lastM1 = m1;
 				}
 				int m2 = m % 10;
 				if (m2 != lastM2) {
-					_tft->drawChar(48 + m2, 122, 5, ST7735S_FONT64_OSR);
+					//_tft->drawChar(48 + m2, 122, 5, ST7735S_FONT64_OSR);
 					lastM2 = m2;
 				}
 				Sleep(100);
 			}
-		}
-	}
-
-	if (false) {
-		for (int i = 0; i < 100; i += 1) {
-			int x1 = i / 10;
-			if (x1 != prevX1) {
-				//drawChar(48 + x1, xPos, yPos, ST7735S_FONT56_OSR);
-				_tft->drawChar(48 + x1, xPos, 10, ST7735S_FONT64_OSR);
-				prevX1 = x1;
-			}
-			int x2 = i % 10;
-			if (x2 != prevX2) {
-				//drawChar(48 + x2, xPos + 34, yPos, ST7735S_FONT56_OSR);
-				_tft->drawChar(48 + x2, xPos + 37, 10, ST7735S_FONT64_OSR);
-				prevX2 = x2;
-			}
-			break;
-
-			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
-			while (iter != ringItems.end()) {
-				(*iter).update(i);
-				++iter;
-			}*/
-
-			Sleep(150);
 		}
 	}
 	
@@ -584,54 +531,6 @@ void draw()
 			digit1.setChar((i / 10) + 48);
 			digit2.setChar((i % 10) + 48);
 	
-			/*int x1 = i / 10;
-			if (x1 != prevX1) {
-				//drawChar(48 + x1, xPos, yPos, ST7735S_FONT64_OSR);
-				
-				//fillRect(xPos, yPos-47, 36, 48, ST7735S_BLACK);
-				//drawCharGFX(48 + x1, xPos, yPos, Open_Sans_Regular_64);
-
-				digit1.setChar(x1 + 48);
-				//fillRect(xPos-24, yPos - 47, 52, 48, ST7735S_BLACK);
-				//drawCharGFX(48 + x1, xPos-24, yPos, Orbitron_Medium_64);
-				prevX1 = x1;
-			}
-			int x2 = i % 10;
-			if (x2 != prevX2) {
-				//drawChar(48 + x2, xPos + 37, yPos, ST7735S_FONT64_OSR);
-
-				//fillRect(xPos + 40, yPos-47, 36, 48, ST7735S_BLACK);
-				//drawCharGFX(48 + x2, xPos + 40, yPos, Open_Sans_Regular_64);
-
-				digit2.setChar(x2 + 48);
-				//fillRect(xPos + 30, yPos-47, 52, 48, ST7735S_BLACK);
-				//drawCharGFX(48 + x2, xPos + 30, yPos, Orbitron_Medium_64);
-				prevX2 = x2;
-			}*/
-			//break;
-			
-			/*std::vector<RingSegmentItem>::iterator iter = ringItems.begin();
-			while (iter != ringItems.end()) {
-				(*iter).update(i);
-				++iter;
-			}*/
-
-			/*int xOffset = 26;
-			int w = 162 - (xOffset * 2);
-			int yOffset = 14;
-			int onWidth = w * i / 99;
-			int offWidth = w * (99 - i) / 99;
-			fillRect(xOffset, yPos + yOffset + 1, onWidth, 2, ST7735S_WHITE);
-			fillRect(xOffset + onWidth, yPos + yOffset + 1, offWidth, 2, ST7735S_BLACK);
-			//drawRect(xOffset + onWidth, yPos + yOffset, offWidth, 3, ST7735S_DARKGREY);
-			drawRect(xOffset, yPos + yOffset, w, 4, ST7735S_DARKGREY);
-			//fillRect(30 + i, yPos + 10, 99 - i, 1, ST7735S_DARKGREY);*/
-
-			/*std::vector<BarItem>::iterator iter = barItems.begin();
-			while (iter != barItems.end()) {
-				(*iter).update(i);
-				++iter;
-			}*/
 			//sb.update(i);
 
 			std::vector<BarItem2>::iterator iter = barItems.begin();
