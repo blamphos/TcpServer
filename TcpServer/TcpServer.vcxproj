@@ -88,6 +88,7 @@
     <ClInclude Include="Font64.h" />
     <ClInclude Include="Font64_OpenSansRegular.h" />
     <ClInclude Include="gfxfont.h" />
+    <ClInclude Include="GFX_Fonts.h" />
     <ClInclude Include="HttpResourceFile.h" />
     <ClInclude Include="HttpResponse.h" />
     <ClInclude Include="HttpServer.h" />
@@ -96,9 +97,14 @@
     <ClInclude Include="OpenSansLight_16_GFX.h" />
     <ClInclude Include="OpenSans_16_GFX.h" />
     <ClInclude Include="OpenSans_24_GFX.h" />
+    <ClInclude Include="OpenSans_28_GFX.h" />
     <ClInclude Include="OpenSans_32_GFX.h" />
     <ClInclude Include="OpenSans_64_GFX.h" />
+    <ClInclude Include="OpenSans_SemiBold_16_GFX.h" />
+    <ClInclude Include="Orbitron_16_GFX.h" />
+    <ClInclude Include="Orbitron_24_GFX.h" />
     <ClInclude Include="Orbitron_64_GFX.h" />
+    <ClInclude Include="Orbitron_72_GFX.h" />
     <ClInclude Include="RobotoMonoMedium_12_GFX.h" />
     <ClInclude Include="RobotoMonoMedium_16_GFX.h" />
     <ClInclude Include="Roboto_Mono_16_GFX.h" />
@@ -108,6 +114,7 @@
     <ClInclude Include="Parameters.h" />
     <ClInclude Include="SafeQueue.h" />
     <ClInclude Include="SpdifUtils.h" />
+    <ClInclude Include="ST7735S.h" />
     <ClInclude Include="ST7735S_defs.h" />
     <ClInclude Include="StoppableTask.h" />
     <ClInclude Include="TcpSocketServer.h" />
