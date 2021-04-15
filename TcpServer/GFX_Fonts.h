@@ -4,6 +4,7 @@
 #include "RobotoMonoMedium_12_GFX.h"
 #include "RobotoMonoMedium_16_GFX.h"
 #include "Orbitron_24_GFX.h"
+#include "Orbitron_56_GFX.h"
 #include "Orbitron_64_GFX.h"
 #include "Orbitron_72_GFX.h"
 #include "OpenSans_16_GFX.h"

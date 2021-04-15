@@ -93,6 +93,7 @@
     <ClInclude Include="OpenSans_SemiBold_16_GFX.h" />
     <ClInclude Include="Orbitron_16_GFX.h" />
     <ClInclude Include="Orbitron_24_GFX.h" />
+    <ClInclude Include="Orbitron_56_GFX.h" />
     <ClInclude Include="Orbitron_64_GFX.h" />
     <ClInclude Include="Orbitron_72_GFX.h" />
     <ClInclude Include="RobotoMonoMedium_12_GFX.h" />

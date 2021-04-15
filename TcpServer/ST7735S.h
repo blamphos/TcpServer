@@ -429,12 +429,12 @@ public:
 		char line = 0;
 		int pX = 0;
 		int pY = p_y;
-		int w = (p_width + 7) / 8;
+		int w = (p_width + 31) / 32 * 4; // bytes per row
 
 		for (int i = 0; i < p_height; i++) {
 			drawFastHLine(p_x, pY, p_width, _text_bgcolor);
 			for (int k = 0; k < w; k++) {
-				line = *(p_bitmap + (4 * i) + k);
+				line = *(p_bitmap + (w * i) + k);
 				if (line != 0) {
 					pX = p_x + k * 8;
 					for (int x = 0; x < 8; x++) {
@@ -453,16 +453,6 @@ public:
 		int index = p_char - 32;
 
 		if ((p_char < p_font.first) || (p_char > p_font.last)) {
-			/*int maxWidth = 0;
-			for (int i = p_font.first; i < p_font.last; i++) {
-				int w = p_font.glyph[i - 32].width;
-				if (w > maxWidth) {
-					maxWidth = w;
-				}
-				//printf("%d, ", p_font.glyph[i - 32].width);
-			}
-			fillRect(p_x, p_y, maxWidth, p_font.yAdvance, ST7735S_BLACK);
-			return 0;*/
 			index = 0;
 		}
 
@@ -474,7 +464,6 @@ public:
 		int len = ((glyph.width * glyph.height) + 7) / 8;
 		uint8_t line = 0;
 
-		//drawFastHLine(p_x, pY, glyph.width + glyph.xOffset, _text_bgcolor);
 
 		for (int i = 0; i < len; i++) {
 			line = (p_font.bitmap[glyph.bitmapOffset + i]);
@@ -487,7 +476,6 @@ public:
 				if (++w == glyph.width) {
 					w = 0;
 					pY++;
-					//drawFastHLine(p_x, pY, glyph.width + glyph.xOffset, _text_bgcolor);
 				}
 			}
 		}
@@ -507,6 +495,11 @@ public:
 		}
 		//_cs->write(1);
 		return sumX;
+	}
+
+	void setTextColor(uint16_t p_color)
+	{
+		_text_color = p_color;
 	}
 
 private:

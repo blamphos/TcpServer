@@ -152,5 +152,8 @@
     <ClInclude Include="ST7735S.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Orbitron_56_GFX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
