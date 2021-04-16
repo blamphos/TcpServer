@@ -476,13 +476,13 @@ void draw()
 		_tft->drawStringGFX("0123456789", 400, 290, Orbitron_Medium_64);
 	}
 
-	if (true) {
+	if (false) {
 		_tft->drawBitmap(gevolBitmap_136x30, 16, 30, 136, 30);
 		getchar();
 		clearScreen();
 	}
 
-	if (true) {
+	if (false) {
 		_tft->drawBitmap(lanIconBitmap24x20, 110, 6, 24, 20);
 		_tft->drawBitmap(wifiIconBitmap24x24, 136, 3, 24, 20);
 	}
@@ -491,16 +491,31 @@ void draw()
 		int x0 = 22;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
 		_tft->drawStringGFX("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
-		_tft->drawStringGFX("COAX1", x0, 48, Open_Sans_Light_16);
-		_tft->drawStringGFX("COAX2", x0, 70, Open_Sans_Light_16);
-		_tft->drawStringGFX("OPT1", x0, 90, Open_Sans_Light_16);
-		_tft->drawStringGFX("AUTO SWITCH", x0, 110, Open_Sans_Light_16);
+		_tft->drawStringGFX("COAX1", x0, 48, Open_Sans_Light_12);
+		_tft->drawStringGFX("COAX2", x0, 70, Open_Sans_Light_12);
+		_tft->drawStringGFX("OPT1", x0, 90, Open_Sans_Light_12);
+		_tft->drawStringGFX("AUTO SWITCH", x0, 110, Open_Sans_Light_12);
+		getchar();
+		clearScreen();
+	}
+
+	if (true) {
+		int x0 = 18;
+		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
+		_tft->drawStringGFX("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
+		//_tft->drawRect(20, 48-20, 136, 21, ST7735S_WHITE);
+		_tft->fillCircle(10, 42, 3, ST7735S_WHITE);
+		_tft->drawStringGFX("COAX1", x0, 48, Dialog_plain_14);
+		_tft->drawStringGFX("COAX2", x0, 70, Dialog_plain_14);
+		_tft->drawStringGFX("OPT1", x0, 90, Dialog_plain_14);
+		_tft->drawStringGFX("OK (press long)", x0, 110, Dialog_plain_14);
+		_tft->drawStringGFX("Unplug after 15s.", 12, 150, Dialog_plain_14);
 		getchar();
 		clearScreen();
 	}
 
 	if (false) {
-		int x0 = 22;
+		int x0 = 18;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
 		_tft->drawStringGFX("2.2 IR CONTROL", 12, 24, Open_Sans_Light_16);
 		_tft->drawStringGFX("> IR CONTROL", x0-12, 48, Open_Sans_Light_12);
@@ -576,7 +591,7 @@ void draw()
 
 	// Clock demo
 	if (true) {
-		_tft->drawStringGFX("00:00", 6, 90, Open_Sans_Regular_64);
+		_tft->drawStringGFX("00:00", 40, 80, Open_Sans_Regular_32);
 
 		int lastH1 = -1;
 		int lastH2 = -1;

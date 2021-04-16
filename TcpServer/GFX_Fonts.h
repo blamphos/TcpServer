@@ -15,4 +15,5 @@
 #include "OpenSansLight_12_GFX.h"
 #include "OpenSansLight_16_GFX.h"
 #include "OpenSans_SemiBold_16_GFX.h"
+#include "Dialog_14_GFX.h"
 

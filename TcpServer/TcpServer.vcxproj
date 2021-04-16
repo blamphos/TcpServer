@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callback.h" />
+    <ClInclude Include="Dialog_14_GFX.h" />
     <ClInclude Include="EmbeddedMessages.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="gfxfont.h" />
