@@ -27,24 +27,21 @@
 					<label id="level">26</label>
 				</div>
 			</div>
-		<div>		
-		<div class="pie-slider-container">
+		<div>	
+  		<div class="pie-slider-container">
 			<div id="slider"></div>
 			<button class="circle volume-mute" onclick="onMuteButtonClick()">MUTE</button>						
-		</div>
+		</div>	
 		<div class="volume-buttons">
 			<button class="circle volume-minus" onclick="onVolumeButtonClick(-1)">&#8722</button>
 			<button class="circle volume-plus" onclick="onVolumeButtonClick(1)">&#x2b</button>		
 		</div>		
 		<div class="input-buttons">	
-			<div>
-				<button class="input-btn" onclick="onInputChanged(0)">COAX1</button>
-				<button class="input-btn" onclick="onInputChanged(1)">COAX2</button>
-				<button class="input-btn" onclick="onInputChanged(2)">OPT1</button>
-				<button class="input-btn" onclick="onInputChanged(-1)">AUTO</button>
-			</div>
+			<button class="input-btn" onclick="onInputChanged(0)">COAX1</button>
+			<button class="input-btn" onclick="onInputChanged(1)">COAX2</button>
+			<button class="input-btn" onclick="onInputChanged(2)">OPT1</button>
+			<button class="input-btn" onclick="onInputChanged(-1)">AUTO</button>
 		</div>
-		<label id="debug"></label>
 	</div>
     <script>
 		var level = 26;

@@ -144,12 +144,12 @@ void HttpServer::handleConnection(SOCKET socket)
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_INFO_UPDATE);
 		}
 
-		int s = _sockets.dequeue();
+		_sockets.dequeue();
 	}
 	else if (_requestType == Get) {
 		if (strstr(_buffer, "GET / HTTP") != NULL) {
 			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_GET);
-			int s =_sockets.dequeue();
+			_sockets.dequeue();
 		}
 		
 		if (strstr(_buffer, "GET /style.css") != NULL) {
