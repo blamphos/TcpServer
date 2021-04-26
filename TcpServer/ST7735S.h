@@ -448,7 +448,8 @@ public:
 		}
 	}
 
-	int drawCharGFX(char p_char, uint16_t p_x, uint16_t p_y, GFXfont p_font)
+	int drawCharGFX(char p_char, uint16_t p_x, uint16_t p_y, GFXfont p_font, 
+		int p_xOffset = 0, int p_clearWidth = 0)
 	{
 		int index = p_char - 32;
 
@@ -457,18 +458,22 @@ public:
 		}
 
 		GFXglyph glyph = p_font.glyph[index];
-
 		int pX = 0;
 		int pY = p_y + glyph.yOffset;
 		int w = 0;
 		int len = ((glyph.width * glyph.height) + 7) / 8;
 		uint8_t line = 0;
+		int clearWidth = glyph.width + glyph.xOffset;
+		if (p_clearWidth > 0) {
+			clearWidth = p_clearWidth;
+		}
 
+		drawFastHLine(p_x, pY, clearWidth, _text_bgcolor);
 
 		for (int i = 0; i < len; i++) {
 			line = (p_font.bitmap[glyph.bitmapOffset + i]);
 			for (int x = 0; x < 8; x++) {
-				pX = p_x + glyph.xOffset + w;
+				pX = p_x + glyph.xOffset + p_xOffset + w;
 				if ((line << x) & 0x80) {
 					drawPixel(pX, pY, _text_color);
 				}
@@ -476,6 +481,7 @@ public:
 				if (++w == glyph.width) {
 					w = 0;
 					pY++;
+					drawFastHLine(p_x, pY, clearWidth, _text_bgcolor);
 				}
 			}
 		}

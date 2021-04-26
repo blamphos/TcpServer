@@ -497,8 +497,8 @@ char muteBitmap_128x128[2048] = {
 
 class Label {
 public:
-	Label(int p_x, int p_y, uint16_t p_color, uint16_t p_backColor, GFXfont p_font) :
-		_x(p_x), _y(p_y), _width(0), _height(0), _color(p_color), _backColor(p_backColor), _font(p_font), _prevChar(0)
+	Label(int p_x, int p_y, uint16_t p_color, uint16_t p_backColor, GFXfont p_font, bool p_alignRight = false) :
+		_x(p_x), _y(p_y), _width(0), _height(0), _color(p_color), _backColor(p_backColor), _font(p_font), _alignRight(p_alignRight), _prevChar(0)
 	{
 		// Scan glyphs to set the (max) height
 		for (int i = 0; i < (_font.last - _font.first); i++) {
@@ -535,21 +535,10 @@ public:
 		if (p_char == _prevChar) {
 			return;
 		}
-
-		/*if (_prevChar >= _font.first && _prevChar <= _font.last) {
-			_tft->setTextColor(_backColor);
-			int xOffset = (_width - _font.glyph[_prevChar - 32].xAdvance) / 2;
-			_tft->drawCharGFX(static_cast<char>(_prevChar), _x + xOffset, _y, _font);
-			_tft->setTextColor(_color);
-		}*/
 		_prevChar = p_char;
-
-		if (_width > 0) {
-			_tft->fillRect(_x, _y - _height, _width, _height+1, _backColor);
-		}
-
-		int xOffset = (_width - _font.glyph[p_char - 32].xAdvance) / 2;
-		_tft->drawCharGFX(static_cast<char>(p_char), _x + xOffset, _y, _font);
+		
+		int xOffset = _width - _font.glyph[p_char - 32].xAdvance;
+		_tft->drawCharGFX(static_cast<char>(p_char), _x, _y, _font, xOffset, _width);
 	}
 
 private:
@@ -561,6 +550,7 @@ private:
 	uint16_t _backColor;
 	GFXfont _font;
 	int _prevChar;
+	bool _alignRight;
 };
 
 class SlidingBar
@@ -660,7 +650,7 @@ void draw()
 		_tft->drawBitmap(wifiIconBitmap24x24, 136, 3, 24, 20);
 	}
 
-	if (true) {
+	if (false) {
 		_tft->drawBitmap(muteBitmap_128x128, 17, 2, 128, 128);
 		getchar();
 		clearScreen();
@@ -795,7 +785,7 @@ void draw()
 	int prevX2 = -1;
 
 	// Clock demo
-	if (true) {
+	if (false) {
 		int lastH1 = -1;
 		int lastH2 = -1;
 		int lastM1 = -1;
@@ -838,7 +828,7 @@ void draw()
 		clearScreen();
 	}
 	
-	Label digit1(24, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72);
+	Label digit1(24, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72, true);
 	Label digit2(84, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72);
 
 	if (true) {
@@ -858,6 +848,7 @@ void draw()
 			}
 
 			Sleep(100);
+			//getchar();
 		}
 	}
 }
