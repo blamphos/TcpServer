@@ -14,20 +14,21 @@
   		<div class="menu-container">
 			<a href="input.html" class="nav-button">☰</a>		
 		</div>
-		<div class="info-container-bg">
-			<div class="info-container">
-				<label class="header-label">INPUT</label>
-				<label class="header-label" style="left:155px">VOLUME</label>
+		<div class="info-container">
+			<div class="input-container">
+				<label id="header">INPUT</label>
 				<br>
-				<label id="info" class="info-label">COAX1</label>
-				<label id="auto" class="auto-label">AUTO</label>		
+				<label id="info">COAX1</label>
+				<label id="auto">AUTO</label>
 				<br>
-				<label id="format" class="format-label">44100 Hz PCM</label>
-				<div class="volume-container">
-					<label id="level">26</label>
-				</div>
+				<label id="format">44100 Hz PCM</label>
 			</div>
-		<div>	
+			<div class="volume-container">
+				<label id="header">VOLUME</label>
+				<br>
+				<label id="level">26</label>
+			</div>
+		</div>
   		<div class="pie-slider-container">
 			<div id="slider"></div>
 			<button class="circle volume-mute" onclick="onMuteButtonClick()">MUTE</button>						

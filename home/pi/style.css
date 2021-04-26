@@ -6,20 +6,17 @@ body {
   background-repeat: no-repeat;
   background-image: url("background.jpg");  
   background-position: center top;    
+  background-position-y: 10px;
   height: 430px;
   touch-action: manipulation;
+  padding-top: 10px;
 }
 	
 .mobile-container {
   opacity: 0.9;
-  height: 430px;
-  border-color: grey;
-  border-style: none;
 }
 
 .menu-container {
-  border-color: white;
-  border-style: none;
   height: 68px;
 }
 		
@@ -37,14 +34,15 @@ body {
   opacity: 0.7;
 }
 
-.info-container-bg {
-  border-style: none;
-}
-
 .info-container {
   opacity: 0.7;
   height: 81px;
-  border-style: none;
+  display: inline-flex;
+  padding: 0 15px;
+}
+
+.input-container {
+  width: 200px;
 }
 		
 .pie-slider-container {
@@ -52,7 +50,6 @@ body {
   left: 48px;
   height: 165px;
   width: 190px;
-  border-style: none;
 }
 
 .rs-control .rs-handle {
@@ -60,8 +57,7 @@ body {
 }
 		
 .volume-buttons {
-  height: 64px;
-  border-style: none;
+  height: 62px;
 }
 
 .circle {
@@ -120,46 +116,33 @@ body {
 }		
 
 .volume-container {
-  position:relative;
-  width: 50px;
-  top: -44px;
-  left: 198px;
-  font-size: 38px;
-  color: cyan;  
   text-align: right;
 }
 
-.header-label {
-  position:relative;
-  top: 4px;
-  left: 15px;
+#level {
+  font-size: 44px;
+  color: yellow; 
+}
+
+#header {
   font-size: 12px;
   color: white;
   opacity: 0.7;
 }
 
-.auto-label {
-  position:relative;
-  top: 4px;
-  left: 14px;
+#auto {
   font-size: 9px;
-  color: cyan;
+  color: yellow;
 }
 
-.info-label {
-  position:relative;
-  top: 4px;
-  left: 15px;
+#info {
   font-size: 24px;
-  color: cyan;
+  color: yellow;
 }
 
-.format-label {
-  position:relative;
-  top: 2px;
-  left: 15px;
+#format {
   font-size: 12px;
-  color: cyan;
+  color: yellow;
 }
 
 .input-buttons {
@@ -167,8 +150,6 @@ body {
   background-color: Transparent;
   left: 10px;
   margin: 1px;
-  border-color: white;
-  border-style: none;
 }
 
 .input-btn {
