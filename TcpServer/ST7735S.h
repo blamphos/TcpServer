@@ -432,7 +432,7 @@ public:
 		int w = (p_width + 31) / 32 * 4; // bytes per row
 
 		for (int i = 0; i < p_height; i++) {
-			drawFastHLine(p_x, pY, p_width, _text_bgcolor);
+			drawFastHLine(p_x, pY, p_width, _textBgcolor);
 			for (int k = 0; k < w; k++) {
 				line = *(p_bitmap + (w * i) + k);
 				if (line != 0) {
@@ -448,8 +448,8 @@ public:
 		}
 	}
 
-	int drawCharGFX(char p_char, uint16_t p_x, uint16_t p_y, GFXfont p_font, 
-		int p_xOffset = 0, int p_clearWidth = 0)
+	int drawChar(char p_char, uint16_t p_x, uint16_t p_y, GFXfont p_font, 
+		uint16_t p_xOffset = 0, uint16_t p_clearWidth = 0)
 	{
 		int index = p_char - 32;
 
@@ -468,7 +468,7 @@ public:
 			clearWidth = p_clearWidth;
 		}
 
-		drawFastHLine(p_x, pY, clearWidth, _text_bgcolor);
+		drawFastHLine(p_x, pY, clearWidth, _textBgcolor);
 
 		for (int i = 0; i < len; i++) {
 			line = (p_font.bitmap[glyph.bitmapOffset + i]);
@@ -481,7 +481,7 @@ public:
 				if (++w == glyph.width) {
 					w = 0;
 					pY++;
-					drawFastHLine(p_x, pY, clearWidth, _text_bgcolor);
+					drawFastHLine(p_x, pY, clearWidth, _textBgcolor);
 				}
 			}
 		}
@@ -489,13 +489,13 @@ public:
 		return glyph.xAdvance;
 	}
 
-	int drawStringGFX(const char* p_str, uint16_t p_oX, uint16_t p_oY, GFXfont p_font)
+	int drawString(const char* p_str, uint16_t p_oX, uint16_t p_oY, GFXfont p_font)
 	{
 		int sumX = 0;
 
 		//_cs->write(0);
 		while (*p_str) {
-			int xPlus = drawCharGFX(*p_str++, p_oX, p_oY, p_font);
+			int xPlus = drawChar(*p_str++, p_oX, p_oY, p_font);
 			sumX += xPlus;
 			p_oX += xPlus; /* Move cursor right       */
 		}
@@ -518,7 +518,7 @@ private:
 
 	int _text_size = 1;
 	int _text_color = ST7735S_WHITE;
-	int _text_bgcolor = ST7735S_BLACK;
+	int _textBgcolor = ST7735S_BLACK;
 
 	// Swap any type
 	template <typename T> 

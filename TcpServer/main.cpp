@@ -497,8 +497,8 @@ char muteBitmap_128x128[2048] = {
 
 class Label {
 public:
-	Label(int p_x, int p_y, uint16_t p_color, uint16_t p_backColor, GFXfont p_font, bool p_alignRight = false) :
-		_x(p_x), _y(p_y), _width(0), _height(0), _color(p_color), _backColor(p_backColor), _font(p_font), _alignRight(p_alignRight), _prevChar(0)
+	Label(int p_x, int p_y, uint16_t p_color, uint16_t p_backColor, GFXfont p_font) :
+		_x(p_x), _y(p_y), _width(0), _height(0), _color(p_color), _backColor(p_backColor), _font(p_font), _prevChar(0)
 	{
 		// Scan glyphs to set the (max) height
 		for (int i = 0; i < (_font.last - _font.first); i++) {
@@ -527,7 +527,7 @@ public:
 			_tft->fillRect(_x, _y - _height, _width, _height, _backColor);
 		}
 
-		_width = _tft->drawStringGFX(p_str, _x, _y, _font);
+		_width = _tft->drawString(p_str, _x, _y, _font);
 	}
 
 	void setChar(int p_char)
@@ -537,8 +537,8 @@ public:
 		}
 		_prevChar = p_char;
 		
-		int xOffset = _width - _font.glyph[p_char - 32].xAdvance;
-		_tft->drawCharGFX(static_cast<char>(p_char), _x, _y, _font, xOffset, _width);
+		uint16_t xOffset = (_width - _font.glyph[p_char - 32].xAdvance) / 2;
+		_tft->drawChar(static_cast<char>(p_char), _x, _y, _font, xOffset, _width);
 	}
 
 private:
@@ -550,7 +550,6 @@ private:
 	uint16_t _backColor;
 	GFXfont _font;
 	int _prevChar;
-	bool _alignRight;
 };
 
 class SlidingBar
@@ -626,17 +625,17 @@ void draw()
 	if (false) {
 		int vx = 6;
 		int vy = 134;
-		//drawStringGFX("COAX2", vx, vy, Roboto_Mono_32);
-		_tft->drawStringGFX("192kHz PCM 0123456789", 170, 10, Roboto_Mono_16);
-		_tft->drawStringGFX("192kHz PCM 0123456789", 170, 30, Roboto_Mono_32);
-		_tft->drawStringGFX("0123456789", 170, 70, Roboto_Mono_64);
+		//drawString("COAX2", vx, vy, Roboto_Mono_32);
+		_tft->drawString("192kHz PCM 0123456789", 170, 10, Roboto_Mono_16);
+		_tft->drawString("192kHz PCM 0123456789", 170, 30, Roboto_Mono_32);
+		_tft->drawString("0123456789", 170, 70, Roboto_Mono_64);
 
-		//drawStringGFX("192KHZ PCM 0123456789", 400, 140, Open_Sans_Regular_16);
-		_tft->drawStringGFX("192 kHz PCM 0123456789", 400, 140, Open_Sans_Light_16);
-		_tft->drawStringGFX("COAX2 0123456789", 400, 160, Open_Sans_Regular_24);
-		_tft->drawStringGFX("COAX2 0123456789", 400, 190, Open_Sans_Regular_32);
-		_tft->drawStringGFX("COAX2 0123456789", 400, 220, Open_Sans_Regular_64);
-		_tft->drawStringGFX("0123456789", 400, 290, Orbitron_Medium_64);
+		//drawString("192KHZ PCM 0123456789", 400, 140, Open_Sans_Regular_16);
+		_tft->drawString("192 kHz PCM 0123456789", 400, 140, Open_Sans_Light_16);
+		_tft->drawString("COAX2 0123456789", 400, 160, Open_Sans_Regular_24);
+		_tft->drawString("COAX2 0123456789", 400, 190, Open_Sans_Regular_32);
+		_tft->drawString("COAX2 0123456789", 400, 220, Open_Sans_Regular_64);
+		_tft->drawString("0123456789", 400, 290, Orbitron_Medium_64);
 	}
 
 	if (false) {
@@ -659,11 +658,11 @@ void draw()
 	if (false) {
 		int x0 = 22;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
-		_tft->drawStringGFX("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
-		_tft->drawStringGFX("COAX1", x0, 48, Open_Sans_Light_12);
-		_tft->drawStringGFX("COAX2", x0, 70, Open_Sans_Light_12);
-		_tft->drawStringGFX("OPT1", x0, 90, Open_Sans_Light_12);
-		_tft->drawStringGFX("AUTO SWITCH", x0, 110, Open_Sans_Light_12);
+		_tft->drawString("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
+		_tft->drawString("COAX1", x0, 48, Open_Sans_Light_12);
+		_tft->drawString("COAX2", x0, 70, Open_Sans_Light_12);
+		_tft->drawString("OPT1", x0, 90, Open_Sans_Light_12);
+		_tft->drawString("AUTO SWITCH", x0, 110, Open_Sans_Light_12);
 		getchar();
 		clearScreen();
 	}
@@ -671,22 +670,22 @@ void draw()
 	if (false)
 	{
 		//_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
-		//_tft->drawStringGFX("1 INFO", 12, 24, Dialog_plain_14);
+		//_tft->drawString("1 INFO", 12, 24, Dialog_plain_14);
 
 		int xPos = 14;
-		xPos += _tft->drawStringGFX("SW: ", xPos, 22, Dialog_plain_14);
-		xPos += _tft->drawStringGFX("3.0.0", xPos, 22, Open_Sans_Light_12);
-		xPos += _tft->drawStringGFX(" HW: ", xPos, 22, Dialog_plain_14);
-		xPos += _tft->drawStringGFX("1.1", xPos, 22, Open_Sans_Light_12);
+		xPos += _tft->drawString("SW: ", xPos, 22, Dialog_plain_14);
+		xPos += _tft->drawString("3.0.0", xPos, 22, Open_Sans_Light_12);
+		xPos += _tft->drawString(" HW: ", xPos, 22, Dialog_plain_14);
+		xPos += _tft->drawString("1.1", xPos, 22, Open_Sans_Light_12);
 
 		xPos = 14;
-		_tft->drawStringGFX("Ethernet", xPos, 46, Dialog_plain_14);
-		_tft->drawStringGFX("IP: 255.255.255.255", xPos + 4, 64, Open_Sans_Light_12);
+		_tft->drawString("Ethernet", xPos, 46, Dialog_plain_14);
+		_tft->drawString("IP: 255.255.255.255", xPos + 4, 64, Open_Sans_Light_12);
 
 		xPos = 14;
-		_tft->drawStringGFX("Wireless LAN", xPos, 88, Dialog_plain_14);
-		_tft->drawStringGFX("IP: 255.255.255.255", xPos + 4, 106, Open_Sans_Light_12);
-		_tft->drawStringGFX("SSID: Kuhaverkko 5G", xPos + 4, 122, Open_Sans_Light_12);
+		_tft->drawString("Wireless LAN", xPos, 88, Dialog_plain_14);
+		_tft->drawString("IP: 255.255.255.255", xPos + 4, 106, Open_Sans_Light_12);
+		_tft->drawString("SSID: Kuhaverkko 5G", xPos + 4, 122, Open_Sans_Light_12);
 		getchar();
 		clearScreen();
 	}
@@ -694,15 +693,15 @@ void draw()
 	if (false) {
 		int x0 = 18;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
-		_tft->drawStringGFX("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
+		_tft->drawString("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
 		//_tft->drawRect(20, 48-20, 136, 21, ST7735S_WHITE);
 		//_tft->fillCircle(10, 42, 3, ST7735S_WHITE);
 		_tft->drawCircle(10, 42, 3, ST7735S_WHITE);
-		_tft->drawStringGFX("COAX1", x0, 48, Dialog_plain_14);
-		_tft->drawStringGFX("COAX2", x0, 70, Dialog_plain_14);
-		_tft->drawStringGFX("OPT1", x0, 90, Dialog_plain_14);
-		_tft->drawStringGFX("OK (press long)", x0, 110, Dialog_plain_14);
-		//_tft->drawStringGFX("Unplug after 15s.", 12, 150, Dialog_plain_14);
+		_tft->drawString("COAX1", x0, 48, Dialog_plain_14);
+		_tft->drawString("COAX2", x0, 70, Dialog_plain_14);
+		_tft->drawString("OPT1", x0, 90, Dialog_plain_14);
+		_tft->drawString("OK (press long)", x0, 110, Dialog_plain_14);
+		//_tft->drawString("Unplug after 15s.", 12, 150, Dialog_plain_14);
 		getchar();
 		clearScreen();
 	}
@@ -710,12 +709,12 @@ void draw()
 	if (false) {
 		int x0 = 18;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
-		_tft->drawStringGFX("2.2 IR CONTROL", 12, 24, Open_Sans_Light_16);
-		_tft->drawStringGFX("> IR CONTROL", x0-12, 48, Open_Sans_Light_12);
-		_tft->drawStringGFX("NETWORK SETUP", x0, 68, Open_Sans_Light_12);
-		_tft->drawStringGFX("FIRMWARE UPDATE", x0, 88, Open_Sans_Light_12);
-		_tft->drawStringGFX("EXIT", x0, 108, Open_Sans_Light_12);
-		_tft->drawStringGFX("DO (PRESS LONG)", x0, 128, Open_Sans_Light_12);
+		_tft->drawString("2.2 IR CONTROL", 12, 24, Open_Sans_Light_16);
+		_tft->drawString("> IR CONTROL", x0-12, 48, Open_Sans_Light_12);
+		_tft->drawString("NETWORK SETUP", x0, 68, Open_Sans_Light_12);
+		_tft->drawString("FIRMWARE UPDATE", x0, 88, Open_Sans_Light_12);
+		_tft->drawString("EXIT", x0, 108, Open_Sans_Light_12);
+		_tft->drawString("DO (PRESS LONG)", x0, 128, Open_Sans_Light_12);
 		getchar();
 		clearScreen();
 	}
@@ -724,15 +723,15 @@ void draw()
 		int xPos = 8;
 		//_text_color = ST7735S_CYAN;
 		//xPos += drawString("COAX2", xPos, 102, ST7735S_FONT32);
-		//drawStringGFX("COAX2", xPos, 126, Roboto_Mono_32);
-		//drawStringGFX("COAX2", xPos, 122, Open_Sans_Regular_24);
+		//drawString("COAX2", xPos, 126, Roboto_Mono_32);
+		//drawString("COAX2", xPos, 122, Open_Sans_Regular_24);
 		_tft->drawRect(xPos - 6, 96, 162-4, 1, ST7735S_DARKGREY);
 		Label inputLabel(xPos, 122, ST7735S_CYAN, ST7735S_BLACK, Open_Sans_Regular_28);
 		inputLabel.setText("COAX2");
 
 
 		if (Parameters::instance()->auto_find) {
-			//drawStringGFX("AUTO", 116, 122, Open_Sans_Light_12);
+			//drawString("AUTO", 116, 122, Open_Sans_Light_12);
 			Label autoLabel(116, 122, ST7735S_CYAN, ST7735S_BLACK, Open_Sans_Light_12);
 			autoLabel.setText("AUTO");
 			//drawRect(116, 102, 40, 20, ST7735S_CYAN);
@@ -740,8 +739,8 @@ void draw()
 
 		xPos = 8;
 		_tft->drawRect(xPos - 6, 30, 162 - 4, 1, ST7735S_DARKGREY);
-		xPos += _tft->drawStringGFX("44.1k ", xPos, 24, Dialog_plain_14);
-		xPos += _tft->drawStringGFX("PCM ", xPos, 24, Dialog_plain_14);
+		xPos += _tft->drawString("44.1k ", xPos, 24, Dialog_plain_14);
+		xPos += _tft->drawString("PCM ", xPos, 24, Dialog_plain_14);
 	}
 
 	/*std::vector<BarItem> barItems;
@@ -815,7 +814,7 @@ void draw()
 				}
 				int m2 = m % 10;
 				if (m2 != lastM2) {
-					_tft->drawStringGFX(":", 73, 86, Open_Sans_Regular_64);
+					_tft->drawString(":", 73, 86, Open_Sans_Regular_64);
 					digit4.setChar(48 + m2);
 					lastM2 = m2;
 				}
@@ -828,14 +827,14 @@ void draw()
 		clearScreen();
 	}
 	
-	Label digit1(24, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72, true);
-	Label digit2(84, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72);
+	Label digit1(24, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72);
+	Label digit2(86, 90, ST7735S_WHITE, ST7735S_BLACK, Orbitron_Medium_72);
 
 	if (true) {
 		//_text_color = ST7735S_WHITE;
 		xPos = 76;
 		yPos = 78;
-		for (int i = 99; i >= 0; i -= 1) {
+		for (int i = 24; i >= 0; i -= 1) {
 			digit1.setChar((i / 10) + 48);
 			digit2.setChar((i % 10) + 48);
 			//break;
