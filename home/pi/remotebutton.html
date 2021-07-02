@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="icon" type="image/png" href="favicon.png">
+	<link rel="stylesheet" href="style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+	<title>GEVOL 3.0</title>	
+	<style>
+
+	.remote-button {
+	  background-color: #222;
+	  box-shadow: 0px 0px 1px 1px #000;
+	  color: #C9CACD;
+	  width: 124px;
+	  height: 30px;
+	  font-size: 12px;
+	  cursor: pointer;
+	  border-radius: 5%;
+	  outline: none;
+	  margin: 2px;
+	}
+	</style>
+</head>
+  <body>
+  <div style="position: relative; top: 320px">		
+		<div class="input-buttons">	
+			<button class="remote-button" onclick="onButton(2)">PWR_SW, short</button>
+			<button class="remote-button" onclick="onButton(3)">PWR_SW, long</button>
+		</div>
+		<div class="input-buttons">	
+			<button class="remote-button" onclick="onButton(12)">INP_SW, short</button>
+			<button class="remote-button" onclick="onButton(13)">INP_SW, long</button>
+
+		</div>
+		<div class="input-buttons">	
+			<button class="remote-button" onclick="onButton(21)">ROT_SW, rev</button>
+			<button class="remote-button" onclick="onButton(20)">ROT_SW, fw</button>
+		</div>
+	</div>
+    <script>
+		function onButton(event) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var arr = this.responseText.split(";");
+					if (arr.length == 4) {
+
+					}
+				}
+			};
+			xhttp.open("POST", "remotebutton=" + event, true);
+			xhttp.send();
+		}		
+	</script>
+  </body>
+</html>

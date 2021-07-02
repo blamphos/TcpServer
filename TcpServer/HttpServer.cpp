@@ -18,6 +18,7 @@ HttpServer::HttpServer() :
 	_resourceJQueryMinScriptJs = new HttpResourceFile("../home/pi/jquery-3.3.1.min.js", HttpResourceFile::TEXT_JAVASCRIPT);
 	_resourceFaviconPng = new HttpResourceFile("../home/pi/favicon.png", HttpResourceFile::IMAGE_PNG);
 	_resourceInputHtml = new HttpResourceFile("../home/pi/input.html", HttpResourceFile::TEXT_HTML);
+	_resourceRemoteButtonHtml = new HttpResourceFile("../home/pi/remotebutton.html", HttpResourceFile::TEXT_HTML);
 }
 
 HttpServer::~HttpServer()
@@ -31,6 +32,7 @@ HttpServer::~HttpServer()
 	delete _resourceJQueryMinScriptJs;
 	delete _resourceFaviconPng;
 	delete _resourceInputHtml;
+	delete _resourceRemoteButtonHtml;
 
 	shutdown();
 }
@@ -138,6 +140,15 @@ void HttpServer::handleConnection(SOCKET socket)
 			}
 			EventQueue::instance()->post(EVENT_HTTP_REQUEST_POST_SET_SWITCH_ORDER, data);
 		}
+		else if (strstr(_buffer, "remotebutton=") != NULL) {
+			int event = -1;
+			parseIntValue(_buffer, "remotebutton=", &event);
+
+			int id = event / 10;
+			event = event % 10;
+			uint32_t data = static_cast<int16_t>((id << 2) | event);
+			EventQueue::instance()->post(EVENT_BUTTON_STATUS, data);
+		}
 		else  {
 			puts("Unknown POST request");
 			//puts(_buffer);
@@ -173,7 +184,9 @@ void HttpServer::handleConnection(SOCKET socket)
 		else if (strstr(_buffer, "GET /input.html") != NULL) {
 			_response->send(_resourceInputHtml);
 		}
-
+		else if (strstr(_buffer, "GET /remotebutton.html") != NULL) {
+			_response->send(_resourceRemoteButtonHtml);
+		}
 		closeSocket();
 	}
 	else {

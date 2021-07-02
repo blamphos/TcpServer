@@ -122,6 +122,37 @@ void threadFunc()
 			puts("system shutdown");
 			running = false;
 			break;
+
+		case EVENT_BUTTON_STATUS:
+		{
+			int event = msg.data & 0x3;
+			int id = (msg.data >> 2) & 0x3;
+			if (id == 0) {
+				std::cout << "Main SW: ";
+			}
+			else if (id == 1) {
+				std::cout << "Input SW: ";
+			}
+			else if (id == 2) {
+				std::cout << "Rotary SW: ";
+			}
+
+			if (event == 0) {
+				std::cout << "forward (+)";
+			}
+			else if (event == 1) {
+				std::cout << "reverse (-)";
+			}
+			else if (event == 2) {
+				std::cout << "short press";
+			}
+			else if (event == 3) {
+				std::cout << "long press";
+			}
+			std::cout << std::endl;
+			EventQueue::instance()->post(EVENT_HTTP_SEND_RESPONSE, HTTP_RESPONSE_POST);
+			break;
+		}
 		default:
 			break;
 		}
@@ -656,6 +687,18 @@ void draw()
 	}
 
 	if (false) {
+		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
+
+		uint16_t xPos = 18;
+		_tft->drawString("Press VOL+ button", xPos, 48, Open_Sans_Light_12);
+		_tft->drawString("on the remote", xPos, 68, Open_Sans_Light_12);
+		_tft->drawString("control a few times", xPos, 88, Open_Sans_Light_12);
+		_tft->drawString("Cancel", xPos, 108, Open_Sans_Light_12);
+		_tft->drawCircle(10, 108 - 5, 3, ST7735S_WHITE);
+		clearScreen();
+	}
+
+	if (false) {
 		int x0 = 22;
 		_tft->drawRect(5, 28, 152, 1, ST7735S_WHITE);
 		_tft->drawString("SWITCH INPUT", 12, 24, Open_Sans_Light_16);
@@ -864,7 +907,7 @@ int __cdecl main(void)
 	}
 
 	puts("GEVOL 3.0.0");
-	puts("Print any key to exit...");
+	puts("Press X key to exit...");
 
 	bool b = Parameters::instance()->auto_find;
 	VolumeControl volume(Parameters::instance()->getStartLevel());

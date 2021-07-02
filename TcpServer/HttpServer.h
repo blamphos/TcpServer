@@ -42,6 +42,7 @@ private:
 	HttpResourceFile* _resourceBackgroundJpg;
 	HttpResourceFile* _resourceFaviconPng;
 	HttpResourceFile* _resourceInputHtml;
+	HttpResourceFile* _resourceRemoteButtonHtml;
 
 	SOCKET _socket;
 	SafeQueue<int> _sockets;
