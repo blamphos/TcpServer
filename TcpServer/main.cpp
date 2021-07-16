@@ -23,6 +23,12 @@ int kbHit(void)
 		return 1;
 	}
 
+	if (GetKeyState('1') & 0x8000/*Check if high-order bit is set (1 << 15)*/)
+	{
+		EventQueue::instance()->post(EVENT_BUTTON_STATUS, 0);
+		Sleep(50);
+	}
+
 	return 0;
 }
 
@@ -634,6 +640,226 @@ void draw()
 {
 	clearScreen();
 
+	if (true) {
+		/*_tft->drawString("abcdefghijklm", 10, 10, Roboto_Mono_16);
+		_tft->drawString("nopqrstuvwxyz", 10, 30, Roboto_Mono_16);
+		_tft->drawString("ABCDEFGHIJKLM", 10, 50, Roboto_Mono_16);
+		_tft->drawString("NOPQRSTUVWXYZ", 10, 70, Roboto_Mono_16);
+		_tft->drawString("0123456789!@#", 10, 90, Roboto_Mono_16);
+		_tft->drawString("$%^&*()-_+=~`", 10, 110, Roboto_Mono_16);
+		_tft->drawString("[]{}|\:;/"'<>,.?//", 10, 130, Roboto_Mono_16);*/
+
+		const char row1[] = { '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', 0 };
+		const char row2[] = { '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 0 };
+		const char row3[] = { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 0 };
+		const char row4[] = { 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', 0 };
+		const char row5[] = { '\\',']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 0 };
+		const char row6[] = { 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', 0 };
+		std::list<std::string> list = { row1, row2, row3, row4, row5, row6 };
+
+		int x0 = 7;
+		int y0 = 16;
+		int yOffset = 18;
+
+		/*std::list<std::string>::const_iterator iter = list.cbegin();
+		while (iter != list.cend()) {
+			_tft->drawString((*iter).c_str(), x0, y0, Dialog_plain_14);
+			y0 += yOffset;
+			++iter;
+		}*/
+
+		
+		class CharSelector {
+		public:
+			CharSelector() : 
+				_startIndex(MIN_INDEX + VISIBLE_ITEMS * 3), 
+				_selectorIndex(0), 
+				_itemXOffsets{0}, 
+				_itemWidth(15),
+				_font(Dialog_plain_14)
+			{
+				update();
+				updateMarker(_selectorIndex, false);
+
+				int x = 5;
+				for (int i = 0; i < VISIBLE_ITEMS; i++) {
+					_tft->drawRect(x, 10, _itemWidth, 20, ST7735S_WHITE);
+					x += _itemWidth;
+				}
+			}
+
+			void moveMarkerRight()
+			{
+				int newIndex = _selectorIndex + 1;
+				if (newIndex == _selectorIndex) {
+					return;
+				}
+
+				if (newIndex >= VISIBLE_ITEMS) {
+					newIndex = 0;
+					moveRight();
+					updateMarker(newIndex);
+				}
+				else {
+					updateMarker(newIndex);
+				}
+			}
+
+			void moveMarkerLeft()
+			{
+				int newIndex = _selectorIndex - 1;
+				if (newIndex == _selectorIndex) {
+					return;
+				}
+
+				if (newIndex < 0) {
+					newIndex = VISIBLE_ITEMS - 1;
+					moveLeft();
+					updateMarker(newIndex);
+				}
+				else {
+					updateMarker(newIndex);
+				}
+			}
+
+			char getSelectorChar()
+			{
+				return _startIndex + _selectorIndex + 32;
+			}
+
+		private:
+			enum Constants {
+				MIN_INDEX = 1,
+				MAX_INDEX = 94,
+				VISIBLE_ITEMS = 10,
+				CHAR_X0 = 8,
+				CHAR_Y0 = 74,
+				CHAR_HEIGHT = 16,
+				CHAR_WIDTH = 11,
+			};
+
+			void moveRight()
+			{
+				_startIndex += VISIBLE_ITEMS;
+				if ((_startIndex + VISIBLE_ITEMS) >= MAX_INDEX) {
+					_startIndex = MAX_INDEX - VISIBLE_ITEMS;
+				}
+				update();
+			}
+
+			void moveLeft()
+			{
+				_startIndex -= VISIBLE_ITEMS;
+				if (_startIndex < MIN_INDEX) {
+					_startIndex = MIN_INDEX;
+				}
+				update();
+			}
+
+			void update()
+			{
+				_tft->fillRect(CHAR_X0, CHAR_Y0 - CHAR_HEIGHT, 161-CHAR_X0, CHAR_HEIGHT+4, ST7735S_BLACK);
+				int x = CHAR_X0;
+				x = 5;
+				for (int c = 0; c < VISIBLE_ITEMS; c++) {
+					_itemXOffsets[c] = x;
+					//x += _tft->drawChar(_startIndex + c + 32, x, CHAR_Y0, Roboto_Mono_16);
+					_tft->drawChar(_startIndex + c + 32, x, CHAR_Y0, _font);
+					x += _itemWidth;
+				}
+
+				//updateMarker(_selectorIndex);
+			}
+
+			void updateMarker(int p_selectorIndex, bool p_clear = true)
+			{
+				int x = 0;
+				if (p_clear) {
+					x = 4 + _selectorIndex * _itemWidth;
+					_tft->drawRect(x, CHAR_Y0 - 15, _itemWidth, 20, ST7735S_BLACK);
+					/*x = _itemXOffsets[_selectorIndex];
+					_tft->setTextColor(ST7735S_WHITE, ST7735S_BLACK);
+					_tft->drawChar(_startIndex + _selectorIndex + 32, x, CHAR_Y0, Roboto_Mono_16);*/
+				}
+
+				_selectorIndex = p_selectorIndex;
+				x = 4 + _selectorIndex * _itemWidth;
+				_tft->drawRect(x, CHAR_Y0 - 15, _itemWidth, 20, ST7735S_WHITE);
+				/*x = _itemXOffsets[_selectorIndex];
+				_tft->setTextColor(ST7735S_BLACK, ST7735S_WHITE);
+				_tft->drawChar(_startIndex + _selectorIndex + 32, x, CHAR_Y0, Roboto_Mono_16);
+				_tft->setTextColor(ST7735S_WHITE, ST7735S_BLACK);*/
+
+				/*int x = CHAR_X0 + _selectorIndex * CHAR_WIDTH;
+				_tft->drawFastHLine(x, CHAR_Y0 + 4, CHAR_WIDTH, ST7735S_BLACK);
+
+				_selectorIndex = p_selectorIndex;
+				x = CHAR_X0 + _selectorIndex * CHAR_WIDTH;
+				_tft->drawFastHLine(x, CHAR_Y0 + 4, CHAR_WIDTH, ST7735S_WHITE);*/
+			}
+
+			int _startIndex;
+			int _selectorIndex;
+			int _itemXOffsets[VISIBLE_ITEMS];
+			int _itemWidth;
+			GFXfont _font;
+		};
+
+		int pwdX = 5;
+		CharSelector selector;
+		while (1)
+		{
+			//system("cls");
+			int k = _getch();
+
+			if (k == 0 || k == 0xE0) {
+				k = _getch();
+			}
+
+			if (k == 27) {
+				puts("exiting... Press any key.");
+				break;
+			}
+			else if (k == 13) {
+				//activeMenu = activeMenu->select();
+				pwdX += _tft->drawChar(selector.getSelectorChar(), pwdX, 110, Dialog_plain_14);
+			}
+			else if (k == 72) {
+				//puts("up");
+				//activeMenu->previous();
+				//activeMenu->draw();
+			}
+			else if (k == 80) {
+				//puts("down");
+				//activeMenu->next();
+				//activeMenu->draw();
+			}
+			else if (k == 75) {
+				//puts("left");
+				selector.moveMarkerLeft();
+				//activeMenu->next();
+				//activeMenu->draw();
+			}
+			else if (k == 77) {
+				//puts("right");
+				selector.moveMarkerRight();
+				//activeMenu->next();
+				//activeMenu->draw();
+			}
+		}
+		/*Sleep(1000);
+		for (int i = 0; i < 100; i++) {
+			selector.moveMarkerLeft();
+			Sleep(50);
+		}
+		for (int i = 0; i < 100; i++) {
+			selector.moveMarkerRight();
+			Sleep(50);
+		}*/
+		
+		return;
+	}
+
 	if (false) {
 		int r = 20;
 		for (int i = 0; i < 5; i++) {
@@ -897,8 +1123,9 @@ void draw()
 
 int __cdecl main(void)
 {
-	if (false) {
-		_tft = new ST7735S();
+	_tft = new ST7735S();
+
+	if (true) {		
 		printf("\n\n\n\n\n\n\n\n\n\n");
 		draw();
 		getchar();
@@ -944,5 +1171,8 @@ int __cdecl main(void)
 	t.join();
 
 	delete _http;
+	if (_tft != NULL) {
+		delete _tft;
+	}
 	return 0;
 }

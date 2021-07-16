@@ -508,6 +508,12 @@ public:
 		_text_color = p_color;
 	}
 
+	void setTextColor(uint16_t c, uint16_t b)
+	{
+		_text_color = c;
+		_textBgcolor = b;
+	}
+
 private:
 	HDC _dc;
 	HWND _myconsole;
